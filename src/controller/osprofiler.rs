@@ -75,7 +75,6 @@ impl Controller for OSProfilerController {
             .cloned()
             .collect()
     }
-
 }
 
 impl OSProfilerController {

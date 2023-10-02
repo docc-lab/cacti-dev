@@ -172,6 +172,9 @@ pub fn set_client_tracepoints(
 ) {
     let (tx, mut rx) = futures::sync::mpsc::unbounded();
 
+    // Connect to client and set tracepoints
+    // TODO: Figure out what "move" does
+    // TODO: console log variables to see what they are and where they come from
     let run = http::connect(client_uri)
         .and_then(move |client: PythiaClient| {
             client.set_tracepoints(settings).and_then(move |x| {

@@ -46,6 +46,7 @@ use crate::trace::Value::UnsignedInt;
 use crate::trace::Value::Str;
 
 pub struct OSProfilerReader {
+    // Connection appears to be a Redis connection from which traces can be read
     connection: Connection,
     client_list: Vec<String>,
     prev_traces: HashMap<String, Duration>,
@@ -59,6 +60,7 @@ impl Reader for OSProfilerReader {
         self.for_searchspace = true;
     }
 
+    // Flushes all data from redis
     fn reset_state(&mut self) {
         if self.free_keys {
             redis::cmd("flushall")
@@ -66,6 +68,7 @@ impl Reader for OSProfilerReader {
                 .ok();
         } else {
             loop {
+                // Pop items at osprofiler_traces key until none left
                 match self.connection.lpop::<_, String>("osprofiler_traces") {
                     Ok(_) => {}
                     Err(_) => {
@@ -78,6 +81,7 @@ impl Reader for OSProfilerReader {
 
     fn get_recent_traces(&mut self) -> Vec<Trace> {
         let mut ids = Vec::new();
+        // Pop traces/trace IDs for osprofiler_traces key and store into ids array/vector
         loop {
             let id: String = match self.connection.lpop("osprofiler_traces") {
                 Ok(i) => i,
@@ -87,6 +91,7 @@ impl Reader for OSProfilerReader {
             };
             ids.push(id);
         }
+        // Clone prev_traces into ids array as well
         for id in self.prev_traces.keys() {
             ids.push(id.clone());
         }

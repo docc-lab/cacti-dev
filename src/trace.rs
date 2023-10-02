@@ -193,15 +193,16 @@ impl fmt::Display for Trace {
     }
 }
 
+/// Events contain trace and tracepoint IDs, as well as timestamps and KV pairs
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Event {
-    /// A trace id is shared between two ends of a span, otherwise it should be unique to events
+    // A trace id is shared between two ends of a span, otherwise it should be unique to events
     pub trace_id: Uuid,
-    /// A tracepoint id represents a place in code
+    // A tracepoint id represents a place in code
     pub tracepoint_id: TracepointID,
     pub timestamp: NaiveDateTime,
-    /// Synthetic nodes are added to preserve the hierarchy, they are not actual events that
-    /// happened
+    // Synthetic nodes are added to preserve the hierarchy, they are
+    // not actual events that happened
     pub is_synthetic: bool,
     pub variant: EventType,
     pub key_value_pair: HashMap<String, Value>,
@@ -232,6 +233,7 @@ impl PartialEq<Event> for Event {
     }
 }
 
+/// A DAGEdge contains a duration and an edge type (child-of or follows-from)
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct DAGEdge {
     pub duration: Duration,

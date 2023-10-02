@@ -204,13 +204,16 @@ impl Group {
        
     }
 
+    /// Adds a trace to a group
     fn add_trace(&mut self, path: &CriticalPath) {
         println!("**** A trace {:?} added to group{:?}",path.g.base_id, self.hash);
+        // Clone path and push onto traces list
         self.traces.push(path.clone());
         let mut cur_node = path.start_node;
         let mut prev_node = None;
         let mut cur_dag_nidx = self.start_node;
         let mut prev_dag_nidx = None;
+        // Loop through edges and push durations
         loop {
             if !prev_dag_nidx.is_none() {
                 match path.g.g.find_edge(prev_node.unwrap(), cur_node) {
@@ -313,6 +316,8 @@ impl GroupManager {
     pub fn update(&mut self, paths: &Vec<CriticalPath>) {
         let mut updated_groups = Vec::new();
         for path in paths {
+            // Extract group corresponding to path (based on path hash) and add trace to that group
+            // Create new group if one does not already exist
             match self.groups.get_mut(path.hash()) {
                 Some(v) => v.add_trace(&path),
                 None => {
@@ -329,7 +334,7 @@ impl GroupManager {
         }
     }
 
-    /// Return groups filtered based on occurance and sorted by variance
+    /// Return groups filtered based on occurrence and sorted by variance
     pub fn problem_groups(&self) -> Vec<&Group> {
         let mut sorted_groups: Vec<&Group> = self
             .groups
@@ -354,7 +359,6 @@ impl GroupManager {
         sorted_groups.sort_by(|a, b| b.variance.partial_cmp(&a.variance).unwrap());
         // println!("\n**Groups sorted in CV Analaysis: {}", sorted_groups);
         sorted_groups
-
     }
 
     /// tsl: Return groups filtered based on mean distribution -- consistently slow groups

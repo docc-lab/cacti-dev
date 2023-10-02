@@ -12,6 +12,7 @@ mod hdfs;
 mod deathstar;
 mod osprofiler;
 mod uber;
+mod deathstar_old;
 
 use std::error::Error;
 use std::fmt;

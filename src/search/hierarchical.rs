@@ -30,6 +30,7 @@ impl SearchStrategy for HierarchicalSearch {
     fn search(&self, group: &Group, edge: EdgeIndex, budget: usize) -> Vec<TracepointID> {
         let mut rng = &mut rand::thread_rng();
         let (source, target) = group.g.edge_endpoints(edge).unwrap();
+        // Get set of tracepoints between source and target nodes for edge
         let source_context = self.get_context(group, source);
         let target_context = self.get_context(group, target);
         let mut common_context = Vec::new();
@@ -45,12 +46,14 @@ impl SearchStrategy for HierarchicalSearch {
             }
         }
         println!("Common context for the search: {:?}", common_context);
+        // Find matching groups within a full group structure in the search space
         let matches = self.manifest.find_matches(group);
         let mut result = self.search_context(&matches, common_context);
         result = result
             .into_iter()
             .filter(|&x| !self.controller.is_enabled(&(x, Some(group.request_type))))
             .collect();
+        // Choose multiple tracepoints from the possible group structure based on budget
         result = result.choose_multiple(&mut rng, budget).cloned().collect();
         result
     }
@@ -115,6 +118,8 @@ impl HierarchicalSearch {
         result.drain().collect()
     }
 
+    /// Get a list of tracepoint ids from the start of the group's trace structure
+    /// up to a certain node index
     fn get_context(&self, group: &Group, node: NodeIndex) -> Vec<TracepointID> {
         let mut result = Vec::new();
         let mut nidx = group.start_node;
