@@ -74,6 +74,7 @@ pub mod rpclib;
 pub mod search;
 pub mod settings;
 pub mod trace;
+pub mod candidate;
 
 use std::collections::HashSet;
 use std::error::Error;
