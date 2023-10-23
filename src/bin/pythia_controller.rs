@@ -93,15 +93,19 @@ fn main() {
     println!("Enabled following tracepoints: {:?}", to_enable);
 
     let pool = ThreadPool::new(SETTINGS.n_workers + 2);
-    let (txIn, rxIn) = channel();
+    let (tx_in, rx_in) = channel();
     for _ in 0..SETTINGS.n_workers {
-        let tx = txIn.clone();
+        let tx = tx_in.clone();
         // Asynchronously loop and continuously fetch recent traces, and then send them to "rx"
         // in order to be able to read later on in "Main pythia loop" section
         pool.execute(move || {
             let mut reader = reader_from_settings(&SETTINGS);
             loop {
                 for trace in reader.get_recent_traces() {
+                    println!("==========\nTrace:");
+                    println!(trace);
+                    println!("\n==========\n\n\n");
+
                     tx.send(CriticalPath::from_trace(&trace).unwrap())
                         .expect("channel will be there waiting for the pool");
                 }
@@ -110,7 +114,7 @@ fn main() {
         });
     }
 
-    let (txAcross, rxAcross) = channel();
+    let (tx_across, rx_across) = channel();
 
     // Main pythia loop
     // Loop infinitely, making tracepoint enabling decisions in each iteration
@@ -124,11 +128,11 @@ fn main() {
             let over_budget = budget_manager.overrun();
 
             // Collect traces, add traces to groups
-            let critical_paths = rxIn.try_iter().collect::<Vec<_>>();
+            let critical_paths = rx_in.try_iter().collect::<Vec<_>>();
 
-            // TODO: use critical_paths to get edge IDs of problematic edge types and send via txAcross
+            // TODO: use critical_paths to get edge IDs of problematic edge types and send via tx_across
             for cp in critical_paths.iter() {
-                txAcross.send(/*some stuff in here to get the problematic edge*/"placeholder")
+                tx_across.send(/*some stuff in here to get the problematic edge*/"placeholder")
                     .expect("CACTI will be receiving on a channel");
             }
 
@@ -343,47 +347,47 @@ fn main() {
         }
     });
 
-    // Main CACTI Loop
-    pool.execute(move || {
-        loop {
-            // Collect non-victim traces from second channel
-            // Requires us to set up another channel, (tx2, rx2)
-            let non_victim_traces = rx2.try_iter().collect::<Vec<_>>();
-
-            // Collect victim edges
-            let victim_edges = rxAcross.try_iter().collect::<Vec<_>>();
-
-            // Update "non-victim groups" - TODO: implement this once design finalized
-            nv_groups.update(non_victim_traces);
-
-            if !over_budget && last_decision.elapsed() > SETTINGS.decision_epoch {
-                // Get non-victim enabled tracepoints
-                // TODO: implement this for non-victim traces, on a per-request-type basis
-                let nv_enabled_tracepoints: HashSet<_> =
-                    CONTROLLER.nv_enabled_tracepoints().drain(..).collect();
-
-                // Get problematic edges and search non-victim groups for overlapping tracepoints
-                for g in problem_groups {
-                    let problem_edges = g.problem_edges();
-
-                    for &edge in problem_edges.iter() {
-                        // let endpoints = g.g.edge_endpoints(edge).unwrap();
-
-                        let overlaps = cacti_strategy.search(edge)
-                            .iter()
-                            .map(|&t| (t, Some(g.request_type)))
-                            .collect::<Vec<_>>();
-
-                        for &overlap in overlaps.iter() {
-                            // TODO: group overlaps by same edge ID/other attributes
-
-                            // TODO: add information to groups
-                        }
-
-                        // TODO: Iterate through groups and make decisions for group(s)
-                    }
-                }
-            }
-        }
-    });
+    // // Main CACTI Loop
+    // pool.execute(move || {
+    //     loop {
+    //         // Collect non-victim traces from second channel
+    //         // Requires us to set up another channel, (tx2, rx2)
+    //         let non_victim_traces = rx2.try_iter().collect::<Vec<_>>();
+    //
+    //         // Collect victim edges
+    //         let victim_edges = rx_across.try_iter().collect::<Vec<_>>();
+    //
+    //         // Update "non-victim groups" - TODO: implement this once design finalized
+    //         nv_groups.update(non_victim_traces);
+    //
+    //         if !over_budget && last_decision.elapsed() > SETTINGS.decision_epoch {
+    //             // Get non-victim enabled tracepoints
+    //             // TODO: implement this for non-victim traces, on a per-request-type basis
+    //             let nv_enabled_tracepoints: HashSet<_> =
+    //                 CONTROLLER.nv_enabled_tracepoints().drain(..).collect();
+    //
+    //             // Get problematic edges and search non-victim groups for overlapping tracepoints
+    //             for g in problem_groups {
+    //                 let problem_edges = g.problem_edges();
+    //
+    //                 for &edge in problem_edges.iter() {
+    //                     // let endpoints = g.g.edge_endpoints(edge).unwrap();
+    //
+    //                     let overlaps = cacti_strategy.search(edge)
+    //                         .iter()
+    //                         .map(|&t| (t, Some(g.request_type)))
+    //                         .collect::<Vec<_>>();
+    //
+    //                     for &overlap in overlaps.iter() {
+    //                         // TODO: group overlaps by same edge ID/other attributes
+    //
+    //                         // TODO: add information to groups
+    //                     }
+    //
+    //                     // TODO: Iterate through groups and make decisions for group(s)
+    //                 }
+    //             }
+    //         }
+    //     }
+    // });
 }

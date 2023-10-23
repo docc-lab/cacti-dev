@@ -31,16 +31,16 @@ use crate::trace::TracepointID;
 use crate::PythiaError;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CandidateAggressor {
+pub struct TraceEdge {
     pub g: Trace,
     pub start: Event,
     pub end: Event,
     pub edge: DAGEdge,
 }
 
-impl CandidateAggressor {
-    pub fn from_trace(dag: &Trace) -> Result<Vec<CandidateAggressor>, Box<dyn Error>> {
-        let mut candidates: Vec<CandidateAggressor> = Vec::new();
+impl TraceEdge {
+    pub fn edges_from_trace(dag: &Trace) -> Result<Vec<TraceEdge>, Box<dyn Error>> {
+        let mut all_edges: Vec<TraceEdge> = Vec::new();
 
         let mut cur_nodes: Vec<NodeIndex> = Vec::new();
         cur_nodes.push(dag.start_node);
@@ -59,24 +59,83 @@ impl CandidateAggressor {
                 .neighbors_directed(cur_node, Direction::Outgoing).collect::<Vec<_>>();
 
             for &nidx in next_nodes.iter() {
-                let mut candidate = CandidateAggressor {
+                let mut new_edge = TraceEdge {
                     g: Trace::new(&dag.base_id),
                     start: Event,
                     end: Event,
                     edge: DAGEdge
                 };
 
-                candidate.g.g.add_edge(
+                new_edge.g.g.add_edge(
                     cur_node,
                     nidx,
                     dag.g[dag.g.find_edge(cur_node, nidx).unwrap()].clone(),
                 );
 
-                // candidate.start = candidate.g.g.
+                new_edge.start = match new_edge.g.g.node_weight(cur_node) {
+                    Some(&e) => e,
+                    None => return Err(Box::new(PythiaError(
+                        format!("Error extracting edges {}", new_edge.g).into(),
+                    )))
+                };
 
-                candidates.push(candidate);
+                new_edge.end = match new_edge.g.g.node_weight(nidx) {
+                    Some(&e) => e,
+                    None => return Err(Box::new(PythiaError(
+                        format!("Error extracting edges {}", new_edge.g).into(),
+                    )))
+                };
+
+                let edge_index = match new_edge.g.g.find_edge(cur_node, nidx) {
+                    Some(ei) => ei,
+                    None => return Err(Box::new(PythiaError(
+                        format!("Error extracting edges {}", new_edge.g).into(),
+                    )))
+                };
+                new_edge.edge = match new_edge.g.g.edge_weight(edge_index) {
+                    Some(&de) => de,
+                    None => return Err(Box::new(PythiaError(
+                        format!("Error extracting edges {}", new_edge.g).into(),
+                    )))
+                };
+
+                all_edges.push(new_edge);
 
                 cur_nodes.push(nidx)
+            }
+        }
+
+        Ok(all_edges)
+    }
+
+    pub fn check_overlap(&self, e: &TraceEdge) -> bool {
+        if e.start.timestamp.timestamp() < self.end.timestamp.timestamp() {
+            if e.end.timestamp.timestamp() > self.start.timestamp.timestamp() {
+                true
+            }
+        }
+
+        false
+    }
+
+    pub fn get_candidates(
+        dag: &Trace,
+        victim: &TraceEdge
+    ) -> Result<Vec<TraceEdge>, Box<dyn Error>> {
+        let mut candidates: Vec<TraceEdge> = Vec::new();
+
+        let mut all_edges: Vec<TraceEdge> = match TraceEdge::edges_from_trace(dag) {
+            Some(es) => es,
+            None => return Err(Box::new(PythiaError(
+                format!("Error extracting candidates {}", dag).into(),
+            )))
+        };
+
+        while all_edges.len() > 0 {
+            let cur_edge = all_edges.pop().unwrap();
+
+            if victim.check_overlap(&cur_edge) {
+                candidates.push(cur_edge)
             }
         }
 

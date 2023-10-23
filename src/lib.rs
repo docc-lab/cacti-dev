@@ -75,6 +75,7 @@ pub mod search;
 pub mod settings;
 pub mod trace;
 pub mod candidate;
+pub mod provenance;
 
 use std::collections::HashSet;
 use std::error::Error;

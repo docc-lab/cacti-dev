@@ -377,7 +377,7 @@ impl OSProfilerReader {
                     dag.request_type = REQUEST_TYPES[matches[0]];
                 }
             }
-            // Don't add asynch_wait into the DAGs
+            // Don't add async_wait into the DAGs
             nidx = match &event.info {
                 OSProfilerEnum::Annotation(AnnotationEnum::WaitFor(w)) => {
                     wait_for.push(w.wait_for);
@@ -419,8 +419,12 @@ impl OSProfilerReader {
                                 None => match parent_of_trace {
                                     Some(nidx) => nidx,
                                     None => {
+                                        // return Err(Box::new(PythiaError(
+                                        //     "No parent, start with annotation".into(),
+                                        // )))
+                                        // TODO: Does this work?
                                         return Err(Box::new(PythiaError(
-                                            "No parent, start with annotation".into(),
+                                            "No parent, start with annotation".to_string(),
                                         )))
                                     }
                                 },
