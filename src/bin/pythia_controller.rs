@@ -49,7 +49,7 @@ fn reset_reader() {
 fn main() {
     // Initialize search strategies and group management
     let now = Instant::now();
-    let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
+    // let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
     let mut budget_manager = BudgetManager::from_settings(&SETTINGS);
     let mut groups = GroupManager::new();
     let mut last_decision = Instant::now();
@@ -103,7 +103,7 @@ fn main() {
             loop {
                 for trace in reader.get_recent_traces() {
                     println!("==========\nTrace:");
-                    println!(trace);
+                    println!("{}", trace);
                     println!("\n==========\n\n\n");
 
                     tx.send(CriticalPath::from_trace(&trace).unwrap())
@@ -120,6 +120,8 @@ fn main() {
     // Loop infinitely, making tracepoint enabling decisions in each iteration
     let mut jiffy_no = 0;
     pool.execute(move || {
+        let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
+
         loop {
             writeln!(output_file, "Jiffy {}, {:?}", jiffy_no, Instant::now()).ok();
             budget_manager.read_stats();

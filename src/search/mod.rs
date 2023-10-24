@@ -25,6 +25,7 @@ use crate::search::historic::HistoricSearch;
 use crate::settings::Settings;
 use crate::trace::TracepointID;
 
+// #[derive(Send)]
 pub trait SearchStrategy {
     /// Simply return a list of tracepoints to enable. The number of trace points should be <= the
     /// budget

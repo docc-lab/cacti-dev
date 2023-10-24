@@ -10,6 +10,7 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
+use std::iter::zip;
 use std::time::Duration;
 
 use crypto::digest::Digest;
@@ -33,9 +34,9 @@ use crate::PythiaError;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TraceEdge {
     pub g: Trace,
-    pub start: Event,
-    pub end: Event,
-    pub edge: DAGEdge,
+    pub start: Option<Event>,
+    pub end: Option<Event>,
+    pub edge: Option<DAGEdge>,
 }
 
 impl TraceEdge {
@@ -61,9 +62,9 @@ impl TraceEdge {
             for &nidx in next_nodes.iter() {
                 let mut new_edge = TraceEdge {
                     g: Trace::new(&dag.base_id),
-                    start: Event,
-                    end: Event,
-                    edge: DAGEdge
+                    start: None,
+                    end: None,
+                    edge: None
                 };
 
                 new_edge.g.g.add_edge(
@@ -73,14 +74,50 @@ impl TraceEdge {
                 );
 
                 new_edge.start = match new_edge.g.g.node_weight(cur_node) {
-                    Some(&e) => e,
+                    Some(e) => {
+                        let mut new_e = Event{
+                            trace_id: e.trace_id,
+                            tracepoint_id: e.tracepoint_id,
+                            timestamp: e.timestamp,
+                            is_synthetic: e.is_synthetic.into(),
+                            variant: e.variant,
+                            key_value_pair: HashMap::new()
+                            // key_value_pair: HashMap::from(
+                            //     zip(e.key_value_pair.into_keys().into(), e.key_value_pair.into_values()).into())
+                        };
+
+                        for key in e.key_value_pair.keys() {
+                            new_e.key_value_pair.insert(
+                                key.clone(),e.key_value_pair[&key.clone()].clone());
+                        }
+
+                        Some(new_e)
+                    },
                     None => return Err(Box::new(PythiaError(
                         format!("Error extracting edges {}", new_edge.g).into(),
                     )))
                 };
 
                 new_edge.end = match new_edge.g.g.node_weight(nidx) {
-                    Some(&e) => e,
+                    Some(e) => {
+                        let mut new_e = Event{
+                            trace_id: e.trace_id,
+                            tracepoint_id: e.tracepoint_id,
+                            timestamp: e.timestamp,
+                            is_synthetic: e.is_synthetic.into(),
+                            variant: e.variant,
+                            key_value_pair: HashMap::new()
+                            // key_value_pair: HashMap::from(
+                            //     zip(e.key_value_pair.into_keys().into(), e.key_value_pair.into_values()).into())
+                        };
+
+                        for key in e.key_value_pair.keys() {
+                            new_e.key_value_pair.insert(
+                                key.clone(),e.key_value_pair[&key.clone()].clone());
+                        }
+
+                        Some(new_e)
+                    },
                     None => return Err(Box::new(PythiaError(
                         format!("Error extracting edges {}", new_edge.g).into(),
                     )))
@@ -93,7 +130,7 @@ impl TraceEdge {
                     )))
                 };
                 new_edge.edge = match new_edge.g.g.edge_weight(edge_index) {
-                    Some(&de) => de,
+                    Some(de) => Some(de.clone()),
                     None => return Err(Box::new(PythiaError(
                         format!("Error extracting edges {}", new_edge.g).into(),
                     )))
@@ -109,9 +146,29 @@ impl TraceEdge {
     }
 
     pub fn check_overlap(&self, e: &TraceEdge) -> bool {
-        if e.start.timestamp.timestamp() < self.end.timestamp.timestamp() {
-            if e.end.timestamp.timestamp() > self.start.timestamp.timestamp() {
-                true
+        let mut self_start = match &self.start {
+            Some(start) => start,
+            None => return false
+        };
+
+        let mut self_end = match &self.end {
+            Some(end) => end,
+            None => return false
+        };
+
+        let mut e_start = match &e.start {
+            Some(start) => start,
+            None => return false
+        };
+
+        let mut e_end = match &e.end {
+            Some(end) => end,
+            None => return false
+        };
+
+        if e_start.timestamp.timestamp() < self_end.timestamp.timestamp() {
+            if e_end.timestamp.timestamp() > self_start.timestamp.timestamp() {
+                return true
             }
         }
 
@@ -125,8 +182,8 @@ impl TraceEdge {
         let mut candidates: Vec<TraceEdge> = Vec::new();
 
         let mut all_edges: Vec<TraceEdge> = match TraceEdge::edges_from_trace(dag) {
-            Some(es) => es,
-            None => return Err(Box::new(PythiaError(
+            Ok(es) => es,
+            _ => return Err(Box::new(PythiaError(
                 format!("Error extracting candidates {}", dag).into(),
             )))
         };

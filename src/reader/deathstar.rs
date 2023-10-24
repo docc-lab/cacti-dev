@@ -42,23 +42,23 @@ use crate::trace::{DAGEdge, EdgeType};
 use crate::PythiaError;
 //use crate::trace::Value::float;
 
-// pub struct DEATHSTARReader {
-//     xtrace_url: String,
-//     jiffy: Duration,
-//     processed_traces: HashSet<String>,
-//     for_searchspace: bool,
-//     simplify_trace: bool,
-//     DEATHSTAR_trace_dir: PathBuf
-// }
-
 pub struct DEATHSTARReader {
-    jaeger_url: String,
+    xtrace_url: String,
     jiffy: Duration,
     processed_traces: HashSet<String>,
     for_searchspace: bool,
     simplify_trace: bool,
     DEATHSTAR_trace_dir: PathBuf
 }
+
+// pub struct DEATHSTARReader {
+//     jaeger_url: String,
+//     jiffy: Duration,
+//     processed_traces: HashSet<String>,
+//     for_searchspace: bool,
+//     simplify_trace: bool,
+//     DEATHSTAR_trace_dir: PathBuf
+// }
 
 impl Reader for DEATHSTARReader {
     fn for_searchspace(&mut self) {
@@ -69,7 +69,7 @@ impl Reader for DEATHSTARReader {
 
     /// This function parses an xtrace webpage to get all requests executed from
     /// shell (with FsShell tag) and those with high enough elapsed time since last update
-    fn get_recent_traces_old(&mut self) -> Vec<Trace> {
+    fn get_recent_traces(&mut self) -> Vec<Trace> {
         let re1 = Regex::new(r"<td>").unwrap();
         let re2 = Regex::new(r"tag/").unwrap();
         let exclude1 = Regex::new(r"offset=").unwrap();
@@ -120,19 +120,19 @@ impl Reader for DEATHSTARReader {
             .collect()
     }
 
-    fn get_recent_traces(&mut self) -> Vec<Trace> {
-        // TODO: change "frontend" to be format param accepting any req type
-        let jaeger_results = self
-            .download_webpage(format!("{}/api/traces?service=frontend", self.jaeger_url))
-            .unwrap();
-        // TODO: add "start" and "end" parameters to above ^^ request in the style of the below comment vv
-        // print('http://localhost:16686/api/traces?service=' + serviceName +
-        //       '&start=' + str(round(round(currDate.total_seconds()*microsPerSecond) - secondsBack*microsPerSecond)) +
-        //         (("&limit=" + str(limit)) if limit != None else ""))
-        let mut result = Vec::new();
-        // TODO: JSON parsing of jaeger_results
-        result;
-    }
+    // fn get_recent_traces(&mut self) -> Vec<Trace> {
+    //     // TODO: change "frontend" to be format param accepting any req type
+    //     let jaeger_results = self
+    //         .download_webpage(format!("{}/api/traces?service=frontend", self.jaeger_url))
+    //         .unwrap();
+    //     // TODO: add "start" and "end" parameters to above ^^ request in the style of the below comment vv
+    //     // print('http://localhost:16686/api/traces?service=' + serviceName +
+    //     //       '&start=' + str(round(round(currDate.total_seconds()*microsPerSecond) - secondsBack*microsPerSecond)) +
+    //     //         (("&limit=" + str(limit)) if limit != None else ""))
+    //     let mut result = Vec::new();
+    //     // TODO: JSON parsing of jaeger_results
+    //     result;
+    // }
 
     // fn get_trace_from_base_id(&mut self, id: &str) -> Result<Trace, Box<dyn Error>> {
     //     assert!(id.len() != 0);
@@ -186,7 +186,8 @@ impl Reader for DEATHSTARReader {
 impl DEATHSTARReader {
     pub fn from_settings(settings: &Settings) -> Self {
         DEATHSTARReader {
-            jaeger_url: settings.jaeger_url.clone(),
+            xtrace_url: settings.xtrace_url.clone(),
+            // jaeger_url: settings.jaeger_url.clone(),
             DEATHSTAR_trace_dir: settings.DEATHSTAR_trace_dir.clone(),
             jiffy: settings.jiffy,
             processed_traces: HashSet::new(),
