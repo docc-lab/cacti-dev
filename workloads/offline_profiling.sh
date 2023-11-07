@@ -9,12 +9,14 @@ rm ~/offline_traces.txt
 
 for script in "create_delete_ip" "create_delete_vm" "create_delete_vm" "create_delete_vm" "usage_list"
 do
-    ~/pythia/workloads/${script}.sh ~/offline_traces.txt $NUM_ITERS
+#    ~/pythia/workloads/${script}.sh ~/offline_traces.txt $NUM_ITERS
+    ~/cacti-dev/workloads/${script}.sh ~/offline_traces.txt $NUM_ITERS
 
     pids=()
     for i in `seq $NUM_ITERS`
     do
-            ~/pythia/workloads/${script}.sh ~/offline_traces.txt 1 &
+#            ~/pythia/workloads/${script}.sh ~/offline_traces.txt 1 &
+            ~/cacti-dev/workloads/${script}.sh ~/offline_traces.txt 1 &
             pids+=($!)
     done
 
