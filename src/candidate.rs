@@ -10,7 +10,7 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
-use std::iter::zip;
+// use std::iter::zip;
 use std::time::Duration;
 
 use crypto::digest::Digest;
