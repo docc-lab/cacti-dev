@@ -46,7 +46,9 @@ create_vm () {
     # Returns the server id
     local server_id
     local trace_id
+#    echo "$SECONDS\n"
     openstack --os-profile $HMAC_KEY server create test_server --flavor m1.tiny --image cirros --network flat-lan-1-net &> $tmpfile
+#    echo $SECONDS
     server_id=$(grep '| id' $tmpfile | awk '{print $4}')
     trace_id=$(grep 'Trace ID:' $tmpfile | awk '{print $3}')
     echo $trace_id >> $TRACE_FILE
@@ -78,7 +80,11 @@ log "START: tmpfile is $tmpfile"
 for i in `seq $iter`
 do
     log "Creating VM $i ..."
+    time1=$(date +%s%N)
     server=$(create_vm)
+    time2=$(date +%s%N)
+    cat $tmpfile
+    log $(($((time1 - time2))/1000000000))
     log "Created "${server}
     list_vm
     log "Listed servers"

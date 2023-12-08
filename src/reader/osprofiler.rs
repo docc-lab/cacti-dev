@@ -53,6 +53,7 @@ pub struct OSProfilerReader {
     trace_error_count: HashMap<String, usize>,
     for_searchspace: bool,
     free_keys: bool,
+    emit_events: bool,
 }
 
 impl Reader for OSProfilerReader {
@@ -309,6 +310,7 @@ impl OSProfilerReader {
             trace_error_count: HashMap::new(),
             for_searchspace: false,
             free_keys: settings.free_keys,
+            emit_events: settings.emit_events,
         }
     }
 
@@ -361,6 +363,13 @@ impl OSProfilerReader {
         let mut prev_nidx = None;
         let mut prev_time = start_time;
         for (idx, event) in event_list.iter().enumerate() {
+            if self.emit_events {
+                println!("\n");
+                println!("Event:\n\n[\n");
+                println!("{:?}", event);
+                println!("\n\n]");
+                println!("\n");
+            }
             assert!(event.base_id == base_id);
             assert!(prev_time <= event.timestamp);
             prev_time = event.timestamp;

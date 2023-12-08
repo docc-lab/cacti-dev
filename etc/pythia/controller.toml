@@ -11,4 +11,7 @@ hdfs_control_file = "/local/hdfs/tracing-framework/pythia.txt"
 # Split by commas, of the form http://localhost:3030
 pythia_clients = "http://ctl:3030,http://cp-1:3030"
 
-# remaining settings are defined in src/settings.rs
+# other settings are defined in src/settings.rs
+
+# aux settings:
+emit_events = "true"

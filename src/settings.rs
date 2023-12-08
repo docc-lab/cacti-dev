@@ -38,6 +38,7 @@ pub struct Settings {
     pub DEATHSTAR_trace_dir: PathBuf,
     pub hdfs_control_file: PathBuf,
     pub deathstar_control_file: PathBuf,
+    pub emit_events: bool,
 
     pub search_strategy: SearchStrategyType,
     pub jiffy: Duration,
@@ -75,6 +76,10 @@ impl Settings {
         } else {
             pythia_clients.split(",").map(|x| x.to_string()).collect()
         };
+        let emit_events = match results.get("emit_events").unwrap().as_str() {
+            "true" => true,
+            _ => false
+        };
         Settings {
             manifest_file,
             hdfs_control_file,
@@ -106,6 +111,7 @@ impl Settings {
             trace_size_limit: TRACE_SIZE_LIMIT,
             n_workers: N_WORKERS,
             free_keys: FREE_KEYS,
+            emit_events,
         }
     }
 }

@@ -13,7 +13,9 @@ extern crate lazy_static;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
+use std::slice::range;
 use std::sync::mpsc::channel;
+use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
@@ -104,6 +106,7 @@ fn main() {
                 for trace in reader.get_recent_traces() {
                     println!("==========\nTrace:");
                     println!("{}", trace);
+                    println!("{}", trace.request_type);
                     println!("\n==========\n\n\n");
 
                     tx.send(CriticalPath::from_trace(&trace).unwrap())
@@ -348,6 +351,18 @@ fn main() {
             sleep(SETTINGS.jiffy);
         }
     });
+
+    let mut i = 0;
+    loop {
+        if i == 60 {
+            break;
+        }
+
+        println!("i = ${}", i);
+        sleep(Duration::from_millis(1000));
+
+        i += 1;
+    }
 
     // // Main CACTI Loop
     // pool.execute(move || {
