@@ -154,7 +154,7 @@ fn main() {
 
             // Collect traces, add traces to groups
             let critical_paths = rx_in.try_iter().collect::<Vec<_>>().into_iter().filter(
-                | cp | cp.request_type == SETTINGS.problem_type
+                | cp: &CriticalPath | cp.request_type == SETTINGS.problem_type
             ).collect();
 
             // TODO: use critical_paths to get edge IDs of problematic edge types and send via tx_across
