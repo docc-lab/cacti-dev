@@ -289,6 +289,9 @@ fn main() {
                 println!("Problem groups: {:?}", problem_groups);
                 println!();
                 println!();
+                println!("Problematic req types before: ");
+                println!("{:?}, ", problematic_req_types);
+                println!();
                 for g in problem_groups {
                     println!();
                     println!("Problem group iteration with type [{}]", g.request_type);
@@ -344,14 +347,17 @@ fn main() {
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
                     }
-                    if budget <= 0 {
-                        break;
-                    }
+                    // if budget <= 0 {
+                    //     break;
+                    // }
                 }
-                println!("Problematic req types: ");
-                for item in problematic_req_types{
-                    println!("{:?}, ", item)
-                }
+                println!();
+                println!("Problematic req types after: ");
+                println!("{:?}, ", problematic_req_types);
+                println!();
+                // for item in problematic_req_types{
+                //     println!("{:?}, ", item)
+                // }
                 for g in used_groups {
                     groups.used(&g);
                 }
