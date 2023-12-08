@@ -53,7 +53,7 @@ fn main() {
     let now = Instant::now();
     // let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
     let mut budget_manager = BudgetManager::from_settings(&SETTINGS);
-    let mut groups = GroupManager::new();
+    // let mut groups = GroupManager::new();
     let mut last_decision = Instant::now();
     let mut last_gc = Instant::now();
 
@@ -126,6 +126,7 @@ fn main() {
     let mut jiffy_no = 0;
     pool.execute(move || {
         let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
+        let mut groups = GroupManager::new();
 
         loop {
             println!();
