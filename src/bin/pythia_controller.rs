@@ -361,7 +361,7 @@ fn main() {
             break;
         }
 
-        println!("i = ${}", i);
+        // println!("i = ${}", i);
         sleep(Duration::from_millis(1000));
 
         i += 1;
