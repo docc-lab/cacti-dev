@@ -128,6 +128,21 @@ fn main() {
         let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
 
         loop {
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!("NEW ITERATION!!");
+            println!();
+            println!();
+            println!();
+            println!();
             writeln!(output_file, "Jiffy {}, {:?}", jiffy_no, Instant::now()).ok();
             budget_manager.read_stats();
             budget_manager.print_stats();
@@ -154,7 +169,11 @@ fn main() {
                     .collect::<Vec<Duration>>(),
                 now.elapsed().as_micros()
             );
+            println!();
+            println!();
             println!("Groups: {}", groups);
+            println!();
+            println!();
             writeln!(output_file, "New traces: {}", critical_paths.len()).ok();
             writeln!(
                 output_file,
