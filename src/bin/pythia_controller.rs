@@ -13,7 +13,7 @@ extern crate lazy_static;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
-use std::slice::range;
+// use std::slice::range;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::thread::sleep;
