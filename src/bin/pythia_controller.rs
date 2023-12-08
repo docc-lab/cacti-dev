@@ -243,8 +243,9 @@ fn main() {
             //     last_gc = Instant::now();
             // }
 
-            println!("BEFORE IF CHECK");
-            if !over_budget && last_decision.elapsed() > SETTINGS.decision_epoch {
+            println!("BEFORE IF CHECK - {:?} - {:?}", last_decision.elapsed(), SETTINGS.decision_epoch);
+            // if !over_budget && last_decision.elapsed() > SETTINGS.decision_epoch {
+            if last_decision.elapsed() > SETTINGS.decision_epoch {
                 println!("IF CHECK SUCCEEDED");
 
                 let enabled_tracepoints: HashSet<_> =
