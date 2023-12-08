@@ -153,7 +153,7 @@ fn main() {
             let over_budget = budget_manager.overrun();
 
             // Collect traces, add traces to groups
-            let critical_paths = rx_in.try_iter().collect::<Vec<CriticalPath>>().into_iter().filter(
+            let critical_paths: Vec<CriticalPath> = rx_in.try_iter().collect::<Vec<CriticalPath>>().into_iter().filter(
                 | cp: &CriticalPath | cp.request_type == SETTINGS.problem_type
             ).collect();
 
