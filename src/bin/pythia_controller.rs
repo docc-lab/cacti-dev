@@ -281,6 +281,11 @@ fn main() {
 
                 // Iterate through selected problematic groups and make decisions to
                 // enable/disable tracepoints based on search strategy
+                println!();
+                println!();
+                println!("Number of distinct groups: {}", problem_groups.len());
+                println!();
+                println!();
                 for g in problem_groups {
                     problematic_req_types.push(g.request_type);
 
