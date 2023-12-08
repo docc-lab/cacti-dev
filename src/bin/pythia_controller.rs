@@ -119,6 +119,8 @@ fn main() {
 
     let (tx_across, rx_across) = channel();
 
+    let mut final_break = false;
+
     // Main pythia loop
     // Loop infinitely, making tracepoint enabling decisions in each iteration
     let mut jiffy_no = 0;
@@ -344,6 +346,7 @@ fn main() {
             quit_in -= 1;
             if quit_in == 0 {
                 eprintln!("Quitting");
+                final_break = true;
                 return;
             }
 
@@ -354,7 +357,7 @@ fn main() {
 
     let mut i = 0;
     loop {
-        if i == 60 {
+        if final_break {
             break;
         }
 
