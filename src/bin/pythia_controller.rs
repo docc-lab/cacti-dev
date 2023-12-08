@@ -283,10 +283,15 @@ fn main() {
                 // enable/disable tracepoints based on search strategy
                 println!();
                 println!();
-                println!("Number of distinct groups: {}", problem_groups.len());
+                println!("Number of distinct problem groups: {}", problem_groups.len());
+                println!();
+                println!("Problem groups: {:?}", problem_groups);
                 println!();
                 println!();
                 for g in problem_groups {
+                    println!();
+                    println!("Problem group iteration with type [{}]", g.request_type);
+                    println!();
                     problematic_req_types.push(g.request_type);
 
                     let problem_edges = g.problem_edges();

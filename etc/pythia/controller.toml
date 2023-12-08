@@ -15,3 +15,5 @@ pythia_clients = "http://ctl:3030,http://cp-1:3030"
 
 # aux settings:
 emit_events = "true"
+
+
