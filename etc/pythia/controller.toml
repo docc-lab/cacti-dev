@@ -14,6 +14,9 @@ pythia_clients = "http://ctl:3030,http://cp-1:3030"
 # other settings are defined in src/settings.rs
 
 # aux settings:
-emit_events = "true"
+emit_events = "false"
+
+# Expected problematic endpoint/request type
+problem_type = "ServerCreate"
 
 

@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use config::{Config, File, FileFormat};
+use pythia_common::RequestType;
 
 use crate::search::SearchStrategyType;
 
@@ -39,6 +40,7 @@ pub struct Settings {
     pub hdfs_control_file: PathBuf,
     pub deathstar_control_file: PathBuf,
     pub emit_events: bool,
+    pub problem_type: RequestType,
 
     pub search_strategy: SearchStrategyType,
     pub jiffy: Duration,
@@ -112,6 +114,7 @@ impl Settings {
             n_workers: N_WORKERS,
             free_keys: FREE_KEYS,
             emit_events,
+            problem_type: RequestType::from_str(results.get("problem_type").unwrap().as_str()).unwrap()
         }
     }
 }

@@ -19,6 +19,8 @@ use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
+use futures::Stream;
+use pythia_common::RequestType;
 
 use threadpool::ThreadPool;
 
@@ -151,7 +153,9 @@ fn main() {
             let over_budget = budget_manager.overrun();
 
             // Collect traces, add traces to groups
-            let critical_paths = rx_in.try_iter().collect::<Vec<_>>();
+            let critical_paths = rx_in.try_iter().collect::<Vec<_>>().into_iter().filter(
+                | cp: CriticalPath | cp.request_type == SETTINGS.problem_type
+            ).collect();
 
             // TODO: use critical_paths to get edge IDs of problematic edge types and send via tx_across
             for cp in critical_paths.iter() {
