@@ -334,6 +334,16 @@ impl GroupManager {
         }
     }
 
+    /// Return all groups
+    pub fn all_groups(&self) -> Vec<&Group> {
+        let mut sorted_groups: Vec<&Group> = self
+            .groups
+            .values()
+            .filter(|&g| g.is_used != true).collect();
+        sorted_groups.sort_by(|a, b| b.variance.partial_cmp(&a.variance).unwrap());
+        sorted_groups
+    }
+
     /// Return groups filtered based on occurrence and sorted by variance
     pub fn problem_groups(&self) -> Vec<&Group> {
         let mut sorted_groups: Vec<&Group> = self

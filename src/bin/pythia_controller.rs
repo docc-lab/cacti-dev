@@ -261,6 +261,7 @@ fn main() {
 
                 // Extract problematic groups from the group manager based on a particular CV (0.05 here)
                 let problem_groups = groups.problem_groups_cv(0.05); // tsl: problem groups takes now
+                // let all_groups = groups.all_groups();
                 // println!("*CV Groups: {:?}", problem_groups);
 
                 //comment-in below line for consistently slow analysis
@@ -403,6 +404,20 @@ fn main() {
 
 
                 last_decision = Instant::now();
+            }
+            else {
+                println!();
+                println!();
+                println!("ALL GROUPS:");
+                for group in groups.all_groups() {
+                    println!();
+                    println!("GROUP:");
+                    let mut group_vec = Vec::new();
+                    group_vec.push(group);
+                    println!("{:?}", group_vec);
+                }
+                println!();
+                println!();
             }
             quit_in -= 1;
             if quit_in == 0 {
