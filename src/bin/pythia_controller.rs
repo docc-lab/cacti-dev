@@ -364,7 +364,7 @@ fn main() {
                             println!();
                             println!("EDGE IS:");
                             let edge_duration = g.g.edge_weight(yeet).unwrap().duration;
-                            let edge_variance = variance(edge_duration);
+                            let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
                             println!("{:?} ; {}", edge_duration, edge_variance/1000000000000000.0);
                             // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
                             println!();
