@@ -22,7 +22,7 @@ use std::time::Instant;
 use futures::Stream;
 use petgraph::visit::IntoEdges;
 use pythia_common::RequestType;
-use stats::variance;
+use stats::{mean, variance};
 
 use threadpool::ThreadPool;
 
@@ -365,7 +365,8 @@ fn main() {
                             println!("EDGE IS:");
                             let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
                             let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
-                            println!("{:?} ; {}", edge_duration, edge_variance/1000000000000000.0);
+                            let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
+                            println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
                             // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
                             println!();
                         }
