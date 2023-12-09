@@ -359,7 +359,7 @@ fn main() {
                         for yeet in reeeee {
                             println!();
                             println!("EDGE IS:");
-                            println!("{:?}", yeet);
+                            println!("{:?}", g.g.edge_endpoints(yeet));
                             println!();
                         }
                     }
