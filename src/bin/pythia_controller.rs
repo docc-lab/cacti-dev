@@ -389,9 +389,10 @@ fn main() {
                 // for item in problematic_req_types{
                 //     println!("{:?}, ", item)
                 // }
-                for g in used_groups {
-                    groups.used(&g);
-                }
+                // TODO: Re-enable "using" groups
+                // for g in used_groups {
+                //     groups.used(&g);
+                // }
 
                 //tsl : for groups that stopped being problematic; just disable tracepoints, which are enabled so far
 
@@ -411,33 +412,35 @@ fn main() {
                 last_decision = Instant::now();
             }
             else {
-                println!();
-                println!();
-                println!();
-                println!("ALL GROUPS:");
-                for group in groups.all_groups() {
+                if false {
                     println!();
                     println!();
-                    println!("GROUP:");
-                    let mut group_vec = Vec::new();
-                    group_vec.push(group);
-                    println!("{:?}", group_vec);
+                    println!();
+                    println!("ALL GROUPS:");
+                    for group in groups.all_groups() {
+                        println!();
+                        println!();
+                        println!("GROUP:");
+                        let mut group_vec = Vec::new();
+                        group_vec.push(group);
+                        println!("{:?}", group_vec);
 
-                    let reeeee = group.g.edge_indices();
-                    // let haaaan = g.traces[0].g.g.edge_indices();
-                    for yeet in reeeee {
-                        println!();
-                        println!("EDGE IS:");
-                        let edge_duration = &group.g.edge_weight(yeet).unwrap().duration;
-                        let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
-                        let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
-                        println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
-                        // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
-                        println!();
+                        let reeeee = group.g.edge_indices();
+                        // let haaaan = g.traces[0].g.g.edge_indices();
+                        for yeet in reeeee {
+                            println!();
+                            println!("EDGE IS:");
+                            let edge_duration = &group.g.edge_weight(yeet).unwrap().duration;
+                            let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
+                            let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
+                            println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
+                            // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
+                            println!();
+                        }
                     }
+                    println!();
+                    println!();
                 }
-                println!();
-                println!();
             }
             quit_in -= 1;
             if quit_in == 0 {
