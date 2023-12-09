@@ -20,6 +20,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
 use futures::Stream;
+use petgraph::visit::IntoEdges;
 use pythia_common::RequestType;
 
 use threadpool::ThreadPool;
@@ -353,6 +354,14 @@ fn main() {
                         }
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
+
+                        let reeeee = g.g.edges().into_iter();
+                        for yeet in reeeee {
+                            println!();
+                            println!("EDGE IS:");
+                            println!("{:?}", yeet);
+                            println!();
+                        }
                     }
                     // if budget <= 0 {
                     //     break;
