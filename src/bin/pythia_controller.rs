@@ -355,7 +355,7 @@ fn main() {
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
 
-                        let reeeee = g.g.edges().into_iter();
+                        let reeeee = g.g.edge_indices();
                         for yeet in reeeee {
                             println!();
                             println!("EDGE IS:");
