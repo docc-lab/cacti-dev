@@ -51,6 +51,11 @@ fn reset_reader() {
     reader.reset_state();
 }
 
+// Search for:
+// -- nova/usr/local/lib/python3.6/dist-packages/nova/virt/libvirt/driver.py:5486:nova.virt.libvirt.driver.LibvirtDriver._get_guest_xml
+// to
+// -- nova/usr/local/lib/python3.6/dist-packages/nova/hooks.py:2046:nova.compute.manager.ComputeManager._do_build_and_run_instance
+
 /// Main Pythia function that runs in a loop and makes decisions
 fn main() {
     // Initialize search strategies and group management
@@ -408,13 +413,28 @@ fn main() {
             else {
                 println!();
                 println!();
+                println!();
                 println!("ALL GROUPS:");
                 for group in groups.all_groups() {
+                    println!();
                     println!();
                     println!("GROUP:");
                     let mut group_vec = Vec::new();
                     group_vec.push(group);
                     println!("{:?}", group_vec);
+
+                    let reeeee = group.g.edge_indices();
+                    // let haaaan = g.traces[0].g.g.edge_indices();
+                    for yeet in reeeee {
+                        println!();
+                        println!("EDGE IS:");
+                        let edge_duration = &group.g.edge_weight(yeet).unwrap().duration;
+                        let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
+                        let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
+                        println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
+                        // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
+                        println!();
+                    }
                 }
                 println!();
                 println!();
