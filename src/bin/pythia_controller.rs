@@ -245,6 +245,7 @@ fn main() {
             // }
 
             println!("BEFORE IF CHECK - {:?} - {:?}", last_decision.elapsed(), SETTINGS.decision_epoch);
+            // TODO: Ignoring budget for now
             // if !over_budget && last_decision.elapsed() > SETTINGS.decision_epoch {
             if last_decision.elapsed() > SETTINGS.decision_epoch {
                 println!("IF CHECK SUCCEEDED");
@@ -320,9 +321,10 @@ fn main() {
                     // Iterate through edges, making decisions and enabling further
                     // tracepoints based on those decisions
                     for &edge in problem_edges.iter() {
-                        if budget <= 0 {
-                            break;
-                        }
+                        // TODO: Ignoring budget for now
+                        // if budget <= 0 {
+                        //     break;
+                        // }
                         let endpoints = g.g.edge_endpoints(edge).unwrap();
                         println!(
                             "Searching ({} -> {}): {}",
@@ -365,6 +367,7 @@ fn main() {
                             println!();
                         }
                     }
+                    // TODO: Ignoring budget for now
                     // if budget <= 0 {
                     //     break;
                     // }
