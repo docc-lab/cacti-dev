@@ -19,10 +19,11 @@ use crate::search::SearchStrategyType;
 
 const SETTINGS_PATH: &str = "/etc/pythia/controller.toml";
 const DECISION_EPOCH: Duration = Duration::from_secs(120);
-const PYTHIA_JIFFY: Duration = Duration::from_secs(20);
+// const PYTHIA_JIFFY: Duration = Duration::from_secs(20);
+const PYTHIA_JIFFY: Duration = Duration::from_secs(10);
 const GC_EPOCH: Duration = Duration::from_secs(120);
 const GC_KEEP_DURATION: Duration = Duration::from_secs(360);
-const TRACEPOINTS_PER_EPOCH: usize = 3;
+const TRACEPOINTS_PER_EPOCH: usize = 10;
 const DISABLE_RATIO: f32 = 0.1;
 const TRACE_SIZE_LIMIT: u32 = 100000000;
 const N_WORKERS: usize = 4;

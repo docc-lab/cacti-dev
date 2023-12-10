@@ -31,7 +31,7 @@ use pythia::controller::controller_from_settings;
 use pythia::controller::Controller;
 use pythia::critical::CriticalPath;
 use pythia::critical::Path;
-use pythia::grouping::GroupManager;
+use pythia::grouping::{Group, GroupManager};
 use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
@@ -136,6 +136,7 @@ fn main() {
     pool.execute(move || {
         let strategy = get_strategy(&SETTINGS, &MANIFEST, &CONTROLLER);
         let mut groups = GroupManager::new();
+        let mut used_groups_archive : Vec<Group> = Vec::new();
 
         loop {
             println!();
@@ -360,6 +361,8 @@ fn main() {
                         writeln!(output_file, "Enabled {:?}", decisions).ok();
                         if decisions.len() > 0 {
                             used_groups.push(g.hash().to_string());
+                            // let gv = *g;
+                            used_groups_archive.push(*g);
                         }
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
@@ -389,10 +392,12 @@ fn main() {
                 // for item in problematic_req_types{
                 //     println!("{:?}, ", item)
                 // }
-                // TODO: Re-enable "using" groups
-                // for g in used_groups {
-                //     groups.used(&g);
-                // }
+
+                for g in used_groups {
+                    groups.used(&g);
+                }
+
+                printlln!();
 
                 //tsl : for groups that stopped being problematic; just disable tracepoints, which are enabled so far
 
