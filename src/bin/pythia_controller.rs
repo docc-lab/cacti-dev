@@ -363,7 +363,7 @@ fn main() {
                         if decisions.len() > 0 {
                             used_groups.push(g.hash().to_string());
                             // let gv = *g;
-                            used_groups_archive.push(*g);
+                            used_groups_archive.push(g.clone());
                         }
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
