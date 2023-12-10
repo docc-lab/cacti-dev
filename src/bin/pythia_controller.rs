@@ -9,6 +9,7 @@ All rights reserved.
 #[macro_use]
 extern crate lazy_static;
 
+use std::cmp::Ordering;
 // use std::collections::HashSet;
 use std::collections::HashSet;
 use std::fs::File;
@@ -381,7 +382,7 @@ fn main() {
                                 edge_durations_indices.push((edge_duration, edge_endpoints))
                             }
 
-                            edge_durations_indices.sort_by(| di1, di2 | -> {
+                            edge_durations_indices.sort_by(| di1, di2 | -> Ordering {
                                 let max1 = max(di1.0.iter().map(|&x| x.as_nanos())).unwrap();
                                 let max2 = max(di2.0.iter().map(|&x| x.as_nanos())).unwrap();
                                 return max2.cmp(&max1);
