@@ -20,6 +20,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
 use futures::Stream;
+use itertools::max;
 use petgraph::visit::IntoEdges;
 use pythia_common::RequestType;
 use stats::{mean, variance};
@@ -371,16 +372,43 @@ fn main() {
                         if !pgp {
                             let reeeee = g.g.edge_indices();
                             // let haaaan = g.traces[0].g.g.edge_indices();
+
+                            let mut edge_durations_indices = Vec::new();
+
                             for yeet in reeeee {
+                                let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
+                                let edge_endpoints = g.g.edge_endpoints(yeet.clone()).unwrap();
+                                edge_durations_indices.push((edge_duration, edge_endpoints))
+                            }
+
+                            edge_durations_indices.sort_by(| di1, di2 | -> {
+                                let max1 = max(di1.0.iter().map(|&x| x.as_nanos())).unwrap();
+                                let max2 = max(di2.0.iter().map(|&x| x.as_nanos())).unwrap();
+                                return max2.cmp(&max1);
+                            });
+
+                            // for yeet in reeeee {
+                            //     println!();
+                            //     println!("EDGE IS:");
+                            //     let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
+                            //     let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
+                            //     let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
+                            //     println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
+                            //     // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
+                            //     println!();
+                            // }
+
+                            for di in edge_durations_indices {
                                 println!();
                                 println!("EDGE IS:");
-                                let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
+                                let edge_duration = di.0;
+                                let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
                                 let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
                                 let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
                                 println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
-                                // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
                                 println!();
                             }
+
                             pgp = true;
                         }
                     }
