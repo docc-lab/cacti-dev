@@ -397,20 +397,23 @@ fn main() {
                 //     println!("{:?}, ", item)
                 // }
 
-                for g in used_groups {
-                    groups.used(&g);
-                }
+                // TODO: Reactivate used groups at some point
+                // for g in used_groups {
+                //     groups.used(&g);
+                // }
 
-                println!();
-                println!();
-                println!("USED GROUPS:");
-                println!();
-                for ug in &used_groups_archive {
-                    println!("{}", ug);
+                if false {
+                    println!();
+                    println!();
+                    println!("USED GROUPS:");
+                    println!();
+                    for ug in &used_groups_archive {
+                        println!("{}", ug);
+                        println!();
+                    }
+                    println!();
                     println!();
                 }
-                println!();
-                println!();
 
                 //tsl : for groups that stopped being problematic; just disable tracepoints, which are enabled so far
 
