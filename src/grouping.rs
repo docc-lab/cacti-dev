@@ -33,7 +33,7 @@ use crate::trace::Value;
 use histogram::Histogram;
 
 /// A group of critical paths
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Copy)]
 pub struct Group {
     /// Representative path and the relevant latency etc. statistics
     pub g: StableGraph<TraceNode, GroupEdge>,
