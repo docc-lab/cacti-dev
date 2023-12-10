@@ -405,7 +405,7 @@ fn main() {
                 println!();
                 println!("USED GROUPS:");
                 println!();
-                for ug in used_groups_archive {
+                for ug in &used_groups_archive {
                     println!("{}", ug);
                     println!();
                 }
