@@ -328,6 +328,7 @@ fn main() {
                     }
                     // Iterate through edges, making decisions and enabling further
                     // tracepoints based on those decisions
+                    let mut pgp = false;
                     for &edge in problem_edges.iter() {
                         // TODO: Ignoring budget for now
                         // if budget <= 0 {
@@ -367,17 +368,20 @@ fn main() {
                         // // tsl: record enabled tracepoints per group
                         // g.update_enabled_tracepoints(&decisions);
 
-                        let reeeee = g.g.edge_indices();
-                        // let haaaan = g.traces[0].g.g.edge_indices();
-                        for yeet in reeeee {
-                            println!();
-                            println!("EDGE IS:");
-                            let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
-                            let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
-                            let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
-                            println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
-                            // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
-                            println!();
+                        if !pgp {
+                            let reeeee = g.g.edge_indices();
+                            // let haaaan = g.traces[0].g.g.edge_indices();
+                            for yeet in reeeee {
+                                println!();
+                                println!("EDGE IS:");
+                                let edge_duration = &g.g.edge_weight(yeet).unwrap().duration;
+                                let edge_variance = variance(edge_duration.iter().map(|&x| x.as_nanos()));
+                                let edge_mean = mean(edge_duration.iter().map(|&x| x.as_nanos()));
+                                println!("{:?} ; {}", edge_duration, (edge_variance/edge_mean)/1000000000.0);
+                                // println!("{:?}", g.traces[0].g.g.edge_endpoints(yeet));
+                                println!();
+                            }
+                            pgp = true;
                         }
                     }
                     // TODO: Ignoring budget for now
@@ -397,7 +401,16 @@ fn main() {
                     groups.used(&g);
                 }
 
-                printlln!();
+                println!();
+                println!();
+                println!("USED GROUPS:");
+                println!();
+                for ug in used_groups_archive {
+                    println!("{}", ug);
+                    println!();
+                }
+                println!();
+                println!();
 
                 //tsl : for groups that stopped being problematic; just disable tracepoints, which are enabled so far
 
