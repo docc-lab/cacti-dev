@@ -203,7 +203,7 @@ impl Trace {
                 let (tid2, tp2, tt2) = (
                     node2.tracepoint_id,
                     node2.tracepoint_id.to_string(),
-                    node1.timestamp.timestamp_nanos()
+                    node2.timestamp.timestamp_nanos()
                 );
                 TraceEdge {
                     tid_start: tid1,
