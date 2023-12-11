@@ -158,7 +158,9 @@ impl CandidateManager {
             .expect("Time went backwards!")
             .as_nanos() as i64;
 
-        for non_victim_info in self.non_victim_segments {
+        let non_victim_segments = self.non_victim_segments.clone();
+
+        for non_victim_info in non_victim_segments {
             // match non_victim_info.1.2 {
             //     Some(t) => {
             //         if t + 300*1000000000 < now_time {
@@ -168,7 +170,7 @@ impl CandidateManager {
             //     None => (),
             // }
             if (non_victim_info.1).2 + 300*1000000000 < now_time {
-                self.non_victim_segments.remove(&non_victim_info.0);
+                (&mut self.non_victim_segments).remove(&non_victim_info.0);
             }
         }
     }
