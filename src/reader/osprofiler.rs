@@ -49,7 +49,7 @@ pub struct OSProfilerReader {
     // Connection appears to be a Redis connection from which traces can be read
     connection: Connection,
     client_list: Vec<String>,
-    prev_traces: HashMap<String, Duration>,
+    prev_traces: HashMap<String, (Duration, i32)>,
     trace_error_count: HashMap<String, usize>,
     for_searchspace: bool,
     free_keys: bool,
@@ -118,8 +118,13 @@ impl Reader for OSProfilerReader {
                     // (i.e., request has finished)
                     let stable = match self.prev_traces.get(id) {
                         Some(&d) => {
-                            if d == t.duration {
-                                true
+                            if d.0 == t.duration {
+                                if d.1 == 10 {
+                                    true
+                                }
+                                else {
+                                    false
+                                }
                             } else {
                                 false
                             }
@@ -136,11 +141,18 @@ impl Reader for OSProfilerReader {
                             }
                             Err(_) => {
                                 *self.trace_error_count.get_mut(id).unwrap() += 1;
-                                self.prev_traces.insert(id.clone(), t.duration);
+                                self.prev_traces.insert(id.clone(), (t.duration, 0));
                             }
                         }
                     } else {
-                        self.prev_traces.insert(id.clone(), t.duration);
+                        match self.prev_traces.get(id) {
+                            Some(&d) => {
+                                self.prev_traces.insert(id.clone(), (t.duration, d.1 + 1));
+                            },
+                            None => {
+                                self.prev_traces.insert(id.clone(), (t.duration, 0));
+                            }
+                        }
                     }
                 }
                 Err(_) => {
