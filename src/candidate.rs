@@ -98,6 +98,7 @@ impl CandidateManager {
             let cur_path = self.victim_paths.pop().unwrap();
 
             let cp_edges = cur_path.g.get_edges();
+            println!("CRITICAL PATH TRACE TYPE = {}", cur_path.g.request_type);
 
             // let mut i = 0;
 
