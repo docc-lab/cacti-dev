@@ -185,7 +185,10 @@ impl CandidateManager {
                     //
                     // }
                     if rt_counts.contains_key(&candidate.request_type) {
-                        rt_counts.insert(candidate.request_type, rt_counts.get(&candidate.request_type).unwrap() + 1)
+                        rt_counts.insert(
+                            candidate.request_type,
+                            rt_counts.get(&candidate.request_type).unwrap() + 1
+                        );
                     }
                     else {
                         rt_counts.insert(candidate.request_type, 1);
