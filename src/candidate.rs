@@ -173,7 +173,7 @@ impl CandidateManager {
 
                 let mut rt_counts: HashMap<RequestType, i32> = HashMap::new();
 
-                let victim_segment = old_victims.0;
+                let victim_segment = old_victims.0.clone();
                 let vs_latency = victim_segment.end - victim_segment.start;
 
                 for candidate in &old_victims.1 {
