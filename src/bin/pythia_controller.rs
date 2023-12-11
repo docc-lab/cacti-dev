@@ -138,7 +138,7 @@ fn main() {
                     tx.send(trace)
                         .expect("channel will be there waiting for the pool");
                 }
-                sleep(3*SETTINGS.jiffy);
+                sleep(SETTINGS.jiffy);
             }
         });
     }
