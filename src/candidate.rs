@@ -156,7 +156,7 @@ impl CandidateManager {
             //     },
             //     None => (),
             // }
-            if non_victim_info.1.2 + 300*1000000000 < now_time {
+            if (non_victim_info.1).2 + 300*1000000000 < now_time {
                 self.non_victim_segments.remove(&non_victim_info.0)
             }
         }
@@ -170,10 +170,10 @@ impl CandidateManager {
 
         for victim in self.victim_overlaps {
             for non_victim in self.non_victim_segments {
-                if victim.0 != non_victim.1.0 {
-                    if victim.1.0.overlaps_with(&non_victim.1.1) {
-                        let mut new_overlaps = victim.1.1.clone();
-                        new_overlaps.push(non_victim.1.1);
+                if victim.0 != (non_victim.1).0 {
+                    if (victim.1).0.overlaps_with(&(non_victim.1).1) {
+                        let mut new_overlaps = (victim.1).1.clone();
+                        new_overlaps.push((non_victim.1).1);
                         self.victim_overlaps.insert(
                             victim.0,
                             (victim.1.0.clone(), new_overlaps)
@@ -184,7 +184,7 @@ impl CandidateManager {
                         );
                         self.non_victim_segments.insert(
                             non_victim.0,
-                            (non_victim.1.0, non_victim.1.1.clone(), now_time.clone())
+                            ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
                         );
                     }
                 }
