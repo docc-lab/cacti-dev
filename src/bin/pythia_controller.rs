@@ -127,6 +127,7 @@ fn main() {
             loop {
                 for trace in reader.get_recent_traces() {
                     println!("==========\nTrace:");
+                    println!("{}", trace.base_id);
                     println!("{}", trace);
                     println!("{}", trace.request_type);
                     println!("\n==========\n\n\n");
