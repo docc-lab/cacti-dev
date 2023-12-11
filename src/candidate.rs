@@ -244,7 +244,7 @@ impl CandidateManager {
                                 non_victim.0.clone(),
                                 ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
                             );
-                            (&mut self.used_pairs.insert(hash_to_check))
+                            ((&mut self.used_pairs).insert(hash_to_check));
                         }
                     }
                 }
