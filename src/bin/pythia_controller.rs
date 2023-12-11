@@ -80,7 +80,7 @@ fn main() {
     targets.insert(TracepointID::from_str("nova/usr/local/lib/python3.6/dist-packages/nova/compute/manager.py:1859:nova.compute.manager.ComputeManager._update_scheduler_instance_info"));
     eprintln!("Targets are {:?}", targets);
 
-    victim_segment = (
+    let victim_segment = (
         "nova/usr/local/lib/python3.6/dist-packages/nova/compute/manager.py:1972:_locked_do_build_and_run_instance:_build_semaphore._waiters",
         "nova/usr/local/lib/python3.6/dist-packages/nova/hooks.py:2046:nova.compute.manager.ComputeManager._do_build_and_run_instance"
     );
