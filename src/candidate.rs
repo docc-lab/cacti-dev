@@ -200,6 +200,13 @@ impl CandidateManager {
     }
 
     pub fn find_candidates(&mut self) {
+        println!();
+        println!();
+        println!();
+        println!("FIND_CANDIDATES START");
+        println!();
+        println!();
+
         let now_time = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards!")
@@ -208,14 +215,20 @@ impl CandidateManager {
         let victim_overlaps = self.victim_overlaps.clone();
         let non_victim_segments = self.non_victim_segments.clone();
 
+        println!("Outermost Loop");
         for victim in victim_overlaps {
+            println!("Inner Loop 1");
             for non_victim in &non_victim_segments {
+                println!("Pre-Uuid check");
                 if victim.0 != (non_victim.1).0 {
+                    println!("Post-Uuid check");
                     if self.used_pairs.contains(&(
                         hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
                         hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
                     )) {
+                        println!("Post-used-pairs check");
                         if (victim.1).0.overlaps_with(&(non_victim.1).1) {
+                            println!("Overlap found!!");
                             let mut new_overlaps = (victim.1).1.clone();
                             new_overlaps.push((non_victim.1.clone()).1);
                             (&mut self.victim_overlaps).insert(
@@ -235,6 +248,11 @@ impl CandidateManager {
                 }
             }
         }
+        println!("Outermost Loop");
+        println!("FIND_CANDIDATES END");
+        println!();
+        println!();
+        println!();
     }
 }
 
