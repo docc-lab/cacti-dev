@@ -551,7 +551,7 @@ fn main() {
             println!();
             println!("OVERLAPS START");
             println!();
-            for overlap in candidates.victim_overlaps {
+            for overlap in &candidates.victim_overlaps {
                 println!();
                 println!("{:?}", overlap);
                 println!();
