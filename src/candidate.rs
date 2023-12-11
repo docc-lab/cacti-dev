@@ -185,7 +185,7 @@ impl CandidateManager {
                 let vs_latency = victim_segment.end - victim_segment.start;
 
                 for rt in RequestType::all_types() {
-                    let rt_count = &old_victim.1.into_iter().filter(
+                    let rt_count = &old_victim.1.clone().into_iter().filter(
                         | c: &TraceEdge | -> bool { c.request_type == rt }
                     ).collect_vec().len();
 
