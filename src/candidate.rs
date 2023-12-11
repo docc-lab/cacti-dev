@@ -128,14 +128,14 @@ impl CandidateManager {
     }
 
     pub fn flush_old_victims(&mut self) {
-        for overlap_info in &mut self.victim_overlaps {
+        for overlap_info in self.victim_overlaps {
             let latest_overlap_time = &self.victim_overlap_max_times.get(&overlap_info.0).unwrap();
             let now_time = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
             if *latest_overlap_time + 300*1000000000 < now_time {
-                &self.victim_overlaps.remove(&overlap_info.0);
+                &mut self.victim_overlaps.remove(&overlap_info.0);
                 self.victim_overlap_max_times.remove(&overlap_info.0);
             }
         }
