@@ -35,5 +35,6 @@ genawaiter = "*"
 itertools = "*"
 config = "*"
 threadpool = "*"
+strum = "0.25.0"
 [target.'cfg(target_os = "linux")'.dependencies]
 procinfo = "*"
