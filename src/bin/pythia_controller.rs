@@ -553,7 +553,12 @@ fn main() {
             println!();
             for overlap in &candidates.victim_overlaps {
                 println!();
-                println!("{:?}", overlap);
+                println!("{:?}", (overlap.1).0);
+                println!("[");
+                for te in (overlap.1).1 {
+                    println!("{:?}", te);
+                }
+                println!("]");
                 println!();
             }
             println!("OVERLAPS END");

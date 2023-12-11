@@ -206,6 +206,8 @@ impl Trace {
                     node2.timestamp.timestamp_nanos()
                 );
                 TraceEdge {
+                    uuid: self.base_id,
+                    request_type: self.request_type,
                     tid_start: tid1,
                     tp_start: tp1,
                     start: tt1,
@@ -220,6 +222,8 @@ impl Trace {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TraceEdge {
+    pub uuid : Uuid,
+    pub request_type : RequestType,
     pub tid_start : TracepointID,
     pub tp_start : String,
     pub start : i64,
