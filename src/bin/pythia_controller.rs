@@ -540,11 +540,11 @@ fn main() {
             let latest_traces: Vec<Trace> = rx_in.try_iter().collect::<Vec<Trace>>().into_iter().collect();
             candidates.add_traces(latest_traces);
             candidates.process_victims();
-            // candidates.process_non_victims();
-            //
-            // candidates.find_candidates();
-            // candidates.flush_old_victims();
-            // candidates.flush_old_non_victims();
+            candidates.process_non_victims();
+
+            candidates.find_candidates();
+            candidates.flush_old_victims();
+            candidates.flush_old_non_victims();
 
             println!();
             println!();

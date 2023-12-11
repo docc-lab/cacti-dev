@@ -99,14 +99,14 @@ impl CandidateManager {
 
             let cp_edges = cur_path.g.get_edges();
 
-            let mut i = 0;
+            // let mut i = 0;
 
             for edge in cp_edges {
-                i += 1;
-                println!();
-                println!("EDGE:");
-                println!("{:?}", edge);
-                println!();
+                // i += 1;
+                // println!();
+                // println!("EDGE:");
+                // println!("{:?}", edge);
+                // println!();
                 if (edge.tp_start == self.victim_start) && (edge.tp_end == self.victim_end) {
                     // self.victim_overlaps.push((cur_path.g.base_id, edge))
                     self.victim_overlaps.insert(cur_path.g.base_id, (edge, Vec::new()));
@@ -114,9 +114,9 @@ impl CandidateManager {
                 }
             }
 
-            println!();
-            println!("There were [[ {} ]] edges in the victim type!", i);
-            println!();
+            // println!();
+            // println!("There were [[ {} ]] edges in the victim type!", i);
+            // println!();
         }
     }
 
