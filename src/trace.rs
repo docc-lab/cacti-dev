@@ -18,7 +18,7 @@ use std::time::Duration;
 use bimap::BiMap;
 use chrono::NaiveDateTime;
 use petgraph::dot::Dot;
-use petgraph::graph::NodeIndex;
+use petgraph::graph::{EdgeIndex, NodeIndex};
 use petgraph::stable_graph::StableGraph;
 use petgraph::Direction;
 use serde::de;
@@ -181,7 +181,59 @@ impl Trace {
             self.g[node].print_key_values();
         }
     }
+
+    pub fn get_edges(&self) -> Vec<TraceEdge> {
+        let edge_indices = self.g.edge_indices();
+        let edge_endpoints : Vec<(NodeIndex, NodeIndex, EdgeIndex)> = edge_indices.into_iter().map(
+            | ei | -> (NodeIndex, NodeIndex, EdgeIndex) {
+                let endpoints = self.g.edge_endpoints(ei).unwrap();
+                return (endpoints.0, endpoints.1, ei.clone());
+            }
+        ).collect();
+        return edge_endpoints.into_iter().map(
+            | nne | -> TraceEdge {
+                let node1 = self.g.node_weight(nne.0).unwrap();
+                let node2 = self.g.node_weight(nne.1).unwrap();
+                // let edge = self.g.edge_weight(nne.2).unwrap();
+                let (tid1, tp1, tt1) = (
+                    node1.tracepoint_id,
+                    node1.tracepoint_id.to_string(),
+                    node1.timestamp.timestamp_nanos()
+                );
+                let (tid2, tp2, tt2) = (
+                    node2.tracepoint_id,
+                    node2.tracepoint_id.to_string(),
+                    node1.timestamp.timestamp_nanos()
+                );
+                TraceEdge {
+                    tid_start: tid1,
+                    tp_start: tp1,
+                    start: tt1,
+                    tid_end: tid2,
+                    tp_end: tp2,
+                    end: tt2,
+                }
+            }
+        ).collect();
+    }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TraceEdge {
+    pub tid_start : TracepointID,
+    pub tp_start : String,
+    pub start : i64,
+    pub tid_end : TracepointID,
+    pub tp_end : String,
+    pub end : i64,
+}
+
+impl TraceEdge {
+    pub fn overlaps_with(&self, te: &TraceEdge) -> bool {
+        (self.start < te.end) && (self.end > te.start)
+    }
+}
+
 impl Event {
     pub fn print_key_values(&self) {
         println!("{:?}", self.key_value_pair);
