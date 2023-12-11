@@ -16,7 +16,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use genawaiter::{rc::gen, yield_};
-use petgraph::visit::EdgeRef;
+use petgraph::visit::{EdgeRef, FilterNode};
 use petgraph::{dot::Dot, graph::NodeIndex, Direction};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -45,6 +45,14 @@ pub struct CandidateManager {
     pub old_victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
     pub victim_overlap_max_times: HashMap<Uuid, i64>,
     used_pairs: HashSet<(String, String)>,
+}
+
+pub fn hash_uuid_and_edge(uuid: Uuid, edge: TraceEdge) -> String {
+    let mut hasher = Sha256::new();
+    hasher.input(uuid.as_bytes());
+    hasher.input(edge.tp_start.as_bytes());
+    hasher.input(edge.tp_end.as_bytes());
+    hasher.result_str()
 }
 
 impl CandidateManager {
@@ -117,13 +125,18 @@ impl CandidateManager {
             let ct_edges = cur_trace.get_edges();
 
             for edge in ct_edges {
-                let mut hasher = Sha256::new();
-                hasher.input(cur_trace.base_id.as_bytes());
-                hasher.input(edge.tp_start.as_bytes());
-                hasher.input(edge.tp_end.as_bytes());
+                // let mut hasher = Sha256::new();
+                // hasher.input(cur_trace.base_id.as_bytes());
+                // hasher.input(edge.tp_start.as_bytes());
+                // hasher.input(edge.tp_end.as_bytes());
+                // self.non_victim_segments.insert(
+                //     hasher.result_str(),
+                //     (cur_trace.base_id, edge, now_time.clone())
+                // );
+
                 self.non_victim_segments.insert(
-                    hasher.result_str(),
-                    (cur_trace.base_id, edge, now_time.clone())
+                    hash_uuid_and_edge(cur_trace.base_id, edge),
+                    (cur_trace.base_id, edge.clone(), now_time.clone())
                 );
             }
         }
@@ -187,21 +200,26 @@ impl CandidateManager {
         for victim in victim_overlaps {
             for non_victim in &non_victim_segments {
                 if victim.0 != (non_victim.1).0 {
-                    if (victim.1).0.overlaps_with(&(non_victim.1).1) {
-                        let mut new_overlaps = (victim.1).1.clone();
-                        new_overlaps.push((non_victim.1.clone()).1);
-                        (&mut self.victim_overlaps).insert(
-                            victim.0,
-                            ((victim.1).0.clone(), new_overlaps)
-                        );
-                        (&mut self.victim_overlap_max_times).insert(
-                            victim.0,
-                            now_time.clone()
-                        );
-                        (&mut self.non_victim_segments).insert(
-                            non_victim.0.clone(),
-                            ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
-                        );
+                    if self.used_pairs.contains(&(
+                        hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
+                        hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
+                    )) {
+                        if (victim.1).0.overlaps_with(&(non_victim.1).1) {
+                            let mut new_overlaps = (victim.1).1.clone();
+                            new_overlaps.push((non_victim.1.clone()).1);
+                            (&mut self.victim_overlaps).insert(
+                                victim.0,
+                                ((victim.1).0.clone(), new_overlaps)
+                            );
+                            (&mut self.victim_overlap_max_times).insert(
+                                victim.0,
+                                now_time.clone()
+                            );
+                            (&mut self.non_victim_segments).insert(
+                                non_victim.0.clone(),
+                                ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
+                            );
+                        }
                     }
                 }
             }
