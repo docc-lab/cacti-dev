@@ -222,7 +222,7 @@ impl CandidateManager {
                 println!("Pre-Uuid check");
                 if victim.0 != (non_victim.1).0 {
                     println!("Post-Uuid check");
-                    if self.used_pairs.contains(&(
+                    if !self.used_pairs.contains(&(
                         hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
                         hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
                     )) {

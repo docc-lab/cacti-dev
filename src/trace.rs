@@ -230,6 +230,11 @@ pub struct TraceEdge {
 
 impl TraceEdge {
     pub fn overlaps_with(&self, te: &TraceEdge) -> bool {
+        println!();
+        println!("Checking for overlap!");
+        println!("{}  ||  {}", self.start, self.end);
+        println!("{}  ||  {}", te.start, te.end);
+        println!();
         (self.start < te.end) && (self.end > te.start)
     }
 }
