@@ -190,7 +190,7 @@ impl CandidateManager {
                     ).collect_vec().len();
 
                     let mut rt_data = self.candidate_groups.get(&rtc.0).unwrap().clone();
-                    rt_data.push((rt_count as i32, vs_latency.clone()));
+                    rt_data.push((rt_count.clone() as i32, vs_latency.clone()));
                     (&mut self.candidate_groups).insert(rt, rt_data);
                 }
 
