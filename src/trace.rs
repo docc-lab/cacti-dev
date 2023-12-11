@@ -209,6 +209,11 @@ impl Trace {
                     node2.tracepoint_id.to_string(),
                     node2.timestamp.timestamp_nanos()
                 );
+                println!();
+                println!("EVENT HOST:");
+                println!("{}", node2.tracepoint_id);
+                println!("{:?}", node2.key_value_pair.get("host"));
+                println!();
                 TraceEdge {
                     uuid: self.base_id,
                     request_type: self.request_type,
