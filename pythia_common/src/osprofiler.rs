@@ -16,15 +16,16 @@ use regex::RegexSet;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use strum::IntoEnumIterator; // 0.17.1
-use strum_macros::EnumIter; // 0.17.1
+// use strum::IntoEnumIterator; // 0.17.1
+// use strum_macros::EnumIter; // 0.17.1
 
 use crate::PythiaError;
+use crate::RequestType::ServerList;
 
 /// Type of a request.
 ///
 /// It's defined here because for now we only use them for OpenStack.
-#[derive(Serialize, Deserialize, Debug, Copy, Eq, PartialEq, Hash, Clone, EnumIter)]
+#[derive(Serialize, Deserialize, Debug, Copy, Eq, PartialEq, Hash, Clone)]
 pub enum RequestType {
     ServerCreate,
     ServerDelete,
@@ -74,6 +75,18 @@ impl RequestType {
             "Unknown" => Ok(RequestType::Unknown),
             _ => Err("Unknown request type"),
         }
+    }
+
+    pub fn all_types() -> Vec<RequestType> {
+        let mut to_return = Vec::new();
+
+        to_return.push(RequestType::ServerCreate);
+        to_return.push(RequestType::ServerList);
+        to_return.push(RequestType::ServerDelete);
+        to_return.push(RequestType::UsageList);
+        to_return.push(RequestType::Unknown);
+
+        to_return
     }
 }
 

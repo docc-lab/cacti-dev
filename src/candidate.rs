@@ -16,6 +16,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use genawaiter::{rc::gen, yield_};
+use itertools::Itertools;
 use petgraph::visit::{EdgeRef, FilterNode};
 use petgraph::{dot::Dot, graph::NodeIndex, Direction};
 use serde::{Deserialize, Serialize};
@@ -176,52 +177,58 @@ impl CandidateManager {
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
             if *latest_overlap_time + 300*1000000000 < now_time {
-                let old_victims = (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap();
+                let old_victim = (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap();
 
-                let mut rt_counts: HashMap<RequestType, i32> = HashMap::new();
+                // let mut rt_counts: HashMap<RequestType, i32> = HashMap::new();
 
-                let victim_segment = old_victims.0.clone();
+                let victim_segment = old_victim.0.clone();
                 let vs_latency = victim_segment.end - victim_segment.start;
 
-                for rt in RequestType::iter() {
-                    println!("{}", rt);
+                for rt in RequestType::all_types() {
+                    let rt_count = &old_victim.1.into_iter().filter(
+                        | c: &TraceEdge | -> bool { c.request_type == rt }
+                    ).collect_vec().len();
+
+                    let mut rt_data = self.candidate_groups.get(&rtc.0).unwrap().clone();
+                    rt_data.push((rt_count as i32, vs_latency.clone()));
+                    (&mut self.candidate_groups).insert(rt, rt_data);
                 }
 
-                for candidate in &old_victims.1 {
-                    // if self.candidate_groups.contains_key(&candidate.request_type) {
-                    //     let mut rt_data = self.candidate_groups.get(&candidate.request_type).unwrap();
-                    //     rt_data.push()
-                    // }
-                    // else {
-                    //
-                    // }
-                    if rt_counts.contains_key(&candidate.request_type) {
-                        rt_counts.insert(
-                            candidate.request_type,
-                            rt_counts.get(&candidate.request_type).unwrap() + 1
-                        );
-                    }
-                    else {
-                        rt_counts.insert(candidate.request_type, 1);
-                    }
-                }
-
-                for rtc in rt_counts {
-                    if self.candidate_groups.contains_key(&rtc.0) {
-                        let mut rt_data = self.candidate_groups.get(&rtc.0).unwrap().clone();
-                        rt_data.push((rtc.1, vs_latency.clone()));
-                        (&mut self.candidate_groups).insert(rtc.0, rt_data);
-                    }
-                    else {
-                        let mut rt_data = Vec::new();
-                        rt_data.push((rtc.1, vs_latency.clone()));
-                        (&mut self.candidate_groups).insert(rtc.0, rt_data);
-                    }
-                }
+                // for candidate in &old_victim.1 {
+                //     // if self.candidate_groups.contains_key(&candidate.request_type) {
+                //     //     let mut rt_data = self.candidate_groups.get(&candidate.request_type).unwrap();
+                //     //     rt_data.push()
+                //     // }
+                //     // else {
+                //     //
+                //     // }
+                //     if rt_counts.contains_key(&candidate.request_type) {
+                //         rt_counts.insert(
+                //             candidate.request_type,
+                //             rt_counts.get(&candidate.request_type).unwrap() + 1
+                //         );
+                //     }
+                //     else {
+                //         rt_counts.insert(candidate.request_type, 1);
+                //     }
+                // }
+                //
+                // for rtc in rt_counts {
+                //     if self.candidate_groups.contains_key(&rtc.0) {
+                //         let mut rt_data = self.candidate_groups.get(&rtc.0).unwrap().clone();
+                //         rt_data.push((rtc.1, vs_latency.clone()));
+                //         (&mut self.candidate_groups).insert(rtc.0, rt_data);
+                //     }
+                //     else {
+                //         let mut rt_data = Vec::new();
+                //         rt_data.push((rtc.1, vs_latency.clone()));
+                //         (&mut self.candidate_groups).insert(rtc.0, rt_data);
+                //     }
+                // }
 
                 (&mut self.old_victim_overlaps).insert(
                     overlap_info.0,
-                    old_victims.clone(),
+                    old_victim.clone(),
                 );
                 // self.move_victim_overlaps(&overlap_info.0);
                 self.victim_overlap_max_times.remove(&overlap_info.0);
