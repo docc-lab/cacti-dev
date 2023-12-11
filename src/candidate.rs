@@ -22,6 +22,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use pythia_common::RequestType;
+use pythia_common::RequestType::ServerCreate;
 
 use crate::trace::{DAGEdge, TraceEdge};
 use crate::trace::EdgeType;
@@ -73,6 +74,12 @@ impl CandidateManager {
             used_pairs: HashSet::new(),
             candidate_groups: HashMap::new(),
         };
+
+        to_return.candidate_groups.insert(ServerCreate, Vec::new());
+        to_return.candidate_groups.insert(RequestType::ServerList, Vec::new());
+        to_return.candidate_groups.insert(RequestType::ServerDelete, Vec::new());
+        to_return.candidate_groups.insert(RequestType::UsageList, Vec::new());
+        to_return.candidate_groups.insert(RequestType::Unknown, Vec::new());
 
         to_return
     }
@@ -175,6 +182,10 @@ impl CandidateManager {
 
                 let victim_segment = old_victims.0.clone();
                 let vs_latency = victim_segment.end - victim_segment.start;
+
+                for rt in RequestType::iter() {
+                    println!("{}", rt);
+                }
 
                 for candidate in &old_victims.1 {
                     // if self.candidate_groups.contains_key(&candidate.request_type) {

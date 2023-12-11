@@ -16,12 +16,15 @@ use regex::RegexSet;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use strum::IntoEnumIterator; // 0.17.1
+use strum_macros::EnumIter; // 0.17.1
+
 use crate::PythiaError;
 
 /// Type of a request.
 ///
 /// It's defined here because for now we only use them for OpenStack.
-#[derive(Serialize, Deserialize, Debug, Copy, Eq, PartialEq, Hash, Clone)]
+#[derive(Serialize, Deserialize, Debug, Copy, Eq, PartialEq, Hash, Clone, EnumIter)]
 pub enum RequestType {
     ServerCreate,
     ServerDelete,
