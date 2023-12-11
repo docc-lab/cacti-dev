@@ -134,7 +134,7 @@ impl CandidateManager {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
-            if latest_overlap_time + 300*1000000000 < now_time {
+            if *latest_overlap_time + 300*1000000000 < now_time {
                 self.victim_overlaps.remove(&overlap_info.0);
                 self.victim_overlap_max_times.remove(&overlap_info.0);
             }
