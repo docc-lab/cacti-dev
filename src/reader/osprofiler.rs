@@ -119,7 +119,7 @@ impl Reader for OSProfilerReader {
                     let stable = match self.prev_traces.get(id) {
                         Some(&d) => {
                             if d.0 == t.duration {
-                                if d.1 == 12 {
+                                if d.1 == 18 {
                                     true
                                 }
                                 else {
@@ -537,9 +537,29 @@ impl OSProfilerReader {
                                         panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
                                     }
                                 }];
-                                assert!(event.timestamp > parent_node.timestamp);
-                                panic!("Parent of node {:?} not found: {:?}", event, parent_node);
+                                async_traces.insert(
+                                    event.trace_id,
+                                    match id_map.get(&event.parent_id) {
+                                        Some(&nidx) => nidx,
+                                        None => {
+                                            panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
+                                        }
+                                    }
+                                );
+                                // assert!(event.timestamp > parent_node.timestamp);
+                                // panic!("Parent of node {:?} not found: {:?}", event, parent_node);
                             }
+                            // None => {
+                            //     // Parent has finished execution before child starts - shouldn't happen
+                            //     let parent_node = &dag.g[match id_map.get(&event.parent_id) {
+                            //         Some(&nidx) => nidx,
+                            //         None => {
+                            //             panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
+                            //         }
+                            //     }];
+                            //     assert!(event.timestamp > parent_node.timestamp);
+                            //     panic!("Parent of node {:?} not found: {:?}", event, parent_node);
+                            // }
                         }
                     }
                 }

@@ -176,7 +176,7 @@ impl CandidateManager {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
-            if *latest_overlap_time + 600*1000000000 < now_time {
+            if *latest_overlap_time + 900*1000000000 < now_time {
                 let old_victim = (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap();
 
                 // let mut rt_counts: HashMap<RequestType, i32> = HashMap::new();
@@ -261,13 +261,13 @@ impl CandidateManager {
         for non_victim_info in non_victim_segments {
             // match non_victim_info.1.2 {
             //     Some(t) => {
-            //         if t + 600*1000000000 < now_time {
+            //         if t + 900*1000000000 < now_time {
             //             self.non_victim_segments.remove(&non_victim_info.0)
             //         }
             //     },
             //     None => (),
             // }
-            if (non_victim_info.1).2 + 600*1000000000 < now_time {
+            if (non_victim_info.1).2 + 900*1000000000 < now_time {
                 (&mut self.non_victim_segments).remove(&non_victim_info.0);
             }
         }
