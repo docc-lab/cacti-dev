@@ -559,6 +559,8 @@ fn main() {
             println!("OVERLAPS END");
             println!();
             println!();
+
+            sleep(SETTINGS.jiffy);
         }
     });
 
