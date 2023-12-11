@@ -555,7 +555,7 @@ fn main() {
                 println!();
                 println!("{:?}", (overlap.1).0);
                 println!("[");
-                for te in (overlap.1).1 {
+                for te in &(overlap.1).1 {
                     println!("{:?}", te);
                 }
                 println!("]");
