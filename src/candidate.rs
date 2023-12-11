@@ -112,16 +112,16 @@ impl CandidateManager {
             let cur_path = self.victim_paths.pop().unwrap();
 
             let cp_edges = cur_path.g.get_edges();
-            println!("CRITICAL PATH TRACE TYPE = {}", cur_path.g.request_type);
+            // println!("CRITICAL PATH TRACE TYPE = {}", cur_path.g.request_type);
 
             // let mut i = 0;
 
             for edge in cp_edges {
                 // i += 1;
-                println!();
-                println!("EDGE:");
-                println!("{:?}", edge);
-                println!();
+                // println!();
+                // println!("EDGE:");
+                // println!("{:?}", edge);
+                // println!();
                 if (edge.tp_start == self.victim_start) && (edge.tp_end == self.victim_end) {
                     // self.victim_overlaps.push((cur_path.g.base_id, edge))
                     self.victim_overlaps.insert(cur_path.g.base_id, (edge, Vec::new()));

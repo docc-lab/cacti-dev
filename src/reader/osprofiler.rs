@@ -119,7 +119,7 @@ impl Reader for OSProfilerReader {
                     let stable = match self.prev_traces.get(id) {
                         Some(&d) => {
                             if d.0 == t.duration {
-                                if d.1 == 10 {
+                                if d.1 == 12 {
                                     true
                                 }
                                 else {
