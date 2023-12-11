@@ -181,21 +181,24 @@ impl CandidateManager {
             .expect("Time went backwards!")
             .as_nanos() as i64;
 
-        for victim in self.victim_overlaps {
-            for non_victim in self.non_victim_segments {
+        let victim_overlaps = self.victim_overlaps.clone();
+        let non_victim_segments = self.non_victim_segments.clone();
+
+        for victim in victim_overlaps {
+            for non_victim in non_victim_segments {
                 if victim.0 != (non_victim.1).0 {
                     if (victim.1).0.overlaps_with(&(non_victim.1).1) {
                         let mut new_overlaps = (victim.1).1.clone();
                         new_overlaps.push((non_victim.1).1);
-                        self.victim_overlaps.insert(
+                        (&mut self.victim_overlaps).insert(
                             victim.0,
                             ((victim.1).0.clone(), new_overlaps)
                         );
-                        self.victim_overlap_max_times.insert(
+                        (&mut self.victim_overlap_max_times).insert(
                             victim.0,
                             now_time.clone()
                         );
-                        self.non_victim_segments.insert(
+                        (&mut self.non_victim_segments).insert(
                             non_victim.0,
                             ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
                         );
