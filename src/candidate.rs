@@ -185,11 +185,11 @@ impl CandidateManager {
         let non_victim_segments = self.non_victim_segments.clone();
 
         for victim in victim_overlaps {
-            for non_victim in non_victim_segments {
+            for non_victim in &non_victim_segments {
                 if victim.0 != (non_victim.1).0 {
                     if (victim.1).0.overlaps_with(&(non_victim.1).1) {
                         let mut new_overlaps = (victim.1).1.clone();
-                        new_overlaps.push((non_victim.1).1);
+                        new_overlaps.push((non_victim.1.clone()).1);
                         (&mut self.victim_overlaps).insert(
                             victim.0,
                             ((victim.1).0.clone(), new_overlaps)
@@ -199,7 +199,7 @@ impl CandidateManager {
                             now_time.clone()
                         );
                         (&mut self.non_victim_segments).insert(
-                            non_victim.0,
+                            non_victim.0.clone(),
                             ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
                         );
                     }
