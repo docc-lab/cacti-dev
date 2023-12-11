@@ -69,7 +69,7 @@ impl CandidateManager {
                 self.victim_paths.push(CriticalPath::from_trace(&trace).unwrap())
             }
             // else {
-            self.candidate_traces.push(trace);
+            self.non_victim_traces.push(trace);
             // }
         }
     }
@@ -157,7 +157,7 @@ impl CandidateManager {
             //     None => (),
             // }
             if (non_victim_info.1).2 + 300*1000000000 < now_time {
-                self.non_victim_segments.remove(&non_victim_info.0)
+                self.non_victim_segments.remove(&non_victim_info.0);
             }
         }
     }
