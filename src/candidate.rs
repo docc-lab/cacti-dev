@@ -176,7 +176,7 @@ impl CandidateManager {
                 let victim_segment = old_victims.0;
                 let vs_latency = victim_segment.end - victim_segment.start;
 
-                for candidate in old_victims.1 {
+                for candidate in &old_victims.1 {
                     // if self.candidate_groups.contains_key(&candidate.request_type) {
                     //     let mut rt_data = self.candidate_groups.get(&candidate.request_type).unwrap();
                     //     rt_data.push()
