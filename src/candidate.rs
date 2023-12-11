@@ -76,7 +76,9 @@ impl CandidateManager {
     pub fn add_traces(&mut self, traces: Vec<Trace>) {
         for trace in traces {
             if trace.request_type == self.victim_type {
-                self.victim_paths.push(CriticalPath::from_trace(&trace).unwrap())
+                let mut new_cp = CriticalPath::from_trace(&trace).unwrap();
+                new_cp.g.set_req_type(trace.request_type);
+                self.victim_paths.push(new_cp);
             }
             // else {
             self.non_victim_traces.push(trace);

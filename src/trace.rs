@@ -66,6 +66,10 @@ impl Trace {
         }
     }
 
+    pub fn set_req_type(&mut self, r: RequestType) {
+        self.request_type = r;
+    }
+
     pub fn to_file(&self, file: &Path) {
         let writer = std::fs::File::create(file).unwrap();
         serde_json::to_writer(writer, self).ok();
