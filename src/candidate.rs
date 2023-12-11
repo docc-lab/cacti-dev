@@ -135,7 +135,7 @@ impl CandidateManager {
                 // );
 
                 self.non_victim_segments.insert(
-                    hash_uuid_and_edge(cur_trace.base_id, edge),
+                    hash_uuid_and_edge(cur_trace.base_id, edge.clone()),
                     (cur_trace.base_id, edge.clone(), now_time.clone())
                 );
             }
