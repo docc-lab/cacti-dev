@@ -176,7 +176,7 @@ impl CandidateManager {
                         new_overlaps.push((non_victim.1).1);
                         self.victim_overlaps.insert(
                             victim.0,
-                            (victim.1.0.clone(), new_overlaps)
+                            ((victim.1).0.clone(), new_overlaps)
                         );
                         self.victim_overlap_max_times.insert(
                             victim.0,
