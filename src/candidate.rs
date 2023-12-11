@@ -161,7 +161,7 @@ impl CandidateManager {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
-            if *latest_overlap_time + 300*1000000000 < now_time {
+            if *latest_overlap_time + 600*1000000000 < now_time {
                 &mut self.old_victim_overlaps.insert(
                     overlap_info.0,
                     (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap()
@@ -187,25 +187,25 @@ impl CandidateManager {
         for non_victim_info in non_victim_segments {
             // match non_victim_info.1.2 {
             //     Some(t) => {
-            //         if t + 300*1000000000 < now_time {
+            //         if t + 600*1000000000 < now_time {
             //             self.non_victim_segments.remove(&non_victim_info.0)
             //         }
             //     },
             //     None => (),
             // }
-            if (non_victim_info.1).2 + 300*1000000000 < now_time {
+            if (non_victim_info.1).2 + 600*1000000000 < now_time {
                 (&mut self.non_victim_segments).remove(&non_victim_info.0);
             }
         }
     }
 
     pub fn find_candidates(&mut self) {
-        println!();
-        println!();
-        println!();
-        println!("FIND_CANDIDATES START");
-        println!();
-        println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!("FIND_CANDIDATES START");
+        // println!();
+        // println!();
 
         let now_time = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -215,20 +215,21 @@ impl CandidateManager {
         let victim_overlaps = self.victim_overlaps.clone();
         let non_victim_segments = self.non_victim_segments.clone();
 
-        println!("Outermost Loop");
+        // println!("Outermost Loop");
         for victim in victim_overlaps {
-            println!("Inner Loop 1");
+            // println!("Inner Loop 1");
             for non_victim in &non_victim_segments {
-                println!("Pre-Uuid check");
+                // println!("Pre-Uuid check");
                 if victim.0 != (non_victim.1).0 {
-                    println!("Post-Uuid check");
-                    if !self.used_pairs.contains(&(
+                    // println!("Post-Uuid check");
+                    let hash_to_check = (
                         hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
                         hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
-                    )) {
-                        println!("Post-used-pairs check");
+                    );
+                    if !self.used_pairs.contains(&hash_to_check) {
+                        // println!("Post-used-pairs check");
                         if (victim.1).0.overlaps_with(&(non_victim.1).1) {
-                            println!("Overlap found!!");
+                            // println!("Overlap found!!");
                             let mut new_overlaps = (victim.1).1.clone();
                             new_overlaps.push((non_victim.1.clone()).1);
                             (&mut self.victim_overlaps).insert(
@@ -243,16 +244,17 @@ impl CandidateManager {
                                 non_victim.0.clone(),
                                 ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
                             );
+                            (&mut self.used_pairs.insert(hash_to_check))
                         }
                     }
                 }
             }
         }
-        println!("Outermost Loop");
-        println!("FIND_CANDIDATES END");
-        println!();
-        println!();
-        println!();
+        // println!("Outermost Loop");
+        // println!("FIND_CANDIDATES END");
+        // println!();
+        // println!();
+        // println!();
     }
 }
 
