@@ -142,7 +142,7 @@ fn main() {
         });
     }
 
-    let (tx_across, rx_across) = channel();
+    // let (tx_across, rx_across) = channel();
 
     let mut final_break = false;
 
