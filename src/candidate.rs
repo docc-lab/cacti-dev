@@ -42,6 +42,7 @@ pub struct CandidateManager {
     pub non_victim_segments: HashMap<String, (Uuid, TraceEdge, i64)>,
     pub candidate_segments: Vec<TraceEdge>,
     pub victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
+    pub old_victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
     pub victim_overlap_max_times: HashMap<Uuid, i64>,
     used_pairs: HashSet<(String, String)>,
 }
@@ -58,6 +59,7 @@ impl CandidateManager {
             non_victim_segments: HashMap::new(),
             candidate_segments: Vec::new(),
             victim_overlaps: HashMap::new(),
+            old_victim_overlaps: HashMap::new(),
             victim_overlap_max_times: HashMap::new(),
             used_pairs: HashSet::new(),
         }
@@ -128,18 +130,27 @@ impl CandidateManager {
     }
 
     pub fn flush_old_victims(&mut self) {
-        for overlap_info in self.victim_overlaps {
+        let victim_overlaps = self.victim_overlaps.clone();
+        for overlap_info in victim_overlaps {
             let latest_overlap_time = &self.victim_overlap_max_times.get(&overlap_info.0).unwrap();
             let now_time = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
             if *latest_overlap_time + 300*1000000000 < now_time {
-                &mut self.victim_overlaps.remove(&overlap_info.0);
+                &mut self.old_victim_overlaps.insert(
+                    overlap_info.0,
+                    (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap()
+                );
+                // self.move_victim_overlaps(&overlap_info.0);
                 self.victim_overlap_max_times.remove(&overlap_info.0);
             }
         }
     }
+
+    // pub fn move_victim_overlaps(victim_uuid: Uuid) {
+    //
+    // }
 
     pub fn flush_old_non_victims(&mut self) {
         let now_time = SystemTime::now()
