@@ -45,6 +45,7 @@ pub struct CandidateManager {
     pub old_victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
     pub victim_overlap_max_times: HashMap<Uuid, i64>,
     used_pairs: HashSet<(String, String)>,
+    pub candidate_groups: HashMap<RequestType, Vec<(i32, i64)>>
 }
 
 pub fn hash_uuid_and_edge(uuid: Uuid, edge: TraceEdge) -> String {
@@ -57,7 +58,7 @@ pub fn hash_uuid_and_edge(uuid: Uuid, edge: TraceEdge) -> String {
 
 impl CandidateManager {
     pub fn from_settings(settings: &Settings, victim_edge: (&str, &str)) -> CandidateManager {
-        return CandidateManager {
+        let mut to_return = CandidateManager {
             victim_type: settings.problem_type,
             victim_start: victim_edge.0.to_string(),
             victim_end: victim_edge.1.to_string(),
@@ -70,7 +71,10 @@ impl CandidateManager {
             old_victim_overlaps: HashMap::new(),
             victim_overlap_max_times: HashMap::new(),
             used_pairs: HashSet::new(),
-        }
+            candidate_groups: HashMap::new(),
+        };
+
+        to_return
     }
 
     pub fn add_traces(&mut self, traces: Vec<Trace>) {
@@ -164,15 +168,61 @@ impl CandidateManager {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!")
                 .as_nanos() as i64;
-            if *latest_overlap_time + 600*1000000000 < now_time {
-                &mut self.old_victim_overlaps.insert(
+            if *latest_overlap_time + 300*1000000000 < now_time {
+                let old_victims = (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap();
+
+                let mut rt_counts: HashMap<RequestType, i32> = HashMap::new();
+
+                let victim_segment = old_victims.0;
+                let vs_latency = victim_segment.end - victim_segment.start;
+
+                for candidate in old_victims.1 {
+                    // if self.candidate_groups.contains_key(&candidate.request_type) {
+                    //     let mut rt_data = self.candidate_groups.get(&candidate.request_type).unwrap();
+                    //     rt_data.push()
+                    // }
+                    // else {
+                    //
+                    // }
+                    if rt_counts.contains_key(&candidate.request_type) {
+                        rt_counts.insert(candidate.request_type, rt_counts.get(&candidate.request_type) + 1)
+                    }
+                    else {
+                        rt_counts.insert(candidate.request_type, 1);
+                    }
+                }
+
+                for rtc in rt_counts {
+                    if self.candidate_groups.contains_key(&rtc.0) {
+                        let mut rt_data = self.candidate_groups.get(&rtc.0).unwrap().clone();
+                        rt_data.push((rtc.1, vs_latency.clone()));
+                        (&mut self.candidate_groups).insert(rtc.0, rt_data);
+                    }
+                    else {
+                        let mut rt_data = Vec::new();
+                        rt_data.push((rtc.1, vs_latency.clone()));
+                        (&mut self.candidate_groups).insert(rtc.0, rt_data);
+                    }
+                }
+
+                (&mut self.old_victim_overlaps).insert(
                     overlap_info.0,
-                    (&mut self.victim_overlaps).remove(&overlap_info.0).unwrap()
+                    old_victims.clone(),
                 );
                 // self.move_victim_overlaps(&overlap_info.0);
                 self.victim_overlap_max_times.remove(&overlap_info.0);
             }
         }
+
+        println!();
+        println!();
+        println!();
+        println!("Flushed old non-victims! Printing candidate groups!");
+        println!();
+        println!("{:?}", self.candidate_groups);
+        println!();
+        println!();
+        println!();
     }
 
     // pub fn move_victim_overlaps(victim_uuid: Uuid) {
@@ -190,13 +240,13 @@ impl CandidateManager {
         for non_victim_info in non_victim_segments {
             // match non_victim_info.1.2 {
             //     Some(t) => {
-            //         if t + 600*1000000000 < now_time {
+            //         if t + 300*1000000000 < now_time {
             //             self.non_victim_segments.remove(&non_victim_info.0)
             //         }
             //     },
             //     None => (),
             // }
-            if (non_victim_info.1).2 + 600*1000000000 < now_time {
+            if (non_victim_info.1).2 + 300*1000000000 < now_time {
                 (&mut self.non_victim_segments).remove(&non_victim_info.0);
             }
         }
