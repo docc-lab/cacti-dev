@@ -8,7 +8,7 @@ pids=()
 
 for i in `seq $NUM_ITERS`
 do
-  ~/pythia/workloads/create_delete_vm_2 "$TRACE_FILE$i" 1 &
+  ~/pythia/workloads/create_delete_vm_2.sh "$TRACE_FILE$i" 1 &
   pids+=($!)
 done
 
