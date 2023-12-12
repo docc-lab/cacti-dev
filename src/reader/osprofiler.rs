@@ -532,26 +532,6 @@ impl OSProfilerReader {
                                     );
                                 }
                             },
-                            None => {
-                                // Parent has finished execution before child starts - shouldn't happen
-                                let parent_node = &dag.g[match id_map.get(&event.parent_id) {
-                                    Some(&nidx) => nidx,
-                                    None => {
-                                        panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
-                                    }
-                                }];
-                                async_traces.insert(
-                                    event.trace_id,
-                                    match id_map.get(&event.parent_id) {
-                                        Some(&nidx) => nidx,
-                                        None => {
-                                            panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
-                                        }
-                                    }
-                                );
-                                // assert!(event.timestamp > parent_node.timestamp);
-                                // panic!("Parent of node {:?} not found: {:?}", event, parent_node);
-                            }
                             // None => {
                             //     // Parent has finished execution before child starts - shouldn't happen
                             //     let parent_node = &dag.g[match id_map.get(&event.parent_id) {
@@ -560,9 +540,29 @@ impl OSProfilerReader {
                             //             panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
                             //         }
                             //     }];
-                            //     assert!(event.timestamp > parent_node.timestamp);
-                            //     panic!("Parent of node {:?} not found: {:?}", event, parent_node);
+                            //     async_traces.insert(
+                            //         event.trace_id,
+                            //         match id_map.get(&event.parent_id) {
+                            //             Some(&nidx) => nidx,
+                            //             None => {
+                            //                 panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
+                            //             }
+                            //         }
+                            //     );
+                            //     // assert!(event.timestamp > parent_node.timestamp);
+                            //     // panic!("Parent of node {:?} not found: {:?}", event, parent_node);
                             // }
+                            None => {
+                                // Parent has finished execution before child starts - shouldn't happen
+                                let parent_node = &dag.g[match id_map.get(&event.parent_id) {
+                                    Some(&nidx) => nidx,
+                                    None => {
+                                        panic!("Warning: Parent of node {:?} not found. Silently ignoring this event", event);
+                                    }
+                                }];
+                                assert!(event.timestamp > parent_node.timestamp);
+                                panic!("Parent of node {:?} not found: {:?}", event, parent_node);
+                            }
                         }
                     }
                 }

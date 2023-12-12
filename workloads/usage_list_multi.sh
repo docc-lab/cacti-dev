@@ -34,11 +34,23 @@ list_usage () {
 tmpfile=$(mktemp /tmp/workload.XXXXXX)
 log "START: tmpfile is $tmpfile"
 
+iteration () {
+  log "Listing Usage..."
+  list_usage
+}
+
+pids=()
+
 for i in `seq $iter`
 do
-    log "Listing Usage..."
-    list_usage
+    iteration &
+    pids+=($!)
 #    sleep 2
+done
+
+for pid in ${pids[@]}
+do
+    wait $pid
 done
 
 duration=$SECONDS
