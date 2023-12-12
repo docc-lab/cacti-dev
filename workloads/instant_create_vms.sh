@@ -8,7 +8,7 @@ pids=()
 
 for i in `seq $NUM_ITERS`
 do
-  ~/pythia/workloads/create_delete_vm_2.sh "$TRACE_FILE$i" 1 &
+  openstack --os-profile Devstack1 server create "test_server$i" --flavor m1.tiny --image cirros --network flat-lan-1-net &
   pids+=($!)
 done
 
