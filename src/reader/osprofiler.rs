@@ -351,6 +351,9 @@ impl OSProfilerReader {
         event_list: &mut Vec<OSProfilerSpan>,
         mut parent_of_trace: Option<NodeIndex>,
     ) -> Result<Option<NodeIndex>, Box<dyn Error>> {
+        println!();
+        println!("Received [[ {} ]] events!", event_list.len());
+        println!();
         if event_list.len() == 0 {
             return Ok(None);
         }
