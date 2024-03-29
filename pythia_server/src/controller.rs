@@ -74,6 +74,10 @@ impl OSProfilerController {
         to_write: &[u8; 1],
     ) {
         let path = self.get_path(tracepoint, request_type);
+        eprintln!(
+            "PFTR - PATH FOR TRACEPOINT {:?} AND REQUEST TYPE {:?} IS {:?}",
+            tracepoint, request_type, path
+        );
         match File::create(&path) {
             Ok(mut f) => {
                 f.write_all(to_write).unwrap();
