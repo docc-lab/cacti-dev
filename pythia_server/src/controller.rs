@@ -74,10 +74,18 @@ impl OSProfilerController {
         to_write: &[u8; 1],
     ) {
         let path = self.get_path(tracepoint, request_type);
-        eprintln!(
+        // eprintln!(
+        //     "PFTR - PATH FOR TRACEPOINT {:?} AND REQUEST TYPE {:?} IS {:?}",
+        //     tracepoint, request_type, path
+        // );
+
+        let data = format!(
             "PFTR - PATH FOR TRACEPOINT {:?} AND REQUEST TYPE {:?} IS {:?}",
             tracepoint, request_type, path
         );
+        let mut f = File::create("/tmp/yeet/lmao.txt").expect("Unable to create file");
+        f.write_all(data.as_bytes()).expect("Unable to write data");
+
         match File::create(&path) {
             Ok(mut f) => {
                 f.write_all(to_write).unwrap();
