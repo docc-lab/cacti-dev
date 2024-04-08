@@ -45,6 +45,16 @@ impl OSProfilerController {
     fn write_dir(&self, dir: &Path, to_write: &[u8; 1]) {
         for f in read_dir(dir).unwrap() {
             let path = f.unwrap().path();
+
+            let data = format!(
+                "PFTR - PATH IS {:?}", path
+            );
+            // let mut f = File::create("/tmp/yeet/lmao.txt").expect("Unable to create file");
+            // f.write_all(data.as_bytes()).expect("Unable to write data");
+            println!();
+            println!(data);
+            println!();
+
             if path.is_dir() {
                 self.write_dir(&path, to_write);
             } else {
