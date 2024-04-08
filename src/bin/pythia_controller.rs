@@ -132,11 +132,11 @@ fn main() {
                     println!("{}", trace.request_type);
                     println!("\n==========\n\n\n");
 
-                    // tx.send(CriticalPath::from_trace(&trace).unwrap())
-                    //     .expect("channel will be there waiting for the pool");
-
-                    tx.send(trace)
+                    tx.send(CriticalPath::from_trace(&trace).unwrap())
                         .expect("channel will be there waiting for the pool");
+
+                    // tx.send(trace)
+                    //     .expect("channel will be there waiting for the pool");
                 }
                 sleep(SETTINGS.jiffy);
             }
