@@ -139,7 +139,7 @@ pub fn run_pythia_server() {
     println!("Server address: {}", server_addr);
 
     let _server = ServerBuilder::new(io)
-        .start_http(&server_addr.clone())
+        .start_http(&server_addr)
         .expect("Unable to start RPC server");
 
     _server.wait();
