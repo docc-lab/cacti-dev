@@ -36,5 +36,6 @@ itertools = "*"
 config = "*"
 threadpool = "*"
 strum = "0.25.0"
+rustc-serialize = "0.3.25"
 [target.'cfg(target_os = "linux")'.dependencies]
 procinfo = "*"
