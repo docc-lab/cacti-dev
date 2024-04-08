@@ -183,11 +183,11 @@ fn main() {
                     | cp: &CriticalPath | cp.request_type == SETTINGS.problem_type
                 ).collect();
 
-                // TODO: use critical_paths to get edge IDs of problematic edge types and send via tx_across
-                for cp in critical_paths.iter() {
-                    tx_across.send(/*some stuff in here to get the problematic edge*/"placeholder")
-                        .expect("CACTI will be receiving on a channel");
-                }
+                // // TODO: use critical_paths to get edge IDs of problematic edge types and send via tx_across
+                // for cp in critical_paths.iter() {
+                //     tx_across.send(/*some stuff in here to get the problematic edge*/"placeholder")
+                //         .expect("CACTI will be receiving on a channel");
+                // }
 
                 groups.update(&critical_paths);
                 budget_manager.update_new_paths(&critical_paths);
