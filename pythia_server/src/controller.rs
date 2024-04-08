@@ -46,13 +46,13 @@ impl OSProfilerController {
         for f in read_dir(dir).unwrap() {
             let path = f.unwrap().path();
 
-            let data = format!(
-                "PFTR - PATH IS {:?}", path
-            );
+            // let data = format!(
+            //     "PFTR - PATH IS {:?}", path
+            // );
             // let mut f = File::create("/tmp/yeet/lmao.txt").expect("Unable to create file");
             // f.write_all(data.as_bytes()).expect("Unable to write data");
             println!();
-            println!(data);
+            println!("PFTR - PATH IS {:?}", path);
             println!();
 
             if path.is_dir() {
