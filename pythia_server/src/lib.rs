@@ -135,7 +135,8 @@ pub fn run_pythia_server() {
 
     let address = settings.server_address;
     println!("Starting the server at {}", address);
-    println!("Server address: {}", address.parse().unwrap());
+    let server_addr: std::net::addr::SocketAddr = address.parse().unwrap();
+    println!("Server address: {}", server_addr);
 
     let _server = ServerBuilder::new(io)
         .start_http(&address.parse().unwrap())
