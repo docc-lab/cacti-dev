@@ -39,7 +39,7 @@ impl PythiaClient {
     }
 
     fn set_all_tracepoints(&self, to_write: [u8; 1]) -> impl Future<Item = (), Error = RpcError> {
-        println!("to_write_1: {:?}", to_write);
+        eprintln!("to_write_1: {:?}", to_write);
         self.0.call_method("set_all_tracepoints", "", (to_write,))
     }
 
@@ -148,7 +148,7 @@ pub fn get_events_from_client(client_uri: &str, trace_id: Uuid) -> Vec<OSProfile
 /// Used by controller
 pub fn set_all_client_tracepoints(client_uri: &str, to_write: [u8; 1]) {
     let (tx, mut rx) = futures::sync::mpsc::unbounded();
-    println!("to_write_0: {:?}", to_write);
+    eprintln!("to_write_0: {:?}", to_write);
     let run = http::connect(client_uri)
         .and_then(move |client: PythiaClient| {
             client
