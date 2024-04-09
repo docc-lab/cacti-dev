@@ -139,7 +139,7 @@ fn main() {
         }
         ("enable-mult",  Some(matches)) => {
             let files: Vec<_> = matches.values_of("to-enable").unwrap().collect();
-            eprintln!("{}", files)
+            eprintln!("{:?}", files)
         }
         ("enable-skeleton", Some(_)) => {
             enable_skeleton();
