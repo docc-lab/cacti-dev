@@ -39,6 +39,7 @@ impl PythiaClient {
     }
 
     fn set_all_tracepoints(&self, to_write: [u8; 1]) -> impl Future<Item = (), Error = RpcError> {
+        println!("to_return: {:?}", to_write);
         self.0.call_method("set_all_tracepoints", "", (to_write,))
     }
 
@@ -60,6 +61,14 @@ impl PythiaClient {
     fn free_keys(&self, keys: Vec<String>) -> impl Future<Item = (), Error = RpcError> {
         self.0.call_method("free_keys", "", (keys,))
     }
+
+    /// New section - tracepoint enabling/disabling
+    // fn enable_disable_tracepoints(
+    //     &self,
+    //     settings: Vec<(TracepointID, Option<RequestType>, [u8; 1])>,
+    // ) -> impl Future<Item = (), Error = RpcError> {
+    //
+    // }
 }
 
 /// Read the overhead stats from the agent
