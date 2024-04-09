@@ -62,7 +62,9 @@ impl PythiaClient {
         self.0.call_method("free_keys", "", (keys,))
     }
 
-    /// New section - tracepoint enabling/disabling
+    //////////
+    // New section - tracepoint enabling/disabling
+    //////////
     // fn enable_disable_tracepoints(
     //     &self,
     //     settings: Vec<(TracepointID, Option<RequestType>, [u8; 1])>,
