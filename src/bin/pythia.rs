@@ -130,6 +130,7 @@ fn main() {
             disable_all();
         }
         ("enable-all", Some(_)) => {
+            eprintln!("PYTHIA ENABLE-ALL");
             enable_all();
         }
         ("enable-skeleton", Some(_)) => {
