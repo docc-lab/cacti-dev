@@ -137,7 +137,7 @@ fn main() {
             eprintln!("PYTHIA ENABLE-ALL");
             enable_all();
         }
-        ("enable-mult") => {
+        ("enable-mult",  Some(matches)) => {
             let files: Vec<_> = matches.values_of("to-enable").unwrap().collect();
             eprintln!("{}", files)
         }
