@@ -81,6 +81,10 @@ fn main() {
             SubCommand::with_name("manifest-stats")
                 .arg(Arg::with_name("manifest-file").required(true).index(1)),
         )
+        .subcommand(
+            SubCommand::with_name("enable-mult")
+                .arg(Arg::with_name("to-enable").required(true).min_values(0)),
+        )
         .get_matches();
     match matches.subcommand() {
         ("manifest", Some(matches)) => {
@@ -132,6 +136,10 @@ fn main() {
         ("enable-all", Some(_)) => {
             eprintln!("PYTHIA ENABLE-ALL");
             enable_all();
+        }
+        ("enable-mult") => {
+            let files: Vec<_> = matches.values_of("to-enable").unwrap().collect();
+            eprintln!("{}", files)
         }
         ("enable-skeleton", Some(_)) => {
             enable_skeleton();
