@@ -97,7 +97,7 @@ impl SpanTrace {
         self.spans.insert(to_add.span_id, to_add.clone());
         // If no parent entry present, insert one and begin populating
         if !parent.is_empty() {
-            match self.children.get(parent.as_str()) {
+            match self.children.get_mut(parent.as_str()) {
                 Some(mut v) => {
                     v.push(to_add.clone())
                 }
