@@ -13,7 +13,6 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::marker::Tuple;
 use std::ptr::null;
 use std::time::Duration;
 
@@ -21,7 +20,7 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Span {
     pub span_id: String,
     pub parent: String,
