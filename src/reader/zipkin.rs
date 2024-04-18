@@ -11,7 +11,7 @@ use std::error::Error;
 use futures::Sink;
 use hyper::http;
 use crate::reader::Reader;
-use crate::Trace;
+use crate::{Settings, Trace};
 use crate::spantrace::Span;
 
 pub struct ZipkinReader {
@@ -62,8 +62,7 @@ impl Reader for ZipkinReader {
 
         let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
 
-        let resp = reqwest::blocking::get("https://httpbin.org/ip")
-            .json()?;
+        let resp = reqwest::blocking::get("https://httpbin.org/ip")?;
 
         println!("{}", resp);
 
@@ -80,5 +79,7 @@ impl Reader for ZipkinReader {
 }
 
 impl ZipkinReader {
-
+    pub fn from_settings(settings: &Settings) -> ZipkinReader {
+        return ZipkinReader{}
+    }
 }
