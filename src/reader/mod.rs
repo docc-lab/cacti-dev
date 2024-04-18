@@ -27,6 +27,7 @@ use crate::reader::hdfs::HDFSReader;
 use crate::reader::deathstar::DEATHSTARReader;
 use crate::reader::osprofiler::OSProfilerReader;
 use crate::reader::uber::UberReader;
+use crate::reader::zipkin::ZipkinReader;
 use crate::settings::ApplicationType;
 use crate::settings::Settings;
 use crate::trace::Trace;
