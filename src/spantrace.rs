@@ -69,10 +69,10 @@ impl Span {
 
     pub fn overlaps(&self, with: &Span) -> bool {
         let self_start = self.start.timestamp_nanos();
-        let self_end = self_start + self.duration.as_nanos();
+        let self_end = self_start + (self.duration.as_nanos() as i64);
 
         let with_start = with.start.timestamp_nanos();
-        let with_end = with_start + with.duration.as_nanos();
+        let with_end = with_start + (with.duration.as_nanos() as i64);
 
         return (with_start < self_end) && (with_end > self_start);
     }
@@ -150,7 +150,7 @@ impl SpanCache {
     // "context" variable represents a trace ID
     pub fn add_span(&mut self, to_add: Span, context: String) {
         let start_time = to_add.start.timestamp_nanos();
-        let end_time = start_time + to_add.duration.as_nanos();
+        let end_time = start_time + (to_add.duration.as_nanos() as i64);
         self.span_times.push((start_time.clone(), end_time));
         self.span_refs.push((context, to_add.span_id));
     }
@@ -169,7 +169,7 @@ impl SpanCache {
             //     to_return.push(span)
             // }
             let target_start = target.start.timestamp_nanos();
-            let target_end = target_start + with.duration.as_nanos();
+            let target_end = target_start + (target.duration.as_nanos() as i64);
 
             if (target_end > time.0) && (target_start < time.1) {
                 to_return.push(self.span_refs[i.clone()].clone())
