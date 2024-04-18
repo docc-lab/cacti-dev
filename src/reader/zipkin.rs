@@ -67,7 +67,7 @@ impl Reader for ZipkinReader {
         //     Ok()
         // }
 
-        eprintln!("RESPONSE = {:?}", resp);
+        eprintln!("RESPONSE = {:?}", resp.json());
 
         return Vec::new();
     }
