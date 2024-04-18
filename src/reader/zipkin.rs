@@ -70,11 +70,13 @@ impl Reader for ZipkinReader {
     }
 
     fn reset_state(&mut self) {
-        todo!()
+        // TODO
+        return
     }
 
     fn for_searchspace(&mut self) {
-        todo!()
+        // TODO
+        return
     }
 }
 
