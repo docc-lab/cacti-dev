@@ -570,17 +570,17 @@ fn main() {
     //     }
     // });
     //
-    // let mut i = 0;
-    // loop {
-    //     if final_break {
-    //         break;
-    //     }
-    //
-    //     // println!("i = ${}", i);
-    //     sleep(Duration::from_millis(1000));
-    //
-    //     i += 1;
-    // }
+    let mut i = 0;
+    loop {
+        if final_break {
+            break;
+        }
+
+        println!("i = ${}", i);
+        sleep(Duration::from_millis(1000));
+
+        i += 1;
+    }
 
     // // Main CACTI Loop
     // pool.execute(move || {
