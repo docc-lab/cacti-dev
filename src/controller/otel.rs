@@ -24,27 +24,33 @@ pub struct OTelController {
 
 impl Controller for OTelController {
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
-        todo!()
+        // todo!()
+        return
     }
 
     fn disable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
-        todo!()
+        // todo!()
+        return
     }
 
     fn is_enabled(&self, point: &(TracepointID, Option<RequestType>)) -> bool {
-        todo!()
+        // todo!()
+        true
     }
 
     fn disable_all(&self) {
-        todo!()
+        // todo!()
+        return
     }
 
     fn enable_all(&self) {
-        todo!()
+        // todo!()
+        return
     }
 
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
-        todo!()
+        // todo!()
+        Vec::new()
     }
 }
 
