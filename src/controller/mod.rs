@@ -11,6 +11,7 @@ All rights reserved.
 
 mod hdfs;
 mod osprofiler;
+mod otel;
 
 use pythia_common::RequestType;
 
@@ -23,6 +24,7 @@ use crate::trace::TracepointID;
 
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
+use crate::controller::otel::OTelController;
 
 pub trait Controller: Send + Sync {
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>);
@@ -43,6 +45,7 @@ pub fn controller_from_settings(settings: &Settings) -> Box<dyn Controller> {
         ApplicationType::HDFS => Box::new(HDFSController::from_settings(settings)),
         ApplicationType::DEATHSTAR => Box::new(HDFSController::from_settings(settings)),
         ApplicationType::Uber => panic!("Can't control uber"),
+        ApplicationType::Zipkin => Box::new(OTelController::from_settings(settings)),
     }
 }
 
