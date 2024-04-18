@@ -64,7 +64,7 @@ impl Reader for ZipkinReader {
 
         let resp = reqwest::blocking::get("https://httpbin.org/ip");
 
-        println!("{:?}", resp);
+        eprintln!("RESPONSE = {:?}", resp);
 
         return Vec::new();
     }
