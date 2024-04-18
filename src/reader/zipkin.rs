@@ -57,15 +57,13 @@ impl Reader for ZipkinReader {
     }
 
     // #[tokio:main]
-    async fn get_recent_traces(&mut self) -> Vec<Trace> {
+    fn get_recent_traces(&mut self) -> Vec<Trace> {
         // let mut ids = Vec::new();
 
         let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
 
-        let resp = reqwest::get("https://httpbin.org/ip")
-            .await?
-            .json()
-            .await?;
+        let resp = reqwest::blocking::get("https://httpbin.org/ip")
+            .json()?;
 
         println!("{}", resp);
 

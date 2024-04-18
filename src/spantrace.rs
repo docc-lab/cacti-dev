@@ -116,7 +116,7 @@ impl SpanTrace {
     }
 
     fn get_backtrace(&self, from: String) -> Vec<Span> {
-        let mut to_return =- Vec::new();
+        let mut to_return = Vec::new();
         let mut cur_id = from;
         loop {
             if cur_id.is_empty() {
