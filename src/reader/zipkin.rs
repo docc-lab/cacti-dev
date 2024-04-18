@@ -62,7 +62,7 @@ impl Reader for ZipkinReader {
 
         let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
 
-        let resp = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
+        let resp: reqwest::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
         // match resp {
         //     Ok()
         // }
