@@ -107,7 +107,7 @@ impl SpanTrace {
             }
         }
         // If self is not member of parent/child map, add entry
-        match self.children.get(to_add.span_id.as_str()) {
+        match self.children.get(to_add.span_id.clone().as_str()) {
             None => {
                 self.children.insert(to_add.span_id.clone(), Vec::new());
             }
