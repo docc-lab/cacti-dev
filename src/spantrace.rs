@@ -94,7 +94,7 @@ pub struct SpanTrace {
 
 impl SpanTrace {
     fn add_span(&mut self, to_add: Span, parent: String) {
-        self.spans.insert(to_add.span_id, to_add.clone());
+        self.spans.insert(to_add.clone().span_id, to_add.clone());
         // If no parent entry present, insert one and begin populating
         if !parent.is_empty() {
             match self.children.get_mut(parent.as_str()) {
