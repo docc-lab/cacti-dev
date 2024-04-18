@@ -66,6 +66,13 @@ pub trait PythiaAPI {
     /// Delete these keys from redis. Used to free up memory, but deleted any records of traces.
     #[rpc(name = "free_keys")]
     fn free_keys(&self, keys: Vec<String>) -> Result<()>;
+
+    //////////
+    // New section - actions to carry enable/disable messages across to tracing infra
+    //////////
+    /// Enable and/or disable a set of tracepoints based on received data
+    #[rpc(name = "enable_disable_tracepoints")]
+    fn enable_disable_tracepoints(&self, settings: String) -> Result<()>;
 }
 
 struct PythiaAPIImpl {
@@ -108,6 +115,10 @@ impl PythiaAPI for PythiaAPIImpl {
         eprintln!("Freeing keys {:?}", keys);
         self.reader.lock().unwrap().free_keys(keys);
         Ok(())
+    }
+
+    fn enable_disable_tracepoints(&self, settings: String) -> Result<()> {
+
     }
 }
 

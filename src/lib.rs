@@ -76,6 +76,9 @@ pub mod settings;
 pub mod trace;
 pub mod candidate;
 pub mod provenance;
+pub mod control_msg;
+pub mod classification;
+pub mod spantrace;
 
 use std::collections::HashSet;
 use std::error::Error;

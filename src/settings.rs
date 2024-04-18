@@ -35,6 +35,7 @@ pub struct Settings {
     pub manifest_file: PathBuf,
     pub pythia_clients: Vec<String>,
     pub redis_url: String,
+    pub zipkin_url: String,
     pub xtrace_url: String,
     pub uber_trace_dir: PathBuf,
     pub DEATHSTAR_trace_dir: PathBuf,
@@ -60,7 +61,8 @@ pub enum ApplicationType {
     HDFS,
     OpenStack,
     Uber,
-    DEATHSTAR
+    DEATHSTAR,
+    Zipkin
 }
 
 impl Settings {
@@ -89,6 +91,7 @@ impl Settings {
             deathstar_control_file,
             pythia_clients,
             redis_url: results.get("redis_url").unwrap().to_string(),
+            zipkin_url: results.get("zipkin_url").unwrap().to_string(),
             uber_trace_dir: PathBuf::from(results.get("uber_trace_dir").unwrap()),
             DEATHSTAR_trace_dir: PathBuf::from(results.get("DEATHSTAR_trace_dir").unwrap()),
             application: match results.get("application").unwrap().as_str() {
@@ -96,6 +99,7 @@ impl Settings {
                 "HDFS" => ApplicationType::HDFS,
                 "Uber" => ApplicationType::Uber,
                 "DEATHSTAR" => ApplicationType::DEATHSTAR,
+                "Zipkin" => ApplicationType::Zipkin,
                 _ => panic!("Unknown application type"),
             },
             xtrace_url: results.get("xtrace_url").unwrap().to_string(),

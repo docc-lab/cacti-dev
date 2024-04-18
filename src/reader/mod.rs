@@ -12,6 +12,7 @@ mod hdfs;
 mod deathstar;
 mod osprofiler;
 mod uber;
+mod zipkin;
 
 use std::error::Error;
 use std::fmt;
@@ -81,6 +82,7 @@ pub fn reader_from_settings(settings: &Settings) -> Box<dyn Reader> {
         ApplicationType::HDFS => Box::new(HDFSReader::from_settings(settings)),
         ApplicationType::DEATHSTAR => Box::new(DEATHSTARReader::from_settings(settings)),
         ApplicationType::Uber => Box::new(UberReader::from_settings(settings)),
+        ApplicationType::Zipkin => Box::new(ZipkinReader::from_settings(settings)),
     }
 }
 
