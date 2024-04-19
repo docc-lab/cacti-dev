@@ -13,6 +13,7 @@ mod deathstar;
 mod osprofiler;
 mod uber;
 mod zipkin;
+mod jaeger;
 
 use std::error::Error;
 use std::fmt;
@@ -25,6 +26,7 @@ use uuid::Uuid;
 
 use crate::reader::hdfs::HDFSReader;
 use crate::reader::deathstar::DEATHSTARReader;
+use crate::reader::jaeger::JaegerReader;
 use crate::reader::osprofiler::OSProfilerReader;
 use crate::reader::uber::UberReader;
 use crate::reader::zipkin::ZipkinReader;
@@ -84,6 +86,7 @@ pub fn reader_from_settings(settings: &Settings) -> Box<dyn Reader> {
         ApplicationType::DEATHSTAR => Box::new(DEATHSTARReader::from_settings(settings)),
         ApplicationType::Uber => Box::new(UberReader::from_settings(settings)),
         ApplicationType::Zipkin => Box::new(ZipkinReader::from_settings(settings)),
+        ApplicationType::Jaeger => Box::new(JaegerReader::from_settings(settings)),
     }
 }
 

@@ -14,12 +14,12 @@ use crate::reader::Reader;
 use crate::{Settings, Trace};
 use crate::spantrace::Span;
 
-pub struct ZipkinReader {
-    // connection: ZipkinConnection // TODO: implement this
+pub struct JaegerReader {
+    // connection: JaegerConnection // TODO: implement this
     fetch_url: String
 }
 
-impl Reader for ZipkinReader {
+impl Reader for JaegerReader {
     fn read_file(&mut self, filename: &str) -> Trace {
         todo!()
     }
@@ -86,10 +86,10 @@ impl Reader for ZipkinReader {
     }
 }
 
-impl ZipkinReader {
-    pub fn from_settings(settings: &Settings) -> ZipkinReader {
-        return ZipkinReader{
-            fetch_url: settings.zipkin_url.clone(),
+impl JaegerReader {
+    pub fn from_settings(settings: &Settings) -> JaegerReader {
+        return JaegerReader{
+            fetch_url: settings.jaeger_url.clone(),
         }
     }
 }
