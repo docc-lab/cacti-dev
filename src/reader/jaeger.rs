@@ -13,6 +13,27 @@ use hyper::http;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
 use crate::spantrace::Span;
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerSpan {
+    traceID: String,
+    spanID: String,
+    flags: i32,
+    operationName: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerTrace {
+    traceID: String,
+    spans: Vec<JaegerSpan>
+    // processes: Vec:
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerPayload {
+    data: Vec<JaegerSpan>,
+}
 
 pub struct JaegerReader {
     // connection: JaegerConnection // TODO: implement this
@@ -66,11 +87,16 @@ impl Reader for JaegerReader {
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
                 .unwrap();
-        // match resp {
-        //     Ok()
+
+        // match resp.text() {
+        //     Ok(res) => {
+        //         eprintln!("RESPONSE = {:?}", resp.text());
+        //     }
         // }
 
-        eprintln!("RESPONSE = {:?}", resp.text());
+        let respObj = serde_json::from_str(resp.text()).unwrap();
+
+        eprintln!("RESPONSE = {:?}", resp);
 
         return Vec::new();
     }
