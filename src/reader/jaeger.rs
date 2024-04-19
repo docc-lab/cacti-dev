@@ -741,8 +741,7 @@ impl Reader for JaegerReader {
         "#;
 
         let resp_obj: JaegerPayload =
-            serde_json::from_str(
-                (static_resp_text.unwrap() as String).as_str()).unwrap();
+            serde_json::from_str(static_resp_text).unwrap();
 
         eprintln!("RESPONSE = {:?}", resp_obj);
 
