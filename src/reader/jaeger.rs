@@ -1372,11 +1372,21 @@ impl Reader for JaegerReader {
     }
   ]"#;
 
+        let static_resp_text_3 = r#"
+        {
+  "data": [],
+  "total": 0,
+  "limit": 0,
+  "offset": 0,
+  "errors": null
+}
+        "#;
+
         // let resp_obj: JaegerPayload =
         //     serde_json::from_str(static_resp_text).unwrap();
 
-        let resp_obj: Vec<JaegerTrace> =
-            serde_json::from_str(static_resp_text_2).unwrap();
+        let resp_obj: JaegerPayload =
+            serde_json::from_str(static_resp_text_3).unwrap();
 
         eprintln!("RESPONSE = {:?}", resp_obj);
 
