@@ -64,7 +64,7 @@ impl Reader for JaegerReader {
 
         // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
         let resp: reqwest::blocking::Response =
-            reqwest::blocking::get(self.fetch_url.clone())
+            reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?limit=10")
                 .unwrap();
         // match resp {
         //     Ok()
