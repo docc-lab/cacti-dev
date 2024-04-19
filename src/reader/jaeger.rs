@@ -741,22 +741,22 @@ impl Reader for JaegerReader {
         "#;
 
         let static_resp_text_2 = r#"{
-      "traceID": "0db1191b4e3bb3a0",
+      "traceID": "0c7996e1fdf4f54c",
       "spans": [
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "1b48999a9ebb3eea",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "003b77ea7fae5361",
           "flags": 1,
           "operationName": "read_home_timeline_redis_find_client",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "aa833c45e2372b21"
+              "traceID": "0c7996e1fdf4f54c",
+              "spanID": "d918f7a03fe2298f"
             }
           ],
-          "startTime": 1713382467579378,
-          "duration": 166,
+          "startTime": 1713382468245494,
+          "duration": 157,
           "tags": [
             {
               "key": "internal.span.format",
@@ -769,19 +769,19 @@ impl Reader for JaegerReader {
           "warnings": null
         },
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "aa833c45e2372b21",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "d918f7a03fe2298f",
           "flags": 1,
           "operationName": "read_home_timeline_server",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "be30b0e65c8f4fe2"
+              "traceID": "0c7996e1fdf4f54c",
+              "spanID": "6fc286da6f0673c9"
             }
           ],
-          "startTime": 1713382467579365,
-          "duration": 1359,
+          "startTime": 1713382468245480,
+          "duration": 351,
           "tags": [
             {
               "key": "internal.span.format",
@@ -794,44 +794,19 @@ impl Reader for JaegerReader {
           "warnings": null
         },
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "4f2fa980e18c05a9",
-          "flags": 1,
-          "operationName": "post_storage_mmc_mget_client",
-          "references": [
-            {
-              "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "4b4cff74948349ec"
-            }
-          ],
-          "startTime": 1713382467579854,
-          "duration": 576,
-          "tags": [
-            {
-              "key": "internal.span.format",
-              "type": "string",
-              "value": "proto"
-            }
-          ],
-          "logs": [],
-          "processID": "p2",
-          "warnings": null
-        },
-        {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "4b4cff74948349ec",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "387f09aa13907219",
           "flags": 1,
           "operationName": "post_storage_read_posts_server",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "aa833c45e2372b21"
+              "traceID": "0c7996e1fdf4f54c",
+              "spanID": "d918f7a03fe2298f"
             }
           ],
-          "startTime": 1713382467579651,
-          "duration": 933,
+          "startTime": 1713382468245753,
+          "duration": 9,
           "tags": [
             {
               "key": "internal.span.format",
@@ -844,19 +819,19 @@ impl Reader for JaegerReader {
           "warnings": null
         },
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "be30b0e65c8f4fe2",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "6fc286da6f0673c9",
           "flags": 1,
           "operationName": "read_home_timeline_client",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "6b18a9b3f4ad7313"
+              "traceID": "0c7996e1fdf4f54c",
+              "spanID": "4ed5a3cde246374e"
             }
           ],
-          "startTime": 1713382467579131,
-          "duration": 5486,
+          "startTime": 1713382468245248,
+          "duration": 718,
           "tags": [
             {
               "key": "internal.span.format",
@@ -869,19 +844,19 @@ impl Reader for JaegerReader {
           "warnings": null
         },
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "6b18a9b3f4ad7313",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "4ed5a3cde246374e",
           "flags": 1,
           "operationName": "/wrk2-api/home-timeline/read",
           "references": [
             {
               "refType": "CHILD_OF",
-              "traceID": "0db1191b4e3bb3a0",
-              "spanID": "0db1191b4e3bb3a0"
+              "traceID": "0c7996e1fdf4f54c",
+              "spanID": "0c7996e1fdf4f54c"
             }
           ],
-          "startTime": 1713382467579059,
-          "duration": 5593,
+          "startTime": 1713382468245175,
+          "duration": 852,
           "tags": [
             {
               "key": "component",
@@ -906,7 +881,7 @@ impl Reader for JaegerReader {
             {
               "key": "http.url",
               "type": "string",
-              "value": "http://localhost:8080/wrk2-api/home-timeline/read?user_id=15&start=43&stop=53"
+              "value": "http://localhost:8080/wrk2-api/home-timeline/read?user_id=64&start=96&stop=106"
             },
             {
               "key": "http.host",
@@ -934,13 +909,13 @@ impl Reader for JaegerReader {
           "warnings": null
         },
         {
-          "traceID": "0db1191b4e3bb3a0",
-          "spanID": "0db1191b4e3bb3a0",
+          "traceID": "0c7996e1fdf4f54c",
+          "spanID": "0c7996e1fdf4f54c",
           "flags": 1,
           "operationName": "/wrk2-api/home-timeline/read",
           "references": [],
-          "startTime": 1713382467578000,
-          "duration": 6651,
+          "startTime": 1713382468245000,
+          "duration": 1025,
           "tags": [
             {
               "key": "sampler.type",
@@ -985,7 +960,7 @@ impl Reader for JaegerReader {
             {
               "key": "http.url",
               "type": "string",
-              "value": "http://localhost:8080/wrk2-api/home-timeline/read?user_id=15&start=43&stop=53"
+              "value": "http://localhost:8080/wrk2-api/home-timeline/read?user_id=64&start=96&stop=106"
             },
             {
               "key": "http.host",
