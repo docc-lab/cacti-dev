@@ -94,13 +94,13 @@ impl Reader for JaegerReader {
         //     }
         // }
 
-        let respText = resp.text();
+        let resp_text = resp.text();
 
-        let respObj: JaegerPayload =
+        let resp_obj: JaegerPayload =
             serde_json::from_str(
-                (respText.unwrap() as String).as_str()).unwrap();
+                (resp_text.unwrap() as String).as_str()).unwrap();
 
-        eprintln!("RESPONSE = {:?}", resp);
+        eprintln!("RESPONSE = {:?}", resp_obj);
 
         return Vec::new();
     }
