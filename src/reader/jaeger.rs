@@ -16,18 +16,41 @@ use crate::spantrace::Span;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+struct JaegerReference {
+    refType: String,
+    traceID: String,
+    spanID: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 struct JaegerSpan {
     traceID: String,
     spanID: String,
     flags: i32,
     operationName: String,
+    startTime: i64,
+    duration: i64,
+    references: Vec<JaegerReference>,
+    processID: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JPTag {
+    key: String,
+    value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerProcess {
+    serviceName: String,
+    tags: Vec<JPTag>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct JaegerTrace {
     traceID: String,
-    spans: Vec<JaegerSpan>
-    // processes: Vec:
+    spans: Vec<JaegerSpan>,
+    processes: HashMap<String, JaegerProcess>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -100,7 +123,7 @@ impl Reader for JaegerReader {
             serde_json::from_str(
                 (resp_text.unwrap() as String).as_str()).unwrap();
 
-        eprintln!("RESPONSE = {:?}", resp_obj);
+        eprintln!("RESPONSE = {:}", resp_obj);
 
         return Vec::new();
     }
