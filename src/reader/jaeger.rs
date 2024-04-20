@@ -123,7 +123,7 @@ impl Reader for JaegerReader {
             serde_json::from_str(
                 (resp_text.unwrap() as String).as_str()).unwrap();
 
-        eprintln!("RESPONSE = {:}", resp_obj);
+        eprintln!("RESPONSE = {:?}", resp_obj);
 
         return Vec::new();
     }
