@@ -33,7 +33,7 @@ use crate::reader::Reader;
 use crate::rpclib::free_keys;
 use crate::rpclib::get_events_from_client;
 use crate::settings::Settings;
-use crate::trace::Event;
+use crate::trace::{Event, IDType};
 use crate::trace::EventType;
 use crate::trace::Trace;
 use crate::trace::TracepointID;
@@ -340,7 +340,7 @@ impl OSProfilerReader {
         id: Uuid,
         mut event_list: Vec<OSProfilerSpan>,
     ) -> Result<Trace, Box<dyn Error>> {
-        let mut mydag = Trace::new(&id);
+        let mut mydag = Trace::new(&IDType::UUID(id));
         self.add_events(&mut mydag, &mut event_list, None)?;
         Ok(mydag)
     }
@@ -371,7 +371,8 @@ impl OSProfilerReader {
         // Map of asynchronous traces that start from this DAG -> parent node in DAG
         let mut async_traces = HashMap::new();
         let mut waiters = HashMap::<Uuid, NodeIndex>::new();
-        let mut wait_spans = HashSet::<Uuid>::new();
+        // let mut wait_spans = HashSet::<Uuid>::new();
+        let mut wait_spans = HashSet::<IDType>::new();
         let mut add_next_to_waiters = false;
         let mut wait_for = Vec::<Uuid>::new();
         let mut nidx = None;
@@ -433,7 +434,7 @@ impl OSProfilerReader {
             if let OSProfilerEnum::Annotation(s) = &event.info {
                 match &s {
                     AnnotationEnum::WaitFor(_) => {
-                        wait_spans.insert(event.trace_id);
+                        wait_spans.insert(IDType::UUID(event.trace_id));
                     }
                     AnnotationEnum::Child(c) => {
                         async_traces.insert(
@@ -752,7 +753,7 @@ impl Event {
             OSProfilerEnum::Annotation(AnnotationEnum::WaitForKeyValue(_wait_for_kv_info)) => {}
         }
         Event {
-            trace_id: event.trace_id,
+            trace_id: IDType::UUID(event.trace_id),
             tracepoint_id: TracepointID::from_str(&event.tracepoint_id),
             timestamp: event.timestamp,
             variant: match event.info {

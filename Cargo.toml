@@ -8,7 +8,7 @@ license = "BSD-2-Clause"
 
 [dependencies]
 pythia_common = { path = "./pythia_common" }
-redis = "*"
+redis = "0.15.1"
 serde = {version = "1.0", features = ["derive"] }
 serde_json = "*"
 rand = "0.7"
@@ -22,9 +22,9 @@ streaming-stats = "*"
 histogram = "0.6.9"
 lazy_static = "*"
 indexmap = "*"
-jsonrpc-core = "*"
-jsonrpc-core-client = "*"
-jsonrpc-client-transports = "*"
+jsonrpc-core = "14.1.0"
+jsonrpc-core-client = "14.1.0"
+jsonrpc-client-transports = "14.1.0"
 hyper = "0.12"
 futures = "~0.1.6"
 dirs = "*"

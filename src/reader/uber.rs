@@ -22,7 +22,7 @@ use uuid::Uuid;
 use crate::reader::HexID;
 use crate::reader::Reader;
 use crate::settings::Settings;
-use crate::trace::Event;
+use crate::trace::{Event, IDType};
 use crate::trace::EventType;
 use crate::trace::Trace;
 use crate::trace::TracepointID;
@@ -96,8 +96,10 @@ fn convert_uber_timestamp(start_time: u64, duration: i64) -> (NaiveDateTime, Nai
 struct UberParsingState {
     nidx: NodeIndex,
     event: UberEvent,
-    active_spans: HashMap<Uuid, NodeIndex>,
-    children_per_parent: HashMap<Uuid, NodeIndex>,
+    // active_spans: HashMap<Uuid, NodeIndex>,
+    active_spans: HashMap<IDType, NodeIndex>,
+    // children_per_parent: HashMap<Uuid, NodeIndex>,
+    children_per_parent: HashMap<IDType, NodeIndex>,
     last_nidx: Option<NodeIndex>,
 }
 
@@ -142,7 +144,7 @@ impl UberReader {
             let (start_time, end_time) = convert_uber_timestamp(span.start_time, span.duration);
             events.push(UberEvent {
                 e: Event {
-                    trace_id: span.span_id.to_uuid(),
+                    trace_id: IDType::UUID(span.span_id.to_uuid()),
                     tracepoint_id: TracepointID::from_str(&span.operation_name.to_string()),
                     timestamp: start_time,
                     is_synthetic: false,
@@ -153,7 +155,7 @@ impl UberReader {
             });
             events.push(UberEvent {
                 e: Event {
-                    trace_id: span.span_id.to_uuid(),
+                    trace_id: IDType::UUID(span.span_id.to_uuid()),
                     tracepoint_id: TracepointID::from_str(&span.operation_name.to_string()),
                     timestamp: end_time,
                     is_synthetic: false,
@@ -169,7 +171,7 @@ impl UberReader {
     fn from_json(&self, data: &mut UberTrace) -> Result<Trace, Box<dyn Error>> {
         assert!(data.data.len() == 1);
         let trace = &data.data[0];
-        let mut mydag = Trace::new(&trace.trace_id.to_uuid());
+        let mut mydag = Trace::new(&IDType::UUID(trace.trace_id.to_uuid()));
         let mut event_list = self.to_events_edges(&trace.spans)?;
         event_list.sort_by(|a, b| a.e.timestamp.cmp(&b.e.timestamp));
         let mut state = UberParsingState {
@@ -193,7 +195,7 @@ impl UberReader {
                     let e = deferred_events.pop().unwrap();
                     match &e.parent_id {
                         Some(id) => {
-                            if state.active_spans.get(&id.to_uuid()).is_none() {
+                            if state.active_spans.get(&IDType::UUID(id.to_uuid())).is_none() {
                                 deferred_events.push(e.clone());
                                 continue;
                             }
@@ -215,7 +217,7 @@ impl UberReader {
             }
             match &event.parent_id {
                 Some(id) => {
-                    if state.active_spans.get(&id.to_uuid()).is_none() {
+                    if state.active_spans.get(&IDType::UUID(id.to_uuid())).is_none() {
                         deferred_events.push(event.clone());
                         deferred_timestamp = event.e.timestamp;
                         continue;
@@ -260,11 +262,11 @@ impl UberReader {
         }
         let prev_sibling = match &s.event.parent_id {
             Some(id) => {
-                let result = match s.children_per_parent.get(&id.to_uuid()) {
+                let result = match s.children_per_parent.get(&IDType::UUID(id.to_uuid())) {
                     Some(&id) => Some(id.clone()),
                     None => None,
                 };
-                s.children_per_parent.insert(id.to_uuid(), s.nidx);
+                s.children_per_parent.insert(IDType::UUID(id.to_uuid()), s.nidx);
                 result
             }
             None => None,
@@ -282,7 +284,7 @@ impl UberReader {
             }
             None => {
                 let prev_nidx = match &s.event.parent_id {
-                    Some(p) => match s.active_spans.get(&p.to_uuid()) {
+                    Some(p) => match s.active_spans.get(&IDType::UUID(p.to_uuid())) {
                         Some(&id) => Some(id),
                         None => {
                             return Err(raise("Parent did not start before current node"));
@@ -322,8 +324,8 @@ impl UberReader {
                 }
             }
         }
-        s.active_spans.insert(s.event.e.trace_id, s.nidx);
-        s.children_per_parent.insert(s.event.e.trace_id, s.nidx);
+        s.active_spans.insert(s.event.e.trace_id.clone(), s.nidx);
+        s.children_per_parent.insert(s.event.e.trace_id.clone(), s.nidx);
         Ok(())
     }
 }

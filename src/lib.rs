@@ -103,7 +103,7 @@ use crate::manifest::Manifest;
 use crate::reader::reader_from_settings;
 use crate::settings::ApplicationType;
 use crate::settings::Settings;
-use crate::trace::Trace;
+use crate::trace::{IDType, Trace};
 
 // use rand::seq::SliceRandom;
 // use crate::cct::CCT;
@@ -409,8 +409,12 @@ pub fn dump_traces(tracefile: &str) {
     let mut reader = reader_from_settings(&settings);
     for trace in reader.read_trace_file(tracefile) {
         let mut outfile = dirs::home_dir().unwrap();
-        outfile.push(trace.base_id.to_hyphenated().to_string());
+        match &trace.base_id {
+            IDType::UUID(u) => outfile.push(u.to_hyphenated().to_string()),
+            IDType::STRING(s) => outfile.push(s),
+        }
         outfile.set_extension("json");
+        // let trace_copy = trace.clone();
         trace.to_file(&outfile);
     }
 }
@@ -560,7 +564,7 @@ fn group_traces(traces: Vec<Trace>) {
                 //                                    }},
                 x.traces.len(),
                 x.variance,
-                x.traces.iter().map(|x| x.g.base_id).collect::<Vec<_>>()
+                x.traces.iter().map(|x| x.g.base_id.clone()).collect::<Vec<_>>()
             ))
             .join("\n")
     );

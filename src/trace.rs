@@ -17,7 +17,7 @@ use std::time::Duration;
 
 use bimap::BiMap;
 use chrono::NaiveDateTime;
-use petgraph::dot::Dot;
+use petgraph::dot::{Config, Dot};
 use petgraph::graph::{EdgeIndex, NodeIndex};
 use petgraph::stable_graph::StableGraph;
 use petgraph::Direction;
@@ -40,11 +40,27 @@ pub enum Value {
     //float(f64),
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, Hash)]
+pub enum IDType {
+    UUID(Uuid),
+    STRING(String),
+}
+
+impl Display for IDType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match &self {
+            IDType::UUID(u) => write!(f, "{}", u),
+            IDType::STRING(s) => write!(f, "{}", s),
+        }
+    }
+}
+
 /// A general-purpose trace which does not contain application-specific things
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Trace {
     pub g: StableGraph<Event, DAGEdge>,
-    pub base_id: Uuid,
+    // pub base_id: Uuid,
+    pub base_id: IDType,
     pub start_node: NodeIndex,
     pub end_node: NodeIndex,
     pub request_type: RequestType,
@@ -54,7 +70,8 @@ pub struct Trace {
 }
 
 impl Trace {
-    pub fn new(base_id: &Uuid) -> Self {
+    // pub fn new(base_id: &Uuid) -> Self {
+    pub fn new(base_id: &IDType) -> Self {
         Trace {
             g: StableGraph::new(),
             base_id: base_id.clone(),
@@ -76,7 +93,8 @@ impl Trace {
     }
 
     /// Does a forward-scan of nodes for the node with the given trace_id
-    pub fn can_reach_from_node(&self, trace_id: Uuid, nidx: NodeIndex) -> bool {
+    // pub fn can_reach_from_node(&self, trace_id: Uuid, nidx: NodeIndex) -> bool {
+    pub fn can_reach_from_node(&self, trace_id: IDType, nidx: NodeIndex) -> bool {
         let mut cur_nidx = nidx;
         loop {
             if self.g[cur_nidx].trace_id == trace_id {
@@ -92,7 +110,7 @@ impl Trace {
                 cur_nidx = next_nids[0];
             } else {
                 for next_nidx in next_nids {
-                    if self.can_reach_from_node(trace_id, next_nidx) {
+                    if self.can_reach_from_node(trace_id.clone(), next_nidx) {
                         return true;
                     }
                 }
@@ -215,7 +233,8 @@ impl Trace {
                 println!("{:?}", node2.key_value_pair.get("host"));
                 println!();
                 TraceEdge {
-                    uuid: self.base_id,
+                    // uuid: self.base_id,
+                    id: self.base_id.clone(),
                     request_type: self.request_type,
                     tid_start: tid1,
                     tp_start: tp1,
@@ -231,7 +250,8 @@ impl Trace {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TraceEdge {
-    pub uuid : Uuid,
+    // pub uuid : Uuid,
+    pub id : IDType,
     pub request_type : RequestType,
     pub tid_start : TracepointID,
     pub tp_start : String,
@@ -259,7 +279,9 @@ impl Event {
 }
 impl fmt::Display for Trace {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", Dot::new(&self.g))
+        // let d = Dot::new(&self.g);
+        // write!(f, "{:?}", d)
+        write!(f, "{:?}", self.g)
     }
 }
 
@@ -267,7 +289,8 @@ impl fmt::Display for Trace {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Event {
     // A trace id is shared between two ends of a span, otherwise it should be unique to events
-    pub trace_id: Uuid,
+    // pub trace_id: Uuid,
+    pub trace_id: IDType,
     // A tracepoint id represents a place in code
     pub tracepoint_id: TracepointID,
     pub timestamp: NaiveDateTime,

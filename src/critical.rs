@@ -22,7 +22,7 @@ use uuid::Uuid;
 
 use pythia_common::RequestType;
 
-use crate::trace::DAGEdge;
+use crate::trace::{DAGEdge, IDType};
 use crate::trace::EdgeType;
 use crate::trace::Event;
 use crate::trace::EventType;
@@ -188,9 +188,10 @@ impl CriticalPath {
         let mut cur_node = self.start_node;
         let mut span_map = HashMap::new();
         let mut nodes_to_remove = Vec::new();
-        let mut exits = HashMap::<Uuid, NodeIndex>::new();
+        // let mut exits = HashMap::<Uuid, NodeIndex>::new();
+        let mut exits = HashMap::<IDType, NodeIndex>::new();
         loop {
-            let cur_trace_id = self.g.g[cur_node].trace_id;
+            let cur_trace_id = self.g.g[cur_node].trace_id.clone();
             let existing_node_id = span_map.get(&cur_trace_id);
             match self.g.g[cur_node].variant {
                 EventType::Entry => match existing_node_id {
@@ -338,9 +339,10 @@ impl CriticalPath {
                     None => {
                         return Err(Box::new(PythiaError(
                             format!(
-                                "Failed to find prev node in trace {}\n{}",
+                                "Failed to find prev node in trace {}\n{:?}",
                                 dag.base_id,
-                                Dot::new(&dag.g)
+                                // Dot::new(&dag.g)
+                                &dag.g
                             )
                             .into(),
                         )));
@@ -427,7 +429,7 @@ impl CriticalPath {
                 None => break,
             };
         }
-        unfinished.retain(|span| dag.can_reach_from_node(span.trace_id, dag_nidx));
+        unfinished.retain(|span| dag.can_reach_from_node(span.trace_id.clone(), dag_nidx));
         unfinished
     }
 
@@ -504,7 +506,7 @@ impl CriticalPath {
                 EventType::Exit => EventType::Entry,
                 EventType::Annotation => panic!("don't give me annotation"),
             },
-            trace_id: node.trace_id,
+            trace_id: node.trace_id.clone(),
             timestamp: self.g.g[after].timestamp + chrono::Duration::nanoseconds(1),
             is_synthetic: true,
             key_value_pair: HashMap::new(),

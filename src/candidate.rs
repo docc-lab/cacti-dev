@@ -25,7 +25,7 @@ use uuid::Uuid;
 use pythia_common::RequestType;
 use pythia_common::RequestType::ServerCreate;
 
-use crate::trace::{DAGEdge, TraceEdge};
+use crate::trace::{DAGEdge, IDType, TraceEdge};
 use crate::trace::EdgeType;
 use crate::trace::Event;
 use crate::trace::EventType;
@@ -41,18 +41,33 @@ pub struct CandidateManager {
     pub non_victim_traces: Vec<Trace>,
     // pub victim_segments: Vec<(Uuid, TraceEdge)>,
     // pub non_victim_segments: HashMap<String, (Uuid, TraceEdge, Option<i64>)>,
-    pub non_victim_segments: HashMap<String, (Uuid, TraceEdge, i64)>,
+    // pub non_victim_segments: HashMap<String, (Uuid, TraceEdge, i64)>,
+    pub non_victim_segments: HashMap<String, (IDType, TraceEdge, i64)>,
     pub candidate_segments: Vec<TraceEdge>,
-    pub victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
-    pub old_victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
-    pub victim_overlap_max_times: HashMap<Uuid, i64>,
+    // pub victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
+    pub victim_overlaps: HashMap<IDType, (TraceEdge, Vec<TraceEdge>)>,
+    // pub old_victim_overlaps: HashMap<Uuid, (TraceEdge, Vec<TraceEdge>)>,
+    pub old_victim_overlaps: HashMap<IDType, (TraceEdge, Vec<TraceEdge>)>,
+    // pub victim_overlap_max_times: HashMap<Uuid, i64>,
+    pub victim_overlap_max_times: HashMap<IDType, i64>,
     used_pairs: HashSet<(String, String)>,
     pub candidate_groups: HashMap<RequestType, Vec<(i32, i64)>>
 }
 
-pub fn hash_uuid_and_edge(uuid: Uuid, edge: TraceEdge) -> String {
+// pub fn hash_uuid_and_edge(uuid: Uuid, edge: TraceEdge) -> String {
+//     let mut hasher = Sha256::new();
+//     hasher.input(uuid.as_bytes());
+//     hasher.input(edge.tp_start.as_bytes());
+//     hasher.input(edge.tp_end.as_bytes());
+//     hasher.result_str()
+// }
+
+pub fn hash_id_and_edge(id: IDType, edge: TraceEdge) -> String {
     let mut hasher = Sha256::new();
-    hasher.input(uuid.as_bytes());
+    match id {
+        IDType::UUID(u) => hasher.input(u.as_bytes()),
+        IDType::STRING(s) => hasher.input(s.as_bytes())
+    }
     hasher.input(edge.tp_start.as_bytes());
     hasher.input(edge.tp_end.as_bytes());
     hasher.result_str()
@@ -124,8 +139,8 @@ impl CandidateManager {
                 // println!();
                 if (edge.tp_start == self.victim_start) && (edge.tp_end == self.victim_end) {
                     // self.victim_overlaps.push((cur_path.g.base_id, edge))
-                    self.victim_overlaps.insert(cur_path.g.base_id, (edge, Vec::new()));
-                    self.victim_overlap_max_times.insert(cur_path.g.base_id, now_time.clone());
+                    self.victim_overlaps.insert(cur_path.g.base_id.clone(), (edge, Vec::new()));
+                    self.victim_overlap_max_times.insert(cur_path.g.base_id.clone(), now_time.clone());
                 }
             }
 
@@ -161,8 +176,9 @@ impl CandidateManager {
                 // );
 
                 self.non_victim_segments.insert(
-                    hash_uuid_and_edge(cur_trace.base_id, edge.clone()),
-                    (cur_trace.base_id, edge.clone(), now_time.clone())
+                    // hash_uuid_and_edge(cur_trace.base_id, edge.clone()),
+                    hash_id_and_edge(cur_trace.base_id.clone(), edge.clone()),
+                    (cur_trace.base_id.clone(), edge.clone(), now_time.clone())
                 );
             }
         }
@@ -227,7 +243,7 @@ impl CandidateManager {
                 // }
 
                 (&mut self.old_victim_overlaps).insert(
-                    overlap_info.0,
+                    overlap_info.0.clone(),
                     old_victim.clone(),
                 );
                 // self.move_victim_overlaps(&overlap_info.0);
@@ -290,15 +306,17 @@ impl CandidateManager {
         let non_victim_segments = self.non_victim_segments.clone();
 
         // println!("Outermost Loop");
-        for victim in victim_overlaps {
+        for victim in &victim_overlaps {
             // println!("Inner Loop 1");
             for non_victim in &non_victim_segments {
                 // println!("Pre-Uuid check");
-                if victim.0 != (non_victim.1).0 {
+                if victim.0.clone() != (non_victim.1).0 {
                     // println!("Post-Uuid check");
                     let hash_to_check = (
-                        hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
-                        hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
+                        // hash_uuid_and_edge(victim.0, (victim.1).0.clone()),
+                        // hash_uuid_and_edge((non_victim.1).0, (non_victim.1.clone()).1),
+                        hash_id_and_edge(victim.0.clone(), (victim.1).0.clone()),
+                        hash_id_and_edge((non_victim.1).0.clone(), (non_victim.1.clone()).1),
                     );
                     if !self.used_pairs.contains(&hash_to_check) {
                         // println!("Post-used-pairs check");
@@ -307,16 +325,16 @@ impl CandidateManager {
                             let mut new_overlaps = (victim.1).1.clone();
                             new_overlaps.push((non_victim.1.clone()).1);
                             (&mut self.victim_overlaps).insert(
-                                victim.0,
+                                victim.0.clone(),
                                 ((victim.1).0.clone(), new_overlaps)
                             );
                             (&mut self.victim_overlap_max_times).insert(
-                                victim.0,
+                                victim.0.clone(),
                                 now_time.clone()
                             );
                             (&mut self.non_victim_segments).insert(
                                 non_victim.0.clone(),
-                                ((non_victim.1).0, (non_victim.1).1.clone(), now_time.clone())
+                                ((non_victim.1).0.clone(), (non_victim.1).1.clone(), now_time.clone())
                             );
                             ((&mut self.used_pairs).insert(hash_to_check));
                         }

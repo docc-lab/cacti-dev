@@ -31,7 +31,7 @@ use std::path::PathBuf;
 use crate::reader::HexID;
 use crate::reader::Reader;
 use crate::settings::Settings;
-use crate::trace::Event;
+use crate::trace::{Event, IDType};
 use crate::trace::EventType;
 use crate::trace::Trace;
 use crate::trace::TracepointID;
@@ -280,7 +280,7 @@ impl DEATHSTARReader {
     }
 
     fn from_json(&self, data: &mut DEATHSTARTrace) -> Trace {
-        let mut mydag = Trace::new(&data.id.to_uuid());
+        let mut mydag = Trace::new(&IDType::UUID(data.id.to_uuid()));
         eprintln!("Working on {}", mydag.base_id);
         let mut event_id_map = HashMap::new();
         let mut nidx = NodeIndex::end();
@@ -444,7 +444,7 @@ impl Event {
     //     }
         
         Event {
-            trace_id: eventid_to_uuid(&event.event_id),
+            trace_id: IDType::UUID(eventid_to_uuid(&event.event_id)),
             // trace_id: event.event_id,
             // tracepoint_id: TracepointID::from_str(match &event.variant {
             //     DEATHSTAREnum::WithSource(s) => &s.source,
