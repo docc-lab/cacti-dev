@@ -108,7 +108,7 @@ pub fn get_events_from_client(client_uri: &str, trace_id: Uuid) -> Vec<OSProfile
     let run = http::connect(client_uri)
         .and_then(move |client: PythiaClient| {
             client
-                .get_events(trace_id.to_hyphenated().to_string())
+                .get_events(trace_id.hyphenated().to_string())
                 .and_then(move |result| {
                     drop(client);
                     let _ = tx.unbounded_send(result);

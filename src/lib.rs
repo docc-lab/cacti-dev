@@ -410,7 +410,7 @@ pub fn dump_traces(tracefile: &str) {
     for trace in reader.read_trace_file(tracefile) {
         let mut outfile = dirs::home_dir().unwrap();
         match &trace.base_id {
-            IDType::UUID(u) => outfile.push(u.to_hyphenated().to_string()),
+            IDType::UUID(u) => outfile.push(u.hyphenated().to_string()),
             IDType::STRING(s) => outfile.push(s),
         }
         outfile.set_extension("json");

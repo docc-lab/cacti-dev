@@ -14,6 +14,7 @@ use std::time::Duration;
 
 use config::{Config, File, FileFormat};
 use pythia_common::RequestType;
+use reqwest::get;
 
 use crate::search::SearchStrategyType;
 
@@ -69,21 +70,33 @@ pub enum ApplicationType {
 
 impl Settings {
     pub fn read() -> Settings {
-        let mut settings = Config::default();
-        settings
-            .merge(File::new(SETTINGS_PATH, FileFormat::Toml))
-            .unwrap();
-        let results = settings.try_into::<HashMap<String, String>>().unwrap();
-        let manifest_file = PathBuf::from(results.get("manifest_file").unwrap());
-        let hdfs_control_file = PathBuf::from(results.get("hdfs_control_file").unwrap());
-        let deathstar_control_file = PathBuf::from(results.get("hdfs_control_file").unwrap());
-        let pythia_clients = results.get("pythia_clients").unwrap();
+        // let mut settings = Config::default();
+        // let mut settings = Config::builder();
+        // settings
+        //     .merge(File::new(SETTINGS_PATH, FileFormat::Toml))
+        //     .unwrap();
+        let mut settings_builder = Config::builder()
+            .set_default("default", "1").unwrap()
+            .add_source(File::new(SETTINGS_PATH, FileFormat::Toml))
+            .set_override("override", "1").unwrap();
+        let mut settings = settings_builder.build().unwrap();
+        let get_setting = |key: &str| { settings.get::<String>(key).unwrap() as String };
+        // let results = settings.try_into::<HashMap<String, String>>().unwrap();
+        // let manifest_file = PathBuf::from(results.get("manifest_file").unwrap());
+        let manifest_file = PathBuf::from(get_setting("manifest_file"));
+        // let hdfs_control_file = PathBuf::from(results.get("hdfs_control_file").unwrap());
+        let hdfs_control_file = PathBuf::from(get_setting("hdfs_control_file"));
+        // let deathstar_control_file = PathBuf::from(results.get("hdfs_control_file").unwrap());
+        let deathstar_control_file = PathBuf::from(get_setting("hdfs_control_file"));
+        // let pythia_clients = results.get("pythia_clients").unwrap();
+        let pythia_clients = get_setting("pythia_clients");
         let pythia_clients = if pythia_clients.len() == 0 {
             Vec::new()
         } else {
             pythia_clients.split(",").map(|x| x.to_string()).collect()
         };
-        let emit_events = match results.get("emit_events").unwrap().as_str() {
+        // let emit_events = match results.get("emit_events").unwrap().as_str() {
+        let emit_events = match get_setting("emit_events").as_str() {
             "true" => true,
             _ => false
         };
@@ -92,12 +105,18 @@ impl Settings {
             hdfs_control_file,
             deathstar_control_file,
             pythia_clients,
-            redis_url: results.get("redis_url").unwrap().to_string(),
-            zipkin_url: results.get("zipkin_url").unwrap().to_string(),
-            jaeger_url: results.get("jaeger_url").unwrap().to_string(),
-            uber_trace_dir: PathBuf::from(results.get("uber_trace_dir").unwrap()),
-            DEATHSTAR_trace_dir: PathBuf::from(results.get("DEATHSTAR_trace_dir").unwrap()),
-            application: match results.get("application").unwrap().as_str() {
+            // redis_url: results.get("redis_url").unwrap().to_string(),
+            // zipkin_url: results.get("zipkin_url").unwrap().to_string(),
+            // jaeger_url: results.get("jaeger_url").unwrap().to_string(),
+            // uber_trace_dir: PathBuf::from(results.get("uber_trace_dir").unwrap()),
+            // DEATHSTAR_trace_dir: PathBuf::from(results.get("DEATHSTAR_trace_dir").unwrap()),
+            // application: match results.get("application").unwrap().as_str() {
+            redis_url: get_setting("redis_url"),
+            zipkin_url: get_setting("zipkin_url"),
+            jaeger_url: get_setting("jaeger_url"),
+            uber_trace_dir: PathBuf::from(get_setting("uber_trace_dir")),
+            DEATHSTAR_trace_dir: PathBuf::from(get_setting("DEATHSTAR_trace_dir")),
+            application: match get_setting("application").as_str() {
                 "OpenStack" => ApplicationType::OpenStack,
                 "HDFS" => ApplicationType::HDFS,
                 "Uber" => ApplicationType::Uber,
@@ -106,9 +125,11 @@ impl Settings {
                 "Jaeger" => ApplicationType::Jaeger,
                 _ => panic!("Unknown application type"),
             },
-            xtrace_url: results.get("xtrace_url").unwrap().to_string(),
+            // xtrace_url: results.get("xtrace_url").unwrap().to_string(),
+            xtrace_url: get_setting("xtrace_url"),
             decision_epoch: DECISION_EPOCH,
-            search_strategy: match results.get("search_strategy").unwrap().as_str() {
+            // search_strategy: match results.get("search_strategy").unwrap().as_str() {
+            search_strategy: match get_setting("search_strategy").as_str() {
                 "Flat" => SearchStrategyType::Flat,
                 "Hierarchical" => SearchStrategyType::Hierarchical,
                 "Historic" => SearchStrategyType::Historic,
@@ -123,7 +144,8 @@ impl Settings {
             n_workers: N_WORKERS,
             free_keys: FREE_KEYS,
             emit_events,
-            problem_type: RequestType::from_str(results.get("problem_type").unwrap().as_str()).unwrap()
+            // problem_type: RequestType::from_str(results.get("problem_type").unwrap().as_str()).unwrap()
+            problem_type: RequestType::from_str(get_setting("problem_type").as_str()).unwrap()
         }
     }
 }
