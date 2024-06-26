@@ -118,7 +118,7 @@ impl PythiaAPI for PythiaAPIImpl {
     }
 
     fn enable_disable_tracepoints(&self, settings: String) -> Result<()> {
-
+        Ok(())
     }
 }
 

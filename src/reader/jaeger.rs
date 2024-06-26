@@ -101,6 +101,32 @@ impl Reader for JaegerReader {
     }
 
     // #[tokio:main]
+    // fn get_recent_traces(&mut self) -> Vec<Trace> {
+    //     // let mut ids = Vec::new();
+    //
+    //     let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
+    //
+    //     // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
+    //     let resp: reqwest::blocking::Response =
+    //         reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
+    //             .unwrap();
+    //
+    //     // match resp.text() {
+    //     //     Ok(res) => {
+    //     //         eprintln!("RESPONSE = {:?}", resp.text());
+    //     //     }
+    //     // }
+    //
+    //     let resp_text = resp.text();
+    //
+    //     let resp_obj: JaegerPayload =
+    //         serde_json::from_str(
+    //             (resp_text.unwrap() as String).as_str()).unwrap();
+    //
+    //     eprintln!("RESPONSE = {:?}", resp_obj);
+    //
+    //     return Vec::new();
+    // }
     fn get_recent_traces(&mut self) -> Vec<Trace> {
         // let mut ids = Vec::new();
 
@@ -110,14 +136,6 @@ impl Reader for JaegerReader {
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
                 .unwrap();
-
-        // match resp.text() {
-        //     Ok(res) => {
-        //         eprintln!("RESPONSE = {:?}", resp.text());
-        //     }
-        // }
-
-        let resp_text = resp.text();
 
         let resp_obj: JaegerPayload =
             serde_json::from_str(
