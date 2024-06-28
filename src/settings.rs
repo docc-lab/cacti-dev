@@ -18,7 +18,7 @@ use reqwest::get;
 
 use crate::search::SearchStrategyType;
 
-const SETTINGS_PATH: &str = "/etc/pythia/controller.toml";
+const SETTINGS_PATH: &str = "./etc/pythia/controller.toml";
 const DECISION_EPOCH: Duration = Duration::from_secs(120);
 // const PYTHIA_JIFFY: Duration = Duration::from_secs(20);
 const PYTHIA_JIFFY: Duration = Duration::from_secs(10);
