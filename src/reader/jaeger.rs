@@ -133,13 +133,17 @@ impl Reader for JaegerReader {
         let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
 
         // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
+        // let resp: reqwest::blocking::Response =
+        //     reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
+        //         .unwrap();
+
         let resp: reqwest::blocking::Response =
-            reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
+            reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
                 .unwrap();
 
         let resp_obj: JaegerPayload =
             serde_json::from_str(
-                (resp_text.unwrap() as String).as_str()).unwrap();
+                (resp.text().unwrap() as String).as_str()).unwrap();
 
         eprintln!("RESPONSE = {:?}", resp_obj);
 
