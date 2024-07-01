@@ -210,6 +210,18 @@ impl Reader for JaegerReader {
 
         eprintln!("JAEGER TRACE TO SPAN TRACE:");
         eprintln!("{:?}", jt.to_trace());
+        eprintln!("\n");
+        eprintln!("\n");
+        eprintln!("\n");
+
+        let st = jt.to_trace();
+        let res_cp = st.to_critical_path();
+
+        eprintln!("SPAN TRACE TO CRITICAL PATH:");
+        eprintln!("{:?}", res_cp);
+        eprintln!("\n");
+        eprintln!("\n");
+        eprintln!("\n");
 
         return Vec::new();
     }

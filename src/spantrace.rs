@@ -260,6 +260,12 @@ impl SpanTrace {
         }
     }
 
+    pub fn to_critical_path(&self) -> Trace {
+        let mut to_ret_trace = Trace::new(IDType::STRING(self.req_id.clone()));
+        self.spans.get(self.root_span_id.as_str()).unwrap().to_critical_path(self, &mut to_ret_trace);
+        return to_ret_trace;
+    }
+
     fn get_backtrace(&self, from: String) -> Vec<Span> {
         let mut to_return = Vec::new();
         let mut cur_id = from;
