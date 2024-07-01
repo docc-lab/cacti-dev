@@ -117,7 +117,7 @@ impl Span {
                 //     ((self.end()%1000)*1000) as u32
                 // ),
                 timestamp: DateTime::from_timestamp_nanos(self.end()).naive_utc(),
-                variant: EventType::Entry,
+                variant: EventType::Exit,
                 is_synthetic: false,
                 key_value_pair: HashMap::new(),
             });
@@ -133,7 +133,7 @@ impl Span {
                     //     ((self.end()%1000)*1000) as u32
                     // ),
                     timestamp: DateTime::from_timestamp_nanos(self.end()).naive_utc(),
-                    variant: EventType::Entry,
+                    variant: EventType::Exit,
                     is_synthetic: false,
                     key_value_pair: HashMap::new(),
                 }
