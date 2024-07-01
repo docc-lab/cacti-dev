@@ -8,6 +8,7 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
+use std::slice::SplitN;
 use std::time::Duration;
 use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use futures::Sink;
@@ -89,18 +90,21 @@ impl JaegerTrace {
         //     span_parents.insert(span.spanID, span.)
         // }
 
-        let mut to_ret_spans: HashMap<String, Span> = HashMap::new();
-        for span in spans {
-            to_ret_spans.insert(span.span_id.clone(), span);
-        }
+        // let mut to_ret_spans: HashMap<String, Span> = HashMap::new();
+        // for span in &spans {
+        //     to_ret_spans.insert(span.span_id.clone(), span);
+        // }
 
-        return SpanTrace{
-            endpoint_type: root_span.operationName.clone(),
-            req_id: self.traceID.clone(),
-            root_span_id: root_span.spanID.clone(),
-            spans: to_ret_spans,
-            children: Default::default()
-        }
+        // return SpanTrace{
+        //     endpoint_type: root_span.operationName.clone(),
+        //     req_id: self.traceID.clone(),
+        //     root_span_id: root_span.spanID.clone(),
+        //     spans: to_ret_spans,
+        //     children: Default::default()
+        // }
+        return SpanTrace::from_span_list(
+            spans, root_span.operationName.clone(),
+            root_span.spanID.clone(), self.traceID.clone());
     }
 }
 
