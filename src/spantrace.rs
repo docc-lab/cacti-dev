@@ -231,12 +231,23 @@ impl SpanTrace {
         self.spans.insert(to_add.clone().span_id, to_add.clone());
         // If no parent entry present, insert one and begin populating
         if !parent.is_empty() {
-            match self.children.get_mut(parent.as_str()) {
-                Some(mut v) => {
-                    v.push(to_add.clone())
+            // match self.children.get_mut(parent.as_str()) {
+            //     Some(v) => {
+            //         v.push(to_add.clone())
+            //     }
+            //     None => {
+            //         self.children.insert(parent, Vec::new());
+            //     }
+            // }
+            match self.children.get(parent.as_str()) {
+                Some(v) => {
+                    let mut new_v = v.clone();
+                    new_v.push(to_add.clone());
+                    self.children.remove(parent.as_str());
+                    self.children.insert(parent, new_v);
                 }
                 None => {
-                    self.children.insert(parent, Vec::new());
+                    self.children.insert(parent, vec![to_add.clone()]);
                 }
             }
         }
