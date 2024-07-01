@@ -116,7 +116,7 @@ impl Span {
                 //     self.end()/1000,
                 //     ((self.end()%1000)*1000) as u32
                 // ),
-                timestamp: DateTime::from_timestamp_nanos(self.end()*1000).naive_utc(),
+                timestamp: DateTime::from_timestamp_nanos(self.end()).naive_utc(),
                 variant: EventType::Entry,
                 is_synthetic: false,
                 key_value_pair: HashMap::new(),
@@ -132,7 +132,7 @@ impl Span {
                     //     self.end()/1000,
                     //     ((self.end()%1000)*1000) as u32
                     // ),
-                    timestamp: DateTime::from_timestamp_nanos(self.end()*1000).naive_utc(),
+                    timestamp: DateTime::from_timestamp_nanos(self.end()).naive_utc(),
                     variant: EventType::Entry,
                     is_synthetic: false,
                     key_value_pair: HashMap::new(),
@@ -153,7 +153,7 @@ impl Span {
             "".to_string(), "".to_string(),
             "".to_string(), "".to_string(),
             DateTime::from_timestamp_nanos(
-                sorted_children[0].end()*1000 + 1).naive_utc());
+                sorted_children[0].end() + 1).naive_utc());
         for c in sorted_children.into_iter() {
             if c.end() < cur_span.start.and_utc().timestamp_nanos_opt().unwrap() {
                 cur_span = c.clone();
