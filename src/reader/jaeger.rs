@@ -8,11 +8,13 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
+use std::time::Duration;
+use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use futures::Sink;
 use hyper::http;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
-use crate::spantrace::Span;
+use crate::spantrace::{Span, SpanTrace};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -34,6 +36,28 @@ struct JaegerSpan {
     processID: String,
 }
 
+impl JaegerSpan {
+    pub fn to_span(&self, processes: &HashMap<String, JaegerProcess>) -> Span {
+        let process_tags = &processes.get(self.processID.as_str()).unwrap().tags;
+        let mut host_name = "".to_string();
+        for tag in process_tags {
+            if tag.key == "hostname".to_string() {
+                host_name = tag.value.clone();
+            }
+        }
+        return Span{
+            span_id: self.spanID.clone(),
+            parent: self.references[0].spanID.clone(),
+            service: processes.get(self.processID.as_str()).unwrap().serviceName.clone(),
+            host: host_name,
+            operation: self.operationName.clone(),
+            start: DateTime::from_timestamp_nanos(
+                self.startTime*1000).naive_utc(),
+            duration: Duration::from_micros(self.duration as u64)
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 struct JPTag {
     key: String,
@@ -51,6 +75,30 @@ struct JaegerTrace {
     traceID: String,
     spans: Vec<JaegerSpan>,
     processes: HashMap<String, JaegerProcess>
+}
+
+impl JaegerTrace {
+    pub fn to_trace(&self) -> SpanTrace {
+        let spans: Vec<Span> = self.spans.iter().map(|span| span.to_span(&self.processes)).collect();
+        let root_span: &JaegerSpan = self.spans.iter().filter(|&span| span.traceID == span.spanID).collect::<Vec<_>>()[0];
+        // let mut span_parents: HashMap<String, String> = HashMap::new();
+        // for span in &self.spans {
+        //     span_parents.insert(span.spanID, span.)
+        // }
+
+        let mut to_ret_spans: HashMap<String, Span> = HashMap::new();
+        for span in spans {
+            to_ret_spans.insert(span.span_id.clone(), span);
+        }
+
+        return SpanTrace{
+            endpoint_type: root_span.operationName.clone(),
+            req_id: self.traceID.clone(),
+            root_span_id: root_span.spanID.clone(),
+            spans: to_ret_spans,
+            children: Default::default()
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -146,6 +194,15 @@ impl Reader for JaegerReader {
                 (resp.text().unwrap() as String).as_str()).unwrap();
 
         eprintln!("RESPONSE = {:?}", resp_obj);
+
+        eprintln!("\n");
+        eprintln!("\n");
+        eprintln!("\n");
+
+        let jt = &resp_obj.data[0];
+
+        eprintln!("JAEGER TRACE TO SPAN TRACE:");
+        eprintln!("{:?}", jt.to_trace());
 
         return Vec::new();
     }

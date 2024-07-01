@@ -13,12 +13,15 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
 use std::fmt::Display;
+use std::hash::Hash;
 use std::ptr::null;
 use std::time::Duration;
 
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use crate::{IDType, Trace};
+use crate::trace::{DAGEdge, EdgeType, Event, EventType, TracepointID};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Span {
@@ -67,14 +70,116 @@ impl Span {
     //     return to_add
     // }
 
+    pub fn end(&self) -> i64 {
+        return self.start.and_utc().timestamp_nanos_opt().unwrap() + (self.duration.as_nanos() as i64);
+    }
+
     pub fn overlaps(&self, with: &Span) -> bool {
-        let self_start = self.start.timestamp_nanos();
+        let self_start = self.start.and_utc().timestamp_nanos_opt().unwrap();
         let self_end = self_start + (self.duration.as_nanos() as i64);
 
-        let with_start = with.start.timestamp_nanos();
+        let with_start = with.start.and_utc().timestamp_nanos_opt().unwrap();
         let with_end = with_start + (with.duration.as_nanos() as i64);
 
         return (with_start < self_end) && (with_end > self_start);
+    }
+
+    pub fn to_critical_path(&self, st: &SpanTrace, res: &mut Trace) {
+        let mut sorted_children: Vec<Span> = st.children.get(self.span_id.as_str()).unwrap().clone();
+        sorted_children.sort_by(
+            |a, b| b.end().partial_cmp(&a.end()).unwrap());
+
+        // let mut to_ret_graph: StableGraph<Event<String>, DAGEdge> = StableGraph::new();
+        // let end_nidx = to_ret_graph.add_node(Event {
+        //     trace_id: st.req_id.clone(),
+        //     tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
+        //     timestamp: NaiveDateTime::from_timestamp(
+        //         self.end()/1000,
+        //         ((self.end()%1000)*1000) as u32
+        //     ),
+        //     variant: EventType::Entry,
+        //     is_synthetic: false,
+        //     key_value_pair: HashMap::new(),
+        // });
+
+        // let mut to_ret_trace: Trace<String> = Trace::new(st.req_id.clone());
+        // to_ret_trace.g = to_ret_graph;
+        // to_ret_trace.end_node = end_nidx;
+
+        if res.g.node_count() == 0 {
+            res.end_node = res.g.add_node(Event {
+                trace_id: IDType::STRING(st.req_id.clone()),
+                tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
+                // timestamp: NaiveDateTime::from_timestamp(
+                //     self.end()/1000,
+                //     ((self.end()%1000)*1000) as u32
+                // ),
+                timestamp: DateTime::from_timestamp_nanos(self.end()*1000).naive_utc(),
+                variant: EventType::Entry,
+                is_synthetic: false,
+                key_value_pair: HashMap::new(),
+            });
+            res.start_node = res.end_node.clone();
+        } else {
+            let connect_node = res.start_node.clone();
+            res.start_node = res.g.add_node(
+                Event {
+                    trace_id: IDType::STRING(st.req_id.clone()),
+                    tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
+                    // timestamp: NaiveDateTime::from_timestamp(
+                    //     self.end()/1000,
+                    //     ((self.end()%1000)*1000) as u32
+                    // ),
+                    timestamp: DateTime::from_timestamp_nanos(self.end()*1000).naive_utc(),
+                    variant: EventType::Entry,
+                    is_synthetic: false,
+                    key_value_pair: HashMap::new(),
+                }
+            );
+            let edge_duration = res.g.node_weight(connect_node).unwrap().timestamp.timestamp_nanos() - self.end();
+            res.g.add_edge(
+                res.start_node.clone(),
+                connect_node.clone(),
+                DAGEdge {
+                    duration: Duration::from_nanos(edge_duration as u64),
+                    variant: EdgeType::ChildOf
+                }
+            );
+        }
+
+        let mut cur_span: Span = Span::from_data(
+            "".to_string(), "".to_string(),
+            "".to_string(), "".to_string(),
+            DateTime::from_timestamp_nanos(
+                sorted_children[0].end()*1000 + 1).naive_utc());
+        for c in sorted_children.into_iter() {
+            if c.end() < cur_span.start.and_utc().timestamp_nanos_opt().unwrap() {
+                cur_span = c.clone();
+                // let child_trace = cur_span.to_critical_path(st);
+                cur_span.to_critical_path(st, res);
+            }
+        }
+
+        let connect_node = res.start_node.clone();
+        res.start_node = res.g.add_node(
+            Event {
+                trace_id: IDType::STRING(st.req_id.clone()),
+                tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_start").as_str()),
+                timestamp: self.start,
+                variant: EventType::Entry,
+                is_synthetic: false,
+                key_value_pair: HashMap::new(),
+            }
+        );
+        let edge_duration = res.g.node_weight(connect_node).unwrap().timestamp.timestamp_nanos() - self.start.timestamp_nanos();
+        res.g.add_edge(
+            res.start_node.clone(),
+            connect_node.clone(),
+            DAGEdge {
+                duration: Duration::from_nanos(edge_duration as u64),
+                variant: EdgeType::ChildOf
+            }
+        );
     }
 }
 
@@ -84,6 +189,7 @@ impl Span {
 //     pub req_id: String,
 // }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SpanTrace {
     pub endpoint_type: String, // maybe change this to a special RequestType implementation later
     pub req_id: String,
@@ -93,6 +199,34 @@ pub struct SpanTrace {
 }
 
 impl SpanTrace {
+    pub fn from_span_list(
+        spans: Vec<Span>,
+        // parents: HashMap<String, String>,
+        oper_name: String,
+        root_span_id: String,
+        trace_id: String
+    ) -> SpanTrace {
+        let mut to_ret_trace = SpanTrace{
+            endpoint_type: oper_name,
+            req_id: trace_id,
+            root_span_id,
+            spans: HashMap::new(),
+            children: HashMap::new()
+        };
+
+        // let span_parents: HashMap<String, String> = HashMap::new();
+        // for span in spans {
+        //
+        // }
+
+        for span in &spans {
+            // to_ret_trace.add_span(span.clone(), parents.get(span.span_id.as_str()).unwrap().clone());
+            to_ret_trace.add_span(span.clone(), span.parent.clone());
+        }
+
+        to_ret_trace
+    }
+
     fn add_span(&mut self, to_add: Span, parent: String) {
         self.spans.insert(to_add.clone().span_id, to_add.clone());
         // If no parent entry present, insert one and begin populating
