@@ -13,10 +13,12 @@ use std::time::Duration;
 use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use futures::Sink;
 use hyper::http;
+use itertools::Itertools;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
 use crate::spantrace::{Span, SpanTrace};
 use serde::{Serialize, Deserialize};
+use crate::trace::Event;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct JaegerReference {
@@ -217,8 +219,17 @@ impl Reader for JaegerReader {
         let st = jt.to_trace();
         let res_cp = st.to_critical_path();
 
+        let mut cp_events_sorted = res_cp.g.node_weights().collect::<Vec<&Event>>();
+        cp_events_sorted.sort_by(|&a, &b| a.timestamp.partial_cmp(&b.timestamp).unwrap());
+
         eprintln!("SPAN TRACE TO CRITICAL PATH:");
         eprintln!("{:?}", res_cp);
+        eprintln!("\n");
+        eprintln!("\n");
+        eprintln!("\n");
+        for e in cp_events_sorted {
+            eprintln!("{:?}", e);
+        }
         eprintln!("\n");
         eprintln!("\n");
         eprintln!("\n");
