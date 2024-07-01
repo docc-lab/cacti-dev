@@ -47,7 +47,10 @@ impl JaegerSpan {
         }
         return Span{
             span_id: self.spanID.clone(),
-            parent: self.references[0].spanID.clone(),
+            parent: match self.references.len() {
+                0 => "".to_string(),
+                _ => self.references[0].spanID.clone()
+            },
             service: processes.get(self.processID.as_str()).unwrap().serviceName.clone(),
             host: host_name,
             operation: self.operationName.clone(),
