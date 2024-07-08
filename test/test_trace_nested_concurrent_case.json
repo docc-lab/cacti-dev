@@ -1,0 +1,330 @@
+{
+  "data": [
+    {
+      "traceID": "A_SPAN",
+      "spans": [
+        {
+          "traceID": "A_SPAN",
+          "spanID": "A_SPAN",
+          "flags": 1,
+          "operationName": "A_SPAN_START",
+          "references": [],
+          "startTime": 0,
+          "duration": 1000,
+          "tags": [
+            {
+              "key": "sampler.type",
+              "type": "string",
+              "value": "probabilistic"
+            },
+            {
+              "key": "sampler.param",
+              "type": "float64",
+              "value": 0.2
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "http.status_line",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "key": "component",
+              "type": "string",
+              "value": "nginx"
+            },
+            {
+              "key": "nginx.worker_pid",
+              "type": "string",
+              "value": "9"
+            },
+            {
+              "key": "peer.address",
+              "type": "string",
+              "value": "172.18.0.1:52332"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "http://127.0.0.1:8080/wrk2-api/user/follow"
+            },
+            {
+              "key": "http.host",
+              "type": "string",
+              "value": "127.0.0.1:8080"
+            },
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p1",
+          "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "B_SPAN",
+          "flags": 1,
+          "operationName": "B_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "A_SPAN"
+            }
+          ],
+          "startTime": 100,
+          "duration": 500,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p2",
+          "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "C_SPAN",
+          "flags": 1,
+          "operationName": "C_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "A_SPAN"
+            }
+          ],
+          "startTime": 400,
+          "duration": 500,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p3",
+          "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "D_SPAN",
+          "flags": 1,
+          "operationName": "D_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "B_SPAN"
+            }
+          ],
+          "startTime": 200,
+          "duration": 300,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p4",
+          "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "E_SPAN",
+          "flags": 1,
+          "operationName": "E_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "C_SPAN"
+            }
+          ],
+          "startTime": 500,
+          "duration": 200,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p5",
+          "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "F_SPAN",
+          "flags": 1,
+          "operationName": "F_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "C_SPAN"
+            }
+          ],
+          "startTime": 600,
+          "duration": 200,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p6",
+          "warnings": null
+        }
+      ],
+      "processes": {
+        "p1": {
+          "serviceName": "SERVICE_A",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "A_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        },
+        "p2": {
+          "serviceName": "SERVICE_B",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "B_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        },
+        "p3": {
+          "serviceName": "SERVICE_C",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "C_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        },
+        "p4": {
+          "serviceName": "SERVICE_D",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "D_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        },
+        "p5": {
+          "serviceName": "SERVICE_E",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "E_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        },
+        "p6": {
+          "serviceName": "SERVICE_F",
+          "tags": [
+            {
+              "key": "hostname",
+              "type": "string",
+              "value": "F_SERV_HOST"
+            },
+            {
+              "key": "ip",
+              "type": "string",
+              "value": "127.0.0.1"
+            },
+            {
+              "key": "jaeger.version",
+              "type": "string",
+              "value": "C++-0.4.2"
+            }
+          ]
+        }
+      },
+      "warnings": null
+    }
+  ],
+  "total": 0,
+  "limit": 0,
+  "offset": 0,
+  "errors": null
+}
