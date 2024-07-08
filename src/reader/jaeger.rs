@@ -195,7 +195,8 @@ impl Reader for JaegerReader {
         //         .unwrap();
 
         let resp: reqwest::blocking::Response =
-            reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
+            // reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
+            reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
                 .unwrap();
 
         let resp_obj: JaegerPayload =
