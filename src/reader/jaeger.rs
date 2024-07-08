@@ -8,6 +8,7 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
+use std::fs;
 use std::slice::SplitN;
 use std::time::Duration;
 use chrono::{DateTime, NaiveDate, NaiveDateTime};
@@ -199,9 +200,14 @@ impl Reader for JaegerReader {
             reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
                 .unwrap();
 
+        let message: String = fs::read_to_string("../../test_trace_base_case.json").unwrap();
+
+        // let resp_obj: JaegerPayload =
+        //     serde_json::from_str(
+        //         (resp.text().unwrap() as String).as_str()).unwrap();
+
         let resp_obj: JaegerPayload =
-            serde_json::from_str(
-                (resp.text().unwrap() as String).as_str()).unwrap();
+            serde_json::from_str(message.as_str()).unwrap();
 
         eprintln!("RESPONSE = {:?}", resp_obj);
 
