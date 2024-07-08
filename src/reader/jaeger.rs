@@ -200,7 +200,7 @@ impl Reader for JaegerReader {
             reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
                 .unwrap();
 
-        let message: String = fs::read_to_string("../../test_trace_base_case.json").unwrap();
+        let message: String = fs::read_to_string("../../test/test_trace_base_case.json").unwrap();
 
         // let resp_obj: JaegerPayload =
         //     serde_json::from_str(
