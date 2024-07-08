@@ -71,6 +71,31 @@
           "logs": [],
           "processID": "p1",
           "warnings": null
+        },
+        {
+          "traceID": "A_SPAN",
+          "spanID": "B_SPAN",
+          "flags": 1,
+          "operationName": "B_SPAN",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "A_SPAN",
+              "spanID": "A_SPAN"
+            }
+          ],
+          "startTime": 10,
+          "duration": 2237,
+          "tags": [
+            {
+              "key": "internal.span.format",
+              "type": "string",
+              "value": "proto"
+            }
+          ],
+          "logs": [],
+          "processID": "p2",
+          "warnings": null
         }
       ],
       "processes": {
@@ -95,7 +120,7 @@
           ]
         },
         "p2": {
-          "serviceName": "user-service",
+          "serviceName": "SERVICE_B",
           "tags": [
             {
               "key": "hostname",
