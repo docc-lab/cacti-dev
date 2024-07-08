@@ -201,7 +201,7 @@ impl Reader for JaegerReader {
                 .unwrap();
 
         let message: String = fs::read_to_string(
-            "/usr/local/pythia/test/test_trace_single_child_case.json").unwrap();
+            "/usr/local/pythia/test/test_trace_sequential_children_case.json").unwrap();
 
         // let resp_obj: JaegerPayload =
         //     serde_json::from_str(
