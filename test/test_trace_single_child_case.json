@@ -85,7 +85,7 @@
             }
           ],
           "startTime": 10,
-          "duration": 2237,
+          "duration": 100,
           "tags": [
             {
               "key": "internal.span.format",
