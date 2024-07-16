@@ -279,7 +279,29 @@ impl Reader for JaegerReader {
             serde_json::from_str(
                 (resp.text().unwrap() as String).as_str()).unwrap();
 
-        println!("{:?}", resp_obj);
+        // println!("{:?}", resp_obj);
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!("NUM TRACES = {}", resp_obj.data.len());
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
 
         // 1721106350200833913
         // 1720719924151000
