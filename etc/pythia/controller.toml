@@ -12,7 +12,8 @@ zipkin_url="http://localhost:16686"
 jaeger_url="http://localhost:16686"
 
 # Split by commas, of the form http://localhost:3030
-pythia_clients = "http://ctl:3030,http://cp-1:3030"
+#pythia_clients = "http://ctl:3030,http://cp-1:3030"
+pythia_clients = "http://ctl:3030"
 
 # other settings are defined in src/settings.rs
 
