@@ -250,13 +250,21 @@ impl Reader for JaegerReader {
     fn get_recent_traces(&mut self) -> Vec<Trace> {
         let mut traces = Vec::new();
 
-        let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_nanos();
+        let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
         println!("CUR TIME: {}", cur_time);
 
+        // let resp: reqwest::blocking::Response =
+        //     reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
+        //     limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
+        //         .unwrap();
         let resp: reqwest::blocking::Response =
-            reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
-            limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
+            reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=" +
+                cur_time.to_string().as_str() + "&limit=20&lookback=1h&maxDuration&minDuration&" +
+                "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
                 .unwrap();
+
+        // 1721106350200833913
+        // 1720719924151000
 
         traces
     }
