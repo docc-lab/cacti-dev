@@ -270,6 +270,8 @@ impl Reader for JaegerReader {
         //         "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
         //         .unwrap();
 
+        println!(query_str);
+
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(query_str).unwrap();
 
