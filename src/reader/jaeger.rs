@@ -8,9 +8,9 @@ All rights reserved.
 
 use std::collections::HashMap;
 use std::error::Error;
-use std::fs;
+use std::{fs, vec};
 use std::slice::SplitN;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use futures::Sink;
 use hyper::http;
@@ -118,7 +118,8 @@ struct JaegerPayload {
 
 pub struct JaegerReader {
     // connection: JaegerConnection // TODO: implement this
-    fetch_url: String
+    fetch_url: String,
+    // current_traces: HashMap<String, i64>
 }
 
 impl Reader for JaegerReader {
@@ -185,64 +186,79 @@ impl Reader for JaegerReader {
     //
     //     return Vec::new();
     // }
+
+    // fn get_recent_traces(&mut self) -> Vec<Trace> {
+    //     // let mut ids = Vec::new();
+    //
+    //     let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
+    //
+    //     // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
+    //     // let resp: reqwest::blocking::Response =
+    //     //     reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
+    //     //         .unwrap();
+    //
+    //     let resp: reqwest::blocking::Response =
+    //         // reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
+    //         reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
+    //             .unwrap();
+    //
+    //     let message: String = fs::read_to_string(
+    //         "/usr/local/pythia/test/test_trace_nested_concurrent_case.json").unwrap();
+    //
+    //     // let resp_obj: JaegerPayload =
+    //     //     serde_json::from_str(
+    //     //         (resp.text().unwrap() as String).as_str()).unwrap();
+    //
+    //     let resp_obj: JaegerPayload =
+    //         serde_json::from_str(message.as_str()).unwrap();
+    //
+    //     eprintln!("RESPONSE = {:?}", resp_obj);
+    //
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //
+    //     let jt = &resp_obj.data[0];
+    //
+    //     eprintln!("JAEGER TRACE TO SPAN TRACE:");
+    //     eprintln!("{:?}", jt.to_trace());
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //
+    //     let st = jt.to_trace();
+    //     let res_cp = st.to_critical_path();
+    //
+    //     let mut cp_events_sorted = res_cp.g.node_weights().collect::<Vec<&Event>>();
+    //     cp_events_sorted.sort_by(|&a, &b| a.timestamp.partial_cmp(&b.timestamp).unwrap());
+    //
+    //     eprintln!("SPAN TRACE TO CRITICAL PATH:");
+    //     eprintln!("{:?}", res_cp);
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //     for e in cp_events_sorted {
+    //         eprintln!("{:?}", e);
+    //     }
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //     eprintln!("\n");
+    //
+    //     return Vec::new();
+    // }
+
     fn get_recent_traces(&mut self) -> Vec<Trace> {
-        // let mut ids = Vec::new();
+        let mut traces = Vec::new();
 
-        let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
-
-        // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
-        // let resp: reqwest::blocking::Response =
-        //     reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
-        //         .unwrap();
+        let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_nanos();
+        println!("CUR TIME: {}", cur_time);
 
         let resp: reqwest::blocking::Response =
-            // reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
-            reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
+            reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
+            limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
                 .unwrap();
 
-        let message: String = fs::read_to_string(
-            "/usr/local/pythia/test/test_trace_nested_concurrent_case.json").unwrap();
-
-        // let resp_obj: JaegerPayload =
-        //     serde_json::from_str(
-        //         (resp.text().unwrap() as String).as_str()).unwrap();
-
-        let resp_obj: JaegerPayload =
-            serde_json::from_str(message.as_str()).unwrap();
-
-        eprintln!("RESPONSE = {:?}", resp_obj);
-
-        eprintln!("\n");
-        eprintln!("\n");
-        eprintln!("\n");
-
-        let jt = &resp_obj.data[0];
-
-        eprintln!("JAEGER TRACE TO SPAN TRACE:");
-        eprintln!("{:?}", jt.to_trace());
-        eprintln!("\n");
-        eprintln!("\n");
-        eprintln!("\n");
-
-        let st = jt.to_trace();
-        let res_cp = st.to_critical_path();
-
-        let mut cp_events_sorted = res_cp.g.node_weights().collect::<Vec<&Event>>();
-        cp_events_sorted.sort_by(|&a, &b| a.timestamp.partial_cmp(&b.timestamp).unwrap());
-
-        eprintln!("SPAN TRACE TO CRITICAL PATH:");
-        eprintln!("{:?}", res_cp);
-        eprintln!("\n");
-        eprintln!("\n");
-        eprintln!("\n");
-        for e in cp_events_sorted {
-            eprintln!("{:?}", e);
-        }
-        eprintln!("\n");
-        eprintln!("\n");
-        eprintln!("\n");
-
-        return Vec::new();
+        traces
     }
 
     fn reset_state(&mut self) {
