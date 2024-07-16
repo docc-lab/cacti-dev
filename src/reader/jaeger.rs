@@ -259,9 +259,15 @@ impl Reader for JaegerReader {
         //         .unwrap();
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=" +
-                cur_time.to_string().as_str() + "&limit=20&lookback=1h&maxDuration&minDuration&" +
+                cur_time.to_string().as_str() + "&limit=20&maxDuration&minDuration&" +
                 "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
                 .unwrap();
+
+        let resp_obj: JaegerPayload =
+            serde_json::from_str(
+                (resp.text().unwrap() as String).as_str()).unwrap();
+
+        println!("{:?}", resp_obj);
 
         // 1721106350200833913
         // 1720719924151000
