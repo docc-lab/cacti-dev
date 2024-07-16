@@ -252,9 +252,7 @@ impl Reader for JaegerReader {
 
         let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
         println!("CUR TIME: {}", cur_time);
-        println!("http://45.56.102.188:16686/api/traces/?end=".to_string() +
-            cur_time.to_string().as_str() + "&limit=20&maxDuration&minDuration&" +
-            "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str());
+        println!("http://45.56.102.188:16686/api/traces/?end={}&limit=20&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 10*60*1000000);
 
         // let resp: reqwest::blocking::Response =
         //     reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
