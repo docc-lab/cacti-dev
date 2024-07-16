@@ -258,7 +258,7 @@ impl Reader for JaegerReader {
         //     limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
         //         .unwrap();
         let resp: reqwest::blocking::Response =
-            reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=" +
+            reqwest::blocking::get(self.fetch_url.clone() + "/api/traces/?end=" +
                 cur_time.to_string().as_str() + "&limit=20&maxDuration&minDuration&" +
                 "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
                 .unwrap();
