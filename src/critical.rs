@@ -472,6 +472,8 @@ impl CriticalPath {
                                     .to_std()
                                     .unwrap(),
                                 variant: EdgeType::ChildOf,
+                                host: None,
+                                service: None
                             },
                         );
                     }
@@ -517,6 +519,8 @@ impl CriticalPath {
             DAGEdge {
                 duration: Duration::new(0, 1),
                 variant: EdgeType::ChildOf,
+                host: None,
+                service: None
             },
         );
         match next_node {
@@ -530,6 +534,8 @@ impl CriticalPath {
                     DAGEdge {
                         duration: old_duration,
                         variant: EdgeType::ChildOf,
+                        host: None,
+                        service: None
                     },
                 );
             }

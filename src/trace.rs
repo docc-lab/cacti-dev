@@ -331,6 +331,8 @@ impl PartialEq<Event> for Event {
 pub struct DAGEdge {
     pub duration: Duration,
     pub variant: EdgeType,
+    pub service: Option<String>,
+    pub host: Option<String>
 }
 
 /// These edge types are taken from OpenTracing, but they are not used much in the codebase

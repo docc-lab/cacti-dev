@@ -333,6 +333,8 @@ impl DEATHSTARReader {
                                         .to_std()
                                         .unwrap(),
                                     variant: EdgeType::ChildOf,
+                                    host: None,
+                                    service: None
                                 },
                             );
                         }
@@ -352,6 +354,8 @@ impl DEATHSTARReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }

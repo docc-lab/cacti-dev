@@ -468,6 +468,8 @@ impl OSProfilerReader {
                             .to_std()
                             .unwrap(),
                         variant: EdgeType::FollowsFrom,
+                        host: None,
+                        service: None
                     },
                 );
                 parent_of_trace = None;
@@ -496,6 +498,8 @@ impl OSProfilerReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }
@@ -515,6 +519,8 @@ impl OSProfilerReader {
                                                 .to_std()
                                                 .unwrap(),
                                             variant: EdgeType::ChildOf,
+                                            host: None,
+                                            service: None
                                         },
                                     );
                                 }
@@ -529,6 +535,8 @@ impl OSProfilerReader {
                                                 .to_std()
                                                 .unwrap(),
                                             variant: EdgeType::ChildOf,
+                                            host: None,
+                                            service: None
                                         },
                                     );
                                 }
@@ -584,6 +592,8 @@ impl OSProfilerReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }
@@ -601,6 +611,8 @@ impl OSProfilerReader {
                                                 .to_std()
                                                 .unwrap(),
                                             variant: EdgeType::ChildOf,
+                                            host: None,
+                                            service: None
                                         },
                                     );
                                 }
@@ -624,6 +636,8 @@ impl OSProfilerReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }
@@ -636,6 +650,8 @@ impl OSProfilerReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }
@@ -666,6 +682,8 @@ impl OSProfilerReader {
                                 .to_std()
                                 .unwrap(),
                             variant: EdgeType::FollowsFrom,
+                            host: None,
+                            service: None
                         },
                     );
                 }

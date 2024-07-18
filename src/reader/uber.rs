@@ -279,6 +279,8 @@ impl UberReader {
                     DAGEdge {
                         duration: (s.event.e.timestamp - mydag.g[i].timestamp).to_std()?,
                         variant: EdgeType::ChildOf,
+                        host: None,
+                        service: None
                     },
                 );
             }
@@ -317,6 +319,8 @@ impl UberReader {
                             DAGEdge {
                                 duration: (s.event.e.timestamp - mydag.g[p].timestamp).to_std()?,
                                 variant: EdgeType::ChildOf,
+                                host: None,
+                                service: None
                             },
                         );
                     }

@@ -302,6 +302,8 @@ impl HDFSReader {
                                         .to_std()
                                         .unwrap(),
                                     variant: EdgeType::ChildOf,
+                                    host: None,
+                                    service: None
                                 },
                             );
                         }
@@ -321,6 +323,8 @@ impl HDFSReader {
                                             .to_std()
                                             .unwrap(),
                                         variant: EdgeType::ChildOf,
+                                        host: None,
+                                        service: None
                                     },
                                 );
                             }

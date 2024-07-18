@@ -86,7 +86,12 @@ impl Span {
         return (with_start < self_end) && (with_end > self_start);
     }
 
-    pub fn to_critical_path(&self, st: &SpanTrace, res: &mut Trace) {
+    pub fn to_critical_path(
+        &self, st: &SpanTrace,
+        res: &mut Trace,
+        par_host: String,
+        par_serv: String
+    ) {
         let mut sorted_children: Vec<Span> = st.children.get(self.span_id.as_str()).unwrap().clone();
         sorted_children.sort_by(
             |a, b| b.end().partial_cmp(&a.end()).unwrap());
@@ -144,7 +149,9 @@ impl Span {
                 connect_node.clone(),
                 DAGEdge {
                     duration: Duration::from_nanos(edge_duration as u64),
-                    variant: EdgeType::ChildOf
+                    variant: EdgeType::ChildOf,
+                    host: Some(par_host),
+                    service: Some(par_serv)
                 }
             );
         }
@@ -159,7 +166,8 @@ impl Span {
                 if c.end() < cur_span.start.and_utc().timestamp_nanos_opt().unwrap() {
                     cur_span = c.clone();
                     // let child_trace = cur_span.to_critical_path(st);
-                    cur_span.to_critical_path(st, res);
+                    cur_span.to_critical_path(
+                        st, res, self.host.clone(), self.service.clone());
                 }
             }
         }
@@ -181,7 +189,9 @@ impl Span {
             connect_node.clone(),
             DAGEdge {
                 duration: Duration::from_nanos(edge_duration as u64),
-                variant: EdgeType::ChildOf
+                variant: EdgeType::ChildOf,
+                host: Some(self.host.clone()),
+                service: Some(self.service.clone())
             }
         );
     }
@@ -266,7 +276,8 @@ impl SpanTrace {
 
     pub fn to_critical_path(&self) -> Trace {
         let mut to_ret_trace = Trace::new(&IDType::STRING(self.req_id.clone()));
-        self.spans.get(self.root_span_id.as_str()).unwrap().to_critical_path(self, &mut to_ret_trace);
+        self.spans.get(self.root_span_id.as_str()).unwrap().to_critical_path(
+            self, &mut to_ret_trace, "".to_string(), "".to_string());
         return to_ret_trace;
     }
 
