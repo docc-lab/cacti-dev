@@ -252,12 +252,12 @@ impl Reader for JaegerReader {
 
         let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
         println!("CUR TIME: {}", cur_time);
-        println!("http://45.56.102.188:16686/api/traces?end={}&limit=20&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 10*60*1000000);
+        println!("http://45.56.102.188:16686/api/traces?end={}&limit=20&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
         // "http://45.56.102.188:16686/api/traces?end=1720720913512000&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720717313512001"
         // "http://45.56.102.188:16686/api/traces?end=1721107686694029&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1721107086694029"
         // "http://45.56.102.188:16686/api/traces?end=1721108216857049&limit=200&lookback=custom&maxDuration&minDuration&service=compose-post-service&start=1721107616857049"
 
-        let query_str = format!("http://localhost:16686/api/traces?end={}&limit=1000000000&lookback=custom&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 10*60*1000000);
+        let query_str = format!("http://localhost:16686/api/traces?end={}&limit=1000000000&lookback=custom&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
 
         // let resp: reqwest::blocking::Response =
         //     reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
