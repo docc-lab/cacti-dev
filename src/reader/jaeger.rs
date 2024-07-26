@@ -92,7 +92,9 @@ impl JaegerTrace {
         if self.spans.len() == 0 {
             println!("{}", self.traceID);
         }
-        let root_span: &JaegerSpan = self.spans.iter().filter(|&span| span.traceID == span.spanID).collect::<Vec<_>>()[0];
+        // let root_span: &JaegerSpan = self.spans.iter().filter(|&span| span.traceID == span.spanID).collect::<Vec<_>>()[0];
+        let root_span: &JaegerSpan = self.spans.iter()
+            .filter(|&span| span.references.len() == 0).collect::<Vec<_>>()[0];
         // let mut span_parents: HashMap<String, String> = HashMap::new();
         // for span in &self.spans {
         //     span_parents.insert(span.spanID, span.)
