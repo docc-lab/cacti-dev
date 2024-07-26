@@ -271,6 +271,9 @@ impl Reader for JaegerReader {
             serde_json::from_str(
                 (resp.text().unwrap() as String).as_str()).unwrap();
 
+        println!("Services:");
+        println!("{:?}", resp_obj.data.clone());
+
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
 
