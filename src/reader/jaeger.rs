@@ -34,7 +34,7 @@ struct JaegerReference {
 struct JaegerSpan {
     traceID: String,
     spanID: String,
-    flags: i32,
+    flags: Option<i32>,
     operationName: String,
     startTime: i64,
     duration: i64,
