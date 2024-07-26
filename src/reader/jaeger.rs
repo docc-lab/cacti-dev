@@ -89,6 +89,9 @@ struct JaegerTrace {
 impl JaegerTrace {
     pub fn to_trace(&self) -> SpanTrace {
         let spans: Vec<Span> = self.spans.iter().map(|span| span.to_span(&self.processes)).collect();
+        if self.spans.len() == 0 {
+            println!("{}", self.traceID);
+        }
         let root_span: &JaegerSpan = self.spans.iter().filter(|&span| span.traceID == span.spanID).collect::<Vec<_>>()[0];
         // let mut span_parents: HashMap<String, String> = HashMap::new();
         // for span in &self.spans {
