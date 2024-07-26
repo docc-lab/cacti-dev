@@ -18,8 +18,8 @@ use std::io::prelude::*;
 use std::time::Duration;
 use std::time::Instant;
 
-use pythia_common::NodeStats;
-use pythia_common::RequestType;
+use pythia_common::{NodeStats, RequestType};
+use pythia_common::OSPRequestType;
 
 use crate::critical::CriticalPath;
 use crate::critical::Path;
@@ -33,6 +33,7 @@ pub struct BudgetManager {
     clients: Vec<String>,
     last_stats: HashMap<String, NodeStats>,
     /// The time each tracepoint was last observed in a trace.
+    // last_seen: HashMap<(TracepointID, Option<OSPRequestType>), Instant>,
     last_seen: HashMap<(TracepointID, Option<RequestType>), Instant>,
     gc_keep_duration: Duration,
     trace_size_limit: u32,
@@ -84,7 +85,7 @@ impl BudgetManager {
             let mut nidx = path.start_node;
             while nidx != path.end_node {
                 self.last_seen
-                    .insert((path.at(nidx), Some(path.request_type)), now);
+                    .insert((path.at(nidx), Some(path.request_type.clone())), now);
                 nidx = path.next_node(nidx).unwrap();
             }
         }
@@ -92,9 +93,10 @@ impl BudgetManager {
 
     /// Tracepoints that were not seen for some time. These should be disabled during garbage
     /// collection.
+    // pub fn old_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)> {
     pub fn old_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
         let mut result = Vec::new();
-        for (&tp, seen) in &self.last_seen {
+        for (tp, seen) in self.last_seen.clone() {
             if seen.elapsed() > self.gc_keep_duration {
                 result.push(tp);
             }

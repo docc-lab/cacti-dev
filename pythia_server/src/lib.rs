@@ -32,7 +32,7 @@ use jsonrpc_derive::rpc;
 use jsonrpc_http_server::ServerBuilder;
 use serde_json;
 
-use pythia_common::RequestType;
+use pythia_common::OSPRequestType;
 
 use crate::budget::NodeStatReader;
 use crate::controller::OSProfilerController;
@@ -51,7 +51,7 @@ pub trait PythiaAPI {
     /// applies it to all request types), and the setting (can be 0 (disabled) or 1
     /// (enabled)).
     #[rpc(name = "set_tracepoints")]
-    fn set_tracepoints(&self, settings: Vec<(String, Option<RequestType>, [u8; 1])>) -> Result<()>;
+    fn set_tracepoints(&self, settings: Vec<(String, Option<OSPRequestType>, [u8; 1])>) -> Result<()>;
 
     /// Change setting for all local tracepoints. `to_write` decides whether to disable (0) or
     /// enable (1) all tracepoints.
@@ -87,7 +87,7 @@ impl PythiaAPI for PythiaAPIImpl {
         Ok(serde_json::to_value(self.reader.lock().unwrap().get_matches(&trace_id)).unwrap())
     }
 
-    fn set_tracepoints(&self, settings: Vec<(String, Option<RequestType>, [u8; 1])>) -> Result<()> {
+    fn set_tracepoints(&self, settings: Vec<(String, Option<OSPRequestType>, [u8; 1])>) -> Result<()> {
         eprintln!("Setting {} tracepoints", settings.len());
         self.controller.lock().unwrap().apply_settings(settings);
         Ok(())

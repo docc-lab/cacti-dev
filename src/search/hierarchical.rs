@@ -51,7 +51,8 @@ impl SearchStrategy for HierarchicalSearch {
         let mut result = self.search_context(&matches, common_context);
         result = result
             .into_iter()
-            .filter(|&x| !self.controller.is_enabled(&(x, Some(group.request_type))))
+            .filter(|&x| !self.controller.is_enabled(
+                &(x, Some(group.request_type.clone()))))
             .collect();
         // Choose multiple tracepoints from the possible group structure based on budget
         result = result.choose_multiple(&mut rng, budget).cloned().collect();
@@ -160,7 +161,7 @@ mod tests {
     use crate::settings::Settings;
     use crate::trace::TracepointID;
 
-    use pythia_common::RequestType;
+    use pythia_common::{OSPRequestType, RequestType};
 
     lazy_static! {
         static ref SETTINGS: Settings = Settings::read();
@@ -176,7 +177,8 @@ mod tests {
         let mut manifest = MANIFEST.clone();
         let mut paths: Vec<HierarchicalCriticalPath> = manifest
             .per_request_type
-            .get_mut(&RequestType::ServerCreate)
+            // .get_mut(&OSPRequestType::ServerCreate)
+            .get_mut(&RequestType::OSP(OSPRequestType::ServerCreate))
             .unwrap()
             .paths
             .values()

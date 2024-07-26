@@ -8,7 +8,7 @@ All rights reserved.
 
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 use crate::controller::Controller;
 use crate::Settings;
 use crate::trace::TracepointID;
@@ -23,16 +23,19 @@ pub struct OTelController {
 }
 
 impl Controller for OTelController {
+    // fn enable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         // todo!()
         return
     }
 
+    // fn disable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn disable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         // todo!()
         return
     }
 
+    // fn is_enabled(&self, point: &(TracepointID, Option<OSPRequestType>)) -> bool {
     fn is_enabled(&self, point: &(TracepointID, Option<RequestType>)) -> bool {
         // todo!()
         true
@@ -48,6 +51,7 @@ impl Controller for OTelController {
         return
     }
 
+    // fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)> {
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
         // todo!()
         Vec::new()

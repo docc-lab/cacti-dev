@@ -17,7 +17,7 @@ use std::fs::{read_dir, File};
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 
-use pythia_common::RequestType;
+use pythia_common::OSPRequestType;
 
 use crate::settings::Settings;
 
@@ -36,7 +36,7 @@ impl OSProfilerController {
         self.write_dir(self.manifest_root.as_path(), to_write);
     }
 
-    pub fn apply_settings(&self, settings: Vec<(String, Option<RequestType>, [u8; 1])>) {
+    pub fn apply_settings(&self, settings: Vec<(String, Option<OSPRequestType>, [u8; 1])>) {
         for (tracepoint, request_type, to_write) in settings.iter() {
             self.write_to_tracepoint(tracepoint, request_type, to_write);
         }
@@ -58,7 +58,7 @@ impl OSProfilerController {
             if path.is_dir() {
                 self.write_dir(&path, to_write);
             } else {
-                if RequestType::from_str(
+                if OSPRequestType::from_str(
                     path.file_name()
                         .unwrap()
                         .to_string_lossy()
@@ -80,7 +80,7 @@ impl OSProfilerController {
     fn write_to_tracepoint(
         &self,
         tracepoint: &str,
-        request_type: &Option<RequestType>,
+        request_type: &Option<OSPRequestType>,
         to_write: &[u8; 1],
     ) {
         let path = self.get_path(tracepoint, request_type);
@@ -108,7 +108,7 @@ impl OSProfilerController {
         }
     }
 
-    fn get_path(&self, tracepoint: &str, request_type: &Option<RequestType>) -> PathBuf {
+    fn get_path(&self, tracepoint: &str, request_type: &Option<OSPRequestType>) -> PathBuf {
         let mut result = self.manifest_root.clone();
         if tracepoint.chars().nth(0).unwrap() == '/' {
             result.push(&tracepoint[1..]);
@@ -117,7 +117,7 @@ impl OSProfilerController {
         }
         match *request_type {
             Some(t) => {
-                if t != RequestType::Unknown {
+                if t != OSPRequestType::Unknown {
                     let mut newname = result.file_name().unwrap().to_os_string();
                     newname.push(":");
                     newname.push(t.to_string());

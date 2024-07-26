@@ -313,12 +313,18 @@ impl SpanCache {
         };
     }
 
+    pub fn add_trace(&mut self, to_add: SpanTrace) {
+        for (_, span) in to_add.spans {
+            self.add_span(span, to_add.req_id.clone());
+        }
+    }
+
     // "context" variable represents a trace ID
-    pub fn add_span(&mut self, to_add: Span, context: String) {
+    pub fn add_span(&mut self, to_add: Span, trace_id: String) {
         let start_time = to_add.start.timestamp_nanos();
         let end_time = start_time + (to_add.duration.as_nanos() as i64);
         self.span_times.push((start_time.clone(), end_time));
-        self.span_refs.push((context, to_add.span_id));
+        self.span_refs.push((trace_id, to_add.span_id));
     }
 
     // pub fn add_spans(&mut self, to_add: Vec<Span>) {
@@ -345,6 +351,21 @@ impl SpanCache {
         return to_return;
     }
 
+    pub fn find_overlaps_raw(&self, target_start: i64, target_end: i64) -> Vec<(String, String)> {
+        let mut to_return = Vec::new();
+        let mut i = 0;
+        for &time in self.span_times.iter() {
+            // if span.overlaps(target) {
+            //     to_return.push(span)
+            // }
+            let target_start = target_start;
 
+            if (target_end > time.0) && (target_start < time.1) {
+                to_return.push(self.span_refs[i.clone()].clone())
+            }
+            i += 1;
+        }
+        return to_return;
+    }
 }
 

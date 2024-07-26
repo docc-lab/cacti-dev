@@ -10,9 +10,10 @@ use std::collections::HashMap;
 use std::error::Error;
 use futures::Sink;
 use hyper::http;
+use pythia_common::RequestType;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
-use crate::spantrace::Span;
+use crate::spantrace::{Span, SpanTrace};
 
 pub struct ZipkinReader {
     // connection: ZipkinConnection // TODO: implement this
@@ -20,6 +21,16 @@ pub struct ZipkinReader {
 }
 
 impl Reader for ZipkinReader {
+    fn all_operations(&self) -> Vec<RequestType> {
+        Vec::new()
+    }
+
+    fn set_fetch_all(&mut self) {}
+
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+        return Vec::new();
+    }
+
     fn read_file(&mut self, filename: &str) -> Trace {
         todo!()
     }

@@ -13,7 +13,7 @@ mod hdfs;
 mod osprofiler;
 mod otel;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::controller::hdfs::HDFSController;
 use crate::controller::osprofiler::OSProfilerController;
@@ -27,11 +27,15 @@ use std::sync::{Arc, Mutex};
 use crate::controller::otel::OTelController;
 
 pub trait Controller: Send + Sync {
+    // fn enable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>);
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>);
+    // fn disable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>);
     fn disable(&self, points: &Vec<(TracepointID, Option<RequestType>)>);
+    // fn is_enabled(&self, point: &(TracepointID, Option<OSPRequestType>)) -> bool;
     fn is_enabled(&self, point: &(TracepointID, Option<RequestType>)) -> bool;
     fn disable_all(&self);
     fn enable_all(&self);
+    // fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)>;
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)>;
 
     fn disable_by_name(&self, point: &str) {
@@ -52,6 +56,7 @@ pub fn controller_from_settings(settings: &Settings) -> Box<dyn Controller> {
 
 pub struct TestController {
 
+// enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<OSPRequestType>)>>>,
 enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<RequestType>)>>>,
 
 }
@@ -64,6 +69,11 @@ impl TestController {
 }
 
 impl Controller for TestController {
+    // fn enable(&self, _: &Vec<(TracepointID, Option<OSPRequestType>)>) {}
+    // fn disable(&self, _: &Vec<(TracepointID, Option<OSPRequestType>)>) {}
+    // fn is_enabled(&self, _: &(TracepointID, Option<OSPRequestType>)) -> bool {
+    //     false
+    // }
     fn enable(&self, _: &Vec<(TracepointID, Option<RequestType>)>) {}
     fn disable(&self, _: &Vec<(TracepointID, Option<RequestType>)>) {}
     fn is_enabled(&self, _: &(TracepointID, Option<RequestType>)) -> bool {
@@ -71,6 +81,7 @@ impl Controller for TestController {
     }
     fn disable_all(&self) {}
     fn enable_all(&self) {}
+    // fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)> {
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
         self.enabled_tracepoints
             .lock()

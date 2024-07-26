@@ -12,7 +12,7 @@ use std::collections::HashSet;
 use petgraph::graph::EdgeIndex;
 use rand::seq::IteratorRandom;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::controller::Controller;
 use crate::grouping::Group;
@@ -24,6 +24,7 @@ use crate::trace::TracepointID;
 /// This strategy returns a random selection of trace points to enable
 pub struct HistoricSearch {
     controller: &'static Box<dyn Controller>,
+    // per_request_types: HashMap<OSPRequestType, HashSet<TracepointID>>,
     per_request_types: HashMap<RequestType, HashSet<TracepointID>>,
 }
 
@@ -34,7 +35,8 @@ impl SearchStrategy for HistoricSearch {
             .get(&group.request_type)
             .unwrap()
             .iter()
-            .filter(|&tp| !self.controller.is_enabled(&(*tp, Some(group.request_type))))
+            .filter(|&tp| !self.controller.is_enabled(
+                &(*tp, Some(group.request_type.clone()))))
             .cloned()
             .choose_multiple(&mut rng, budget)
     }

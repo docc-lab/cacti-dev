@@ -9,7 +9,7 @@ All rights reserved.
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::controller::Controller;
 use crate::rpclib::set_all_client_tracepoints;
@@ -21,15 +21,17 @@ pub struct OSProfilerController {
     client_list: Vec<String>,
 
     /// This should only be valid after disable_all is called
+    // enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<OSPRequestType>)>>>,
     enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<RequestType>)>>>,
 }
 
 impl Controller for OSProfilerController {
+    // fn enable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         eprintln!("Enabling {:?}", points);
         let mut enabled_tracepoints = self.enabled_tracepoints.lock().unwrap();
         for p in points {
-            if p.1 == Some(RequestType::Unknown) {
+            if p.1 == Some(RequestType::OSP(OSPRequestType::Unknown)) {
                 enabled_tracepoints.insert((p.0, None));
             } else {
                 enabled_tracepoints.insert(p.clone());
@@ -38,11 +40,12 @@ impl Controller for OSProfilerController {
         self.write_to_tracepoints(points, b"1");
     }
 
+    // fn disable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn disable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         eprintln!("Disabling {:?}", points);
         let mut enabled_tracepoints = self.enabled_tracepoints.lock().unwrap();
         for p in points {
-            if p.1 == Some(RequestType::Unknown) {
+            if p.1 == Some(RequestType::OSP(OSPRequestType::Unknown)) {
                 enabled_tracepoints.remove(&(p.0, None));
             } else {
                 enabled_tracepoints.remove(p);
@@ -51,6 +54,7 @@ impl Controller for OSProfilerController {
         self.write_to_tracepoints(points, b"0");
     }
 
+    // fn is_enabled(&self, point: &(TracepointID, Option<OSPRequestType>)) -> bool {
     fn is_enabled(&self, point: &(TracepointID, Option<RequestType>)) -> bool {
         let enabled_tracepoints = self.enabled_tracepoints.lock().unwrap();
         // A tracepoint is enabled either globally or for a request type
@@ -67,6 +71,7 @@ impl Controller for OSProfilerController {
     fn enable_all(&self) {
         self.set_all_tracepoints(b"1");
     }
+    // fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)> {
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
         self.enabled_tracepoints
             .lock()
@@ -87,6 +92,7 @@ impl OSProfilerController {
 
     fn write_to_tracepoints(
         &self,
+        // points: &Vec<(TracepointID, Option<OSPRequestType>)>,
         points: &Vec<(TracepointID, Option<RequestType>)>,
         to_write: &[u8; 1],
     ) {

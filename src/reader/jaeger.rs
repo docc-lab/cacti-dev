@@ -6,7 +6,7 @@ Copyright (c) 2022, Diagnosis and Control of Clouds Laboratory
 All rights reserved.
 */
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::{fs, vec};
 use std::slice::SplitN;
@@ -15,6 +15,8 @@ use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use futures::Sink;
 use hyper::http;
 use itertools::Itertools;
+use pythia_common::jaeger::JaegerRequestType;
+use pythia_common::RequestType;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
 use crate::spantrace::{Span, SpanTrace};
@@ -119,6 +121,10 @@ struct JaegerPayload {
 pub struct JaegerReader {
     // connection: JaegerConnection // TODO: implement this
     fetch_url: String,
+    problem_type: RequestType,
+    fetch_all: bool,
+    for_searchspace: bool,
+    cycle_lookback: u128,
     // current_traces: HashMap<String, i64>
 }
 
@@ -159,154 +165,85 @@ impl Reader for JaegerReader {
         todo!()
     }
 
-    // #[tokio:main]
-    // fn get_recent_traces(&mut self) -> Vec<Trace> {
-    //     // let mut ids = Vec::new();
+    fn get_recent_traces(&mut self) -> Vec<Trace> {
+        return Vec::new();
+    }
+
+    // fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+    //     let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
+    //     println!("CUR TIME: {}", cur_time);
+    //     println!("http://45.56.102.188:16686/api/traces?end={}&limit=20&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
+    //     // "http://45.56.102.188:16686/api/traces?end=1720720913512000&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720717313512001"
+    //     // "http://45.56.102.188:16686/api/traces?end=1721107686694029&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1721107086694029"
+    //     // "http://45.56.102.188:16686/api/traces?end=1721108216857049&limit=200&lookback=custom&maxDuration&minDuration&service=compose-post-service&start=1721107616857049"
     //
-    //     let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
+    //     let query_str = format!("http://localhost:16686/api/traces?end={}&limit=1000000000&lookback=custom&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
     //
-    //     // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
+    //     // let resp: reqwest::blocking::Response =
+    //     //     reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
+    //     //     limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
+    //     //         .unwrap();
+    //
+    //     // let resp: reqwest::blocking::Response =
+    //     //     reqwest::blocking::get("http://45.56.102.188:16686/api/traces?end=".to_string() +
+    //     //         cur_time.to_string().as_str() + "&limit=20&maxDuration&minDuration&" +
+    //     //         "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
+    //     //         .unwrap();
+    //
+    //     println!("{}", query_str);
+    //
     //     let resp: reqwest::blocking::Response =
-    //         reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
-    //             .unwrap();
-    //
-    //     // match resp.text() {
-    //     //     Ok(res) => {
-    //     //         eprintln!("RESPONSE = {:?}", resp.text());
-    //     //     }
-    //     // }
-    //
-    //     let resp_text = resp.text();
+    //         reqwest::blocking::get(query_str).unwrap();
     //
     //     let resp_obj: JaegerPayload =
     //         serde_json::from_str(
-    //             (resp_text.unwrap() as String).as_str()).unwrap();
+    //             (resp.text().unwrap() as String).as_str()).unwrap();
     //
-    //     eprintln!("RESPONSE = {:?}", resp_obj);
+    //     // println!("{:?}", resp_obj);
     //
-    //     return Vec::new();
-    // }
-
-    // fn get_recent_traces(&mut self) -> Vec<Trace> {
-    //     // let mut ids = Vec::new();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!("NUM TRACES = {}", resp_obj.data.len());
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
+    //     println!();
     //
-    //     let mut traces: HashMap<String, Vec<Span>> = HashMap::new();
+    //     let mut to_ret_traces = Vec::new();
     //
-    //     // let resp: reqwest::blocking::Response = reqwest::blocking::get("https://httpbin.org/ip").unwrap();
-    //     // let resp: reqwest::blocking::Response =
-    //     //     reqwest::blocking::get(self.fetch_url.clone() + "/api/traces?service=nginx-web-server&limit=10")
-    //     //         .unwrap();
-    //
-    //     let resp: reqwest::blocking::Response =
-    //         // reqwest::blocking::get("http://45.56.102.188:16686/api/traces/19c8d9a240f56031")
-    //         reqwest::blocking::get("http://45.56.102.188:16686/api/traces/01f2aa083a69e203")
-    //             .unwrap();
-    //
-    //     let message: String = fs::read_to_string(
-    //         "/usr/local/pythia/test/test_trace_nested_concurrent_case.json").unwrap();
-    //
-    //     // let resp_obj: JaegerPayload =
-    //     //     serde_json::from_str(
-    //     //         (resp.text().unwrap() as String).as_str()).unwrap();
-    //
-    //     let resp_obj: JaegerPayload =
-    //         serde_json::from_str(message.as_str()).unwrap();
-    //
-    //     eprintln!("RESPONSE = {:?}", resp_obj);
-    //
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //
-    //     let jt = &resp_obj.data[0];
-    //
-    //     eprintln!("JAEGER TRACE TO SPAN TRACE:");
-    //     eprintln!("{:?}", jt.to_trace());
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //
-    //     let st = jt.to_trace();
-    //     let res_cp = st.to_critical_path();
-    //
-    //     let mut cp_events_sorted = res_cp.g.node_weights().collect::<Vec<&Event>>();
-    //     cp_events_sorted.sort_by(|&a, &b| a.timestamp.partial_cmp(&b.timestamp).unwrap());
-    //
-    //     eprintln!("SPAN TRACE TO CRITICAL PATH:");
-    //     eprintln!("{:?}", res_cp);
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //     for e in cp_events_sorted {
-    //         eprintln!("{:?}", e);
+    //     for jt in resp_obj.data {
+    //         to_ret_traces.push(jt.to_trace());
     //     }
-    //     eprintln!("\n");
-    //     eprintln!("\n");
-    //     eprintln!("\n");
     //
-    //     return Vec::new();
+    //     return to_ret_traces
     // }
 
-    fn get_recent_traces(&mut self) -> Vec<Trace> {
-        let mut traces = Vec::new();
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+        if self.fetch_all {
+            let mut to_return = Vec::new();
 
-        let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
-        println!("CUR TIME: {}", cur_time);
-        println!("http://45.56.102.188:16686/api/traces?end={}&limit=20&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
-        // "http://45.56.102.188:16686/api/traces?end=1720720913512000&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720717313512001"
-        // "http://45.56.102.188:16686/api/traces?end=1721107686694029&limit=200&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1721107086694029"
-        // "http://45.56.102.188:16686/api/traces?end=1721108216857049&limit=200&lookback=custom&maxDuration&minDuration&service=compose-post-service&start=1721107616857049"
+            for service in self.all_operations() {
+                to_return.append(&mut self.get_span_traces(service.to_string(), self.cycle_lookback))
+            }
 
-        let query_str = format!("http://localhost:16686/api/traces?end={}&limit=1000000000&lookback=custom&maxDuration&minDuration&service=compose-post-service&start={}", cur_time, cur_time - 1*60*1000000);
-
-        // let resp: reqwest::blocking::Response =
-        //     reqwest::blocking::get(self.fetch_url.clone() + ":16686/api/traces/?end=1720719924151000&\
-        //     limit=20&lookback=1h&maxDuration&minDuration&service=compose-post-service&start=1720716324151000")
-        //         .unwrap();
-
-        // let resp: reqwest::blocking::Response =
-        //     reqwest::blocking::get("http://45.56.102.188:16686/api/traces?end=".to_string() +
-        //         cur_time.to_string().as_str() + "&limit=20&maxDuration&minDuration&" +
-        //         "service=compose-post-service&start=" + (cur_time - 10*60*1000000).to_string().as_str())
-        //         .unwrap();
-
-        println!("{}", query_str);
-
-        let resp: reqwest::blocking::Response =
-            reqwest::blocking::get(query_str).unwrap();
-
-        let resp_obj: JaegerPayload =
-            serde_json::from_str(
-                (resp.text().unwrap() as String).as_str()).unwrap();
-
-        // println!("{:?}", resp_obj);
-
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!("NUM TRACES = {}", resp_obj.data.len());
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-
-        // 1721106350200833913
-        // 1720719924151000
-
-        traces
+            to_return
+        } else {
+            self.get_span_traces(self.problem_type.to_string(), self.cycle_lookback)
+        }
     }
 
     fn reset_state(&mut self) {
@@ -315,15 +252,76 @@ impl Reader for JaegerReader {
     }
 
     fn for_searchspace(&mut self) {
-        // TODO
-        return
+        self.for_searchspace = true;
     }
+
+    fn all_operations(&self) -> Vec<RequestType> {
+        let mut to_set_types = HashSet::new();
+
+        let resp: reqwest::blocking::Response =
+            reqwest::blocking::get(
+                format!("{}/api/services", self.fetch_url)).unwrap();
+
+        let resp_obj: JaegerServicesPayload =
+            serde_json::from_str(
+                (resp.text().unwrap() as String).as_str()).unwrap();
+
+        for service in resp_obj.data {
+            // let traces = self.get_span_traces(service, 60*60*1000000);
+
+            for trace in self.get_span_traces(service, 60*60*1000000) {
+                for (_, span) in trace.spans {
+                    if span.parent.is_empty() {
+                        to_set_types.insert(
+                            RequestType::Jaeger(JaegerRequestType{
+                                rt: span.operation.clone()
+                            }));
+                    }
+                }
+            }
+        }
+
+        to_set_types.into_iter().collect()
+    }
+
+    fn set_fetch_all(&mut self) {
+        self.fetch_all = true;
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerServicesPayload {
+    data: Vec<String>,
 }
 
 impl JaegerReader {
     pub fn from_settings(settings: &Settings) -> JaegerReader {
         return JaegerReader{
             fetch_url: settings.jaeger_url.clone(),
+            problem_type: settings.problem_type.clone(),
+            for_searchspace: false,
+            fetch_all: false,
+            cycle_lookback: settings.cycle_lookback,
         }
+    }
+
+    fn get_span_traces(&self, service: String, lookback: u128) -> Vec<SpanTrace> {
+        let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
+
+        let query_str = format!(
+            "http://localhost:16686/api/traces?end={}\
+            &limit=1000000000&lookback=custom&maxDuration&minDuration&service={}&start={}",
+            cur_time, service, cur_time - lookback
+        );
+
+        let resp: reqwest::blocking::Response =
+            reqwest::blocking::get(query_str).unwrap();
+
+        let resp_obj: JaegerPayload =
+            serde_json::from_str(
+                (resp.text().unwrap() as String).as_str()).unwrap();
+
+        resp_obj.data.into_iter()
+            .map(|jt| jt.to_trace()).collect()
     }
 }

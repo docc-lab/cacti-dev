@@ -20,10 +20,10 @@ use redis::Connection;
 use uuid::Uuid;
 
 use pythia_common::osprofiler::ExitEnum;
-use pythia_common::AnnotationEnum;
+use pythia_common::{AnnotationEnum, RequestType};
 use pythia_common::OSProfilerEnum;
 use pythia_common::OSProfilerSpan;
-use pythia_common::RequestType;
+use pythia_common::OSPRequestType;
 use pythia_common::REQUEST_TYPES;
 use pythia_common::REQUEST_TYPE_REGEXES;
 
@@ -39,6 +39,7 @@ use crate::trace::Trace;
 use crate::trace::TracepointID;
 use crate::trace::{DAGEdge, EdgeType};
 use crate::PythiaError;
+use crate::spantrace::SpanTrace;
 
 use crate::trace::Value::SignedInt;
 use crate::trace::Value::UnsignedInt;
@@ -57,6 +58,16 @@ pub struct OSProfilerReader {
 }
 
 impl Reader for OSProfilerReader {
+    fn all_operations(&self) -> Vec<RequestType> {
+        Vec::new()
+    }
+
+    fn set_fetch_all(&mut self) {}
+
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+        return Vec::new();
+    }
+
     fn for_searchspace(&mut self) {
         self.for_searchspace = true;
     }
@@ -299,6 +310,7 @@ impl Reader for OSProfilerReader {
                 panic!("Malformed UUID received as base ID: {}", id);
             }
         };
+        // if result.request_type == OSPRequestType::Unknown {
         if result.request_type == RequestType::Unknown {
             eprintln!("Warning: couldn't get type for request {}", id);
         }
@@ -399,7 +411,7 @@ impl OSProfilerReader {
                     .collect();
                 if matches.len() > 0 {
                     assert!(matches.len() == 1);
-                    dag.request_type = REQUEST_TYPES[matches[0]];
+                    dag.request_type = RequestType::OSP(REQUEST_TYPES[matches[0]]);
                 }
             }
             // Don't add async_wait into the DAGs

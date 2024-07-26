@@ -15,7 +15,7 @@ use std::sync::{Arc, Mutex};
 
 use itertools::Itertools;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::controller::Controller;
 use crate::manifest::Manifest;
@@ -27,10 +27,12 @@ pub struct HDFSController {
     all_tracepoints: HashSet<TracepointID>,
     disabled_tracepoints: Arc<Mutex<HashSet<TracepointID>>>,
     // This should only be valid after disable_all is called
+    // enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<OSPRequestType>)>>>,
     enabled_tracepoints: Arc<Mutex<HashSet<(TracepointID, Option<RequestType>)>>>,
 }
 
 impl Controller for HDFSController {
+    // fn enable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn enable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         eprintln!("Enabling {:?}", points);
         let mut disabled_tracepoints = self.disabled_tracepoints.lock().unwrap();
@@ -41,6 +43,7 @@ impl Controller for HDFSController {
         self.flush();
     }
 
+    // fn disable(&self, points: &Vec<(TracepointID, Option<OSPRequestType>)>) {
     fn disable(&self, points: &Vec<(TracepointID, Option<RequestType>)>) {
         eprintln!("Disabling {:?}", points);
         let mut disabled_tracepoints = self.disabled_tracepoints.lock().unwrap();
@@ -51,6 +54,7 @@ impl Controller for HDFSController {
         self.flush();
     }
 
+    // fn is_enabled(&self, point: &(TracepointID, Option<OSPRequestType>)) -> bool {
     fn is_enabled(&self, point: &(TracepointID, Option<RequestType>)) -> bool {
         let disabled_tracepoints = self.disabled_tracepoints.lock().unwrap();
         // A tracepoint is enabled either globally or for a request type
@@ -72,6 +76,7 @@ impl Controller for HDFSController {
         drop(disabled_tracepoints);
         self.flush();
     }
+    // fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<OSPRequestType>)> {
     fn enabled_tracepoints(&self) -> Vec<(TracepointID, Option<RequestType>)> {
         self.enabled_tracepoints
             .lock()

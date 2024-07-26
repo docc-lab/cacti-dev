@@ -24,7 +24,7 @@ use petgraph::visit::IntoNodeReferences;
 use petgraph::visit::NodeRef;
 use serde::{Deserialize, Serialize};
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 use pythia_common::REQUEST_TYPE_REGEXES;
 
 use crate::grouping::Group;
@@ -36,16 +36,18 @@ pub use crate::manifest::searchspace::HierarchicalCriticalPath;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Manifest {
+    // pub per_request_type: HashMap<OSPRequestType, SearchSpace>,
     pub per_request_type: HashMap<RequestType, SearchSpace>,
     pub request_type_tracepoints: Vec<TracepointID>,
 }
 
 impl Manifest {
     /// Returns the set of trace points seen for each request type
+    // pub fn get_per_request_types(&self) -> HashMap<OSPRequestType, HashSet<TracepointID>> {
     pub fn get_per_request_types(&self) -> HashMap<RequestType, HashSet<TracepointID>> {
         let mut result = HashMap::new();
         for (rt, ss) in self.per_request_type.iter() {
-            result.insert(*rt, ss.trace_points());
+            result.insert(rt.clone(), ss.trace_points());
         }
         result
     }
@@ -60,6 +62,7 @@ impl Manifest {
 
     pub fn find_matches<'a>(&'a self, group: &Group) -> Vec<&'a HierarchicalCriticalPath> {
         let now = Instant::now();
+        // let matches = if group.request_type == OSPRequestType::Unknown {
         let matches = if group.request_type == RequestType::Unknown {
             let mut result = Vec::new();
             for ss in self.per_request_type.values() {
@@ -118,6 +121,7 @@ impl Manifest {
     }
 
     pub fn from_trace_list(traces: &Vec<Trace>) -> Manifest {
+        // let mut map = HashMap::<OSPRequestType, SearchSpace>::new();
         let mut map = HashMap::<RequestType, SearchSpace>::new();
         for trace in traces {
             match map.get_mut(&trace.request_type) {
@@ -127,7 +131,7 @@ impl Manifest {
                 None => {
                     let mut space = SearchSpace::default();
                     space.add_trace(&trace, false);
-                    map.insert(trace.request_type, space);
+                    map.insert(trace.request_type.clone(), space);
                 }
             }
         }

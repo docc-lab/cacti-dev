@@ -40,8 +40,9 @@ use crate::trace::Value::UnsignedInt;
 use crate::trace::{DAGEdge, EdgeType};
 use crate::PythiaError;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 use pythia_common::REQUEST_TYPES;
+use crate::spantrace::SpanTrace;
 //use crate::trace::Value::float;
 
 pub struct HDFSReader {
@@ -53,11 +54,21 @@ pub struct HDFSReader {
 }
 
 impl Reader for HDFSReader {
+    fn set_fetch_all(&mut self) {}
+
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+        return Vec::new();
+    }
+
     fn for_searchspace(&mut self) {
         self.for_searchspace = true;
     }
 
     fn reset_state(&mut self) {}
+
+    fn all_operations(&self) -> Vec<RequestType> {
+        Vec::new()
+    }
 
     /// This function parses an xtrace webpage to get all requests executed from
     /// shell (with FsShell tag) and those with high enough elapsed time since last update
@@ -184,7 +195,7 @@ impl HDFSReader {
                     break;
                 }
                 Err(_) => {
-                    return Err(Box::new(PythiaError("Poll got us Err".into())));
+                    return Err(Box::new(PythiaError("Poll got us Err".to_string())));
                 }
             }
         }

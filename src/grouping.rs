@@ -21,7 +21,7 @@ use petgraph::Direction;
 use stats::variance;
 use stats::mean;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::critical::CriticalPath;
 use crate::critical::Path;
@@ -41,6 +41,7 @@ pub struct Group {
     hash: String,
     pub start_node: NodeIndex,
     pub end_node: NodeIndex,
+    // pub request_type: OSPRequestType,
     pub request_type: RequestType,
     /// The raw critical paths that this group was constructed from
     pub traces: Vec<CriticalPath>,
@@ -150,7 +151,7 @@ impl Group {
             start_node: start_node.unwrap(),
             end_node: end_node,
             hash: path.hash().to_string(),
-            request_type: path.request_type,
+            request_type: path.request_type.clone(),
             traces: vec![path],
             variance: 0.0,
             mean: 0.0,

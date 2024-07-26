@@ -22,8 +22,8 @@ use petgraph::{dot::Dot, graph::NodeIndex, Direction};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use pythia_common::RequestType;
-use pythia_common::RequestType::ServerCreate;
+use pythia_common::{OSPRequestType, RequestType};
+use pythia_common::OSPRequestType::ServerCreate;
 
 use crate::trace::{DAGEdge, IDType, TraceEdge};
 use crate::trace::EdgeType;
@@ -34,6 +34,8 @@ use crate::trace::TracepointID;
 use crate::{CriticalPath, PythiaError, Settings};
 
 pub struct CandidateManager {
+    // pub victim_type: OSPRequestType,
+    pub all_types: Vec<RequestType>,
     pub victim_type: RequestType,
     pub victim_start: String,
     pub victim_end: String,
@@ -51,6 +53,7 @@ pub struct CandidateManager {
     // pub victim_overlap_max_times: HashMap<Uuid, i64>,
     pub victim_overlap_max_times: HashMap<IDType, i64>,
     used_pairs: HashSet<(String, String)>,
+    // pub candidate_groups: HashMap<OSPRequestType, Vec<(i32, i64)>>
     pub candidate_groups: HashMap<RequestType, Vec<(i32, i64)>>
 }
 
@@ -76,7 +79,8 @@ pub fn hash_id_and_edge(id: IDType, edge: TraceEdge) -> String {
 impl CandidateManager {
     pub fn from_settings(settings: &Settings, victim_edge: (&str, &str)) -> CandidateManager {
         let mut to_return = CandidateManager {
-            victim_type: settings.problem_type,
+            all_types: settings.all_request_types.clone(),
+            victim_type: settings.problem_type.clone(),
             victim_start: victim_edge.0.to_string(),
             victim_end: victim_edge.1.to_string(),
             victim_paths: Vec::new(),
@@ -91,24 +95,28 @@ impl CandidateManager {
             candidate_groups: HashMap::new(),
         };
 
-        to_return.candidate_groups.insert(ServerCreate, Vec::new());
-        to_return.candidate_groups.insert(RequestType::ServerList, Vec::new());
-        to_return.candidate_groups.insert(RequestType::ServerDelete, Vec::new());
-        to_return.candidate_groups.insert(RequestType::UsageList, Vec::new());
-        to_return.candidate_groups.insert(RequestType::Unknown, Vec::new());
+        // to_return.candidate_groups.insert(ServerCreate, Vec::new());
+        // to_return.candidate_groups.insert(OSPRequestType::ServerList, Vec::new());
+        // to_return.candidate_groups.insert(OSPRequestType::ServerDelete, Vec::new());
+        // to_return.candidate_groups.insert(OSPRequestType::UsageList, Vec::new());
+        // to_return.candidate_groups.insert(OSPRequestType::Unknown, Vec::new());
+
+        for rt in settings.all_request_types.clone() {
+            to_return.candidate_groups.insert(rt, Vec::new());
+        }
 
         to_return
     }
 
     pub fn add_traces(&mut self, traces: Vec<Trace>) {
-        for trace in traces {
+        for trace in &traces {
             if trace.request_type == self.victim_type {
                 let mut new_cp = CriticalPath::from_trace(&trace).unwrap();
-                new_cp.g.set_req_type(trace.request_type);
+                new_cp.g.set_req_type(trace.request_type.clone());
                 self.victim_paths.push(new_cp);
             }
             // else {
-            self.non_victim_traces.push(trace);
+            self.non_victim_traces.push(trace.clone());
             // }
         }
     }
@@ -200,7 +208,8 @@ impl CandidateManager {
                 let victim_segment = old_victim.0.clone();
                 let vs_latency = victim_segment.end - victim_segment.start;
 
-                for rt in RequestType::all_types() {
+                // for rt in OSPRequestType::all_types() {
+                for rt in self.all_types.clone() {
                     let rt_count = &old_victim.1.clone().into_iter().filter(
                         | c: &TraceEdge | -> bool { c.request_type == rt }
                     ).collect_vec().len();

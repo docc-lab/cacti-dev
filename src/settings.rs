@@ -12,9 +12,12 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::Duration;
 
+use serde::{Serialize, Deserialize};
+
 use config::{Config, File, FileFormat};
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType, REQUEST_TYPES};
 use reqwest::get;
+use crate::reader::reader_from_settings;
 
 use crate::search::SearchStrategyType;
 
@@ -44,6 +47,7 @@ pub struct Settings {
     pub hdfs_control_file: PathBuf,
     pub deathstar_control_file: PathBuf,
     pub emit_events: bool,
+    // pub problem_type: OSPRequestType,
     pub problem_type: RequestType,
 
     pub search_strategy: SearchStrategyType,
@@ -56,6 +60,9 @@ pub struct Settings {
     pub trace_size_limit: u32,
     pub n_workers: usize,
     pub free_keys: bool,
+
+    pub all_request_types: Vec<RequestType>,
+    pub cycle_lookback: u128,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -66,6 +73,24 @@ pub enum ApplicationType {
     DEATHSTAR,
     Zipkin,
     Jaeger,
+}
+
+impl ApplicationType {
+    pub fn as_str(&self) -> &str {
+        match self {
+            ApplicationType::HDFS => "HDFS",
+            ApplicationType::OpenStack => "OpenStack",
+            ApplicationType::DEATHSTAR => "DEATHSTAR",
+            ApplicationType::Uber => "Uber",
+            ApplicationType::Jaeger => "Jaeger",
+            ApplicationType::Zipkin => "Zipkin",
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JaegerServicesPayload {
+    data: Vec<String>,
 }
 
 impl Settings {
@@ -100,7 +125,8 @@ impl Settings {
             "true" => true,
             _ => false
         };
-        Settings {
+
+        let mut to_return = Settings {
             manifest_file,
             hdfs_control_file,
             deathstar_control_file,
@@ -145,7 +171,22 @@ impl Settings {
             free_keys: FREE_KEYS,
             emit_events,
             // problem_type: RequestType::from_str(results.get("problem_type").unwrap().as_str()).unwrap()
-            problem_type: RequestType::from_str(get_setting("problem_type").as_str()).unwrap()
-        }
+            // problem_type: OSPRequestType::from_str(get_setting("problem_type").as_str()).unwrap()
+            problem_type: RequestType::from_str(
+                get_setting("problem_type").as_str(),
+                get_setting("application").as_str()).unwrap(),
+            all_request_types: Vec::new(),
+            cycle_lookback: get_setting("uber_trace_dir").parse::<u128>().unwrap()
+        };
+
+        to_return.all_request_types = match get_setting("application").as_str() {
+            "OpenStack" =>  REQUEST_TYPES.clone().into_iter()
+                .map(|rt| RequestType::OSP(rt)).collect(),
+            "Jaeger" => reader_from_settings(&to_return).all_operations(),
+            _ => Vec::new()
+            // _ => panic!("Unknown application type"),
+        };
+
+        to_return
     }
 }

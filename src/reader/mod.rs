@@ -20,6 +20,7 @@ use std::fmt;
 
 use hex;
 use itertools::Itertools;
+use pythia_common::RequestType;
 use serde::de;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -32,6 +33,7 @@ use crate::reader::uber::UberReader;
 use crate::reader::zipkin::ZipkinReader;
 use crate::settings::ApplicationType;
 use crate::settings::Settings;
+use crate::spantrace::SpanTrace;
 use crate::trace::Trace;
 
 pub trait Reader {
@@ -48,6 +50,8 @@ pub trait Reader {
     /// It is called multiple times for OpenStack, which collects traces in the first
     /// call and returns traces whose duration did not change in the second call.
     fn get_recent_traces(&mut self) -> Vec<Trace>;
+
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace>;
 
     /// Used before get_recent_traces, so we know what is *recent*.
     fn reset_state(&mut self);
@@ -76,6 +80,10 @@ pub trait Reader {
         }
         traces
     }
+
+    fn all_operations(&self) -> Vec<RequestType>;
+
+    fn set_fetch_all(&mut self);
 }
 
 /// Constructor for Reader

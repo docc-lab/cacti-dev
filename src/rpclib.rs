@@ -18,9 +18,9 @@ use jsonrpc_core_client::{RpcChannel, RpcError, TypedClient};
 use serde_json;
 use uuid::Uuid;
 
-use pythia_common::NodeStats;
+use pythia_common::{NodeStats, RequestType};
 use pythia_common::OSProfilerSpan;
-use pythia_common::RequestType;
+use pythia_common::OSPRequestType;
 
 use crate::trace::TracepointID;
 
@@ -45,8 +45,10 @@ impl PythiaClient {
 
     fn set_tracepoints(
         &self,
+        // settings: Vec<(TracepointID, Option<OSPRequestType>, [u8; 1])>,
         settings: Vec<(TracepointID, Option<RequestType>, [u8; 1])>,
     ) -> impl Future<Item = (), Error = RpcError> {
+        // let new_settings: Vec<(String, Option<OSPRequestType>, [u8; 1])> = settings
         let new_settings: Vec<(String, Option<RequestType>, [u8; 1])> = settings
             .iter()
             .map(|(x, y, z)| (x.to_string(), y.clone(), z.clone()))
@@ -179,6 +181,7 @@ pub fn set_all_client_tracepoints(client_uri: &str, to_write: [u8; 1]) {
 /// Used by controller
 pub fn set_client_tracepoints(
     client_uri: &str,
+    // settings: Vec<(TracepointID, Option<OSPRequestType>, [u8; 1])>,
     settings: Vec<(TracepointID, Option<RequestType>, [u8; 1])>,
 ) {
     let (tx, mut rx) = futures::sync::mpsc::unbounded();

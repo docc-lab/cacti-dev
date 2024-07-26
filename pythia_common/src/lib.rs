@@ -14,6 +14,8 @@ extern crate lazy_static;
 
 mod budget;
 pub mod osprofiler;
+pub mod jaeger;
+pub mod reqtype;
 
 use std::error::Error;
 use std::fmt;
@@ -21,9 +23,11 @@ use std::fmt;
 pub use crate::osprofiler::AnnotationEnum;
 pub use crate::osprofiler::OSProfilerEnum;
 pub use crate::osprofiler::OSProfilerSpan;
-pub use crate::osprofiler::RequestType;
+pub use crate::osprofiler::OSPRequestType;
 pub use crate::osprofiler::REQUEST_TYPES;
 pub use crate::osprofiler::REQUEST_TYPE_REGEXES;
+
+pub use crate::reqtype::RequestType;
 
 pub use crate::budget::NodeStats;
 

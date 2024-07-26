@@ -27,6 +27,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use uuid::Uuid;
 use stats::variance;
+use pythia_common::OSPRequestType;
 use pythia_common::RequestType;
 
 use std::collections::HashMap;
@@ -63,6 +64,7 @@ pub struct Trace {
     pub base_id: IDType,
     pub start_node: NodeIndex,
     pub end_node: NodeIndex,
+    // pub request_type: OSPRequestType,
     pub request_type: RequestType,
     pub duration: Duration,
     /// used by osprofiler to find keys to delete from redis
@@ -77,12 +79,16 @@ impl Trace {
             base_id: base_id.clone(),
             start_node: NodeIndex::end(),
             end_node: NodeIndex::end(),
+            // request_type: OSPRequestType::Unknown,
             request_type: RequestType::Unknown,
             duration: Duration::new(0, 0),
             keys: Vec::new(),
         }
     }
 
+    // pub fn set_req_type(&mut self, r: OSPRequestType) {
+    //     self.request_type = r;
+    // }
     pub fn set_req_type(&mut self, r: RequestType) {
         self.request_type = r;
     }
@@ -235,7 +241,7 @@ impl Trace {
                 TraceEdge {
                     // uuid: self.base_id,
                     id: self.base_id.clone(),
-                    request_type: self.request_type,
+                    request_type: self.request_type.clone(),
                     tid_start: tid1,
                     tp_start: tp1,
                     start: tt1,
@@ -252,6 +258,7 @@ impl Trace {
 pub struct TraceEdge {
     // pub uuid : Uuid,
     pub id : IDType,
+    // pub request_type : OSPRequestType,
     pub request_type : RequestType,
     pub tid_start : TracepointID,
     pub tp_start : String,

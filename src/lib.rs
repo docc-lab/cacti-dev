@@ -94,7 +94,7 @@ use std::time::Instant;
 use itertools::Itertools;
 #[cfg(target_os = "linux")]
 use procinfo::pid::statm_self;
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::controller::controller_from_settings;
 use crate::critical::CriticalPath;
@@ -399,7 +399,9 @@ pub fn show_manifest(request_type: &str) {
         "{}",
         manifest
             .per_request_type
-            .get(&RequestType::from_str(request_type).unwrap())
+            // .get(&OSPRequestType::from_str(request_type).unwrap())
+            .get(&RequestType::from_str(
+                request_type, settings.application.as_str()).unwrap())
             .unwrap()
     );
 }

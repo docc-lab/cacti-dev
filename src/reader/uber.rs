@@ -16,12 +16,14 @@ use chrono::Duration;
 use chrono::NaiveDateTime;
 use petgraph::algo::connected_components;
 use petgraph::graph::{Graph, NodeIndex};
+use pythia_common::RequestType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::reader::HexID;
 use crate::reader::Reader;
 use crate::settings::Settings;
+use crate::spantrace::{Span, SpanTrace};
 use crate::trace::{Event, IDType};
 use crate::trace::EventType;
 use crate::trace::Trace;
@@ -41,7 +43,7 @@ impl Error for UberParseError {}
 
 fn raise(s: &str) -> Box<dyn Error> {
     // panic!(s.to_string());
-    Box::new(UberParseError(s.into()))
+    Box::new(UberParseError(s.to_string()))
 }
 
 pub struct UberReader {
@@ -49,6 +51,13 @@ pub struct UberReader {
 }
 
 impl Reader for UberReader {
+    fn all_operations(&self) -> Vec<RequestType> {
+        Vec::new()
+    }
+    fn set_fetch_all(&mut self) {}
+    fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
+        return Vec::new();
+    }
     fn for_searchspace(&mut self) {}
     fn reset_state(&mut self) {}
     fn read_file(&mut self, filename: &str) -> Trace {

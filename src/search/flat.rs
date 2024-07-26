@@ -40,7 +40,8 @@ impl SearchStrategy for FlatSearch {
             eprintln!("Finding middle took {}", now.elapsed().as_micros(),);
             result = result
                 .into_iter()
-                .filter(|&x| !self.controller.is_enabled(&(x, Some(group.request_type))))
+                .filter(|&x| !self.controller.is_enabled(
+                    &(x, Some(group.request_type.clone()))))
                 .collect();
         }
         result.drain().collect()
@@ -110,7 +111,7 @@ impl FlatSearch {
             }
             if self
                 .controller
-                .is_enabled(&(path.g[cur_path_idx].tracepoint_id, Some(path.request_type)))
+                .is_enabled(&(path.g[cur_path_idx].tracepoint_id, Some(path.request_type.clone())))
             {
                 match path.next_node(cur_path_idx) {
                     Some(nidx) => {

@@ -20,7 +20,7 @@ use petgraph::{dot::Dot, graph::NodeIndex, Direction};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::trace::{DAGEdge, IDType};
 use crate::trace::EdgeType;
@@ -39,6 +39,7 @@ pub struct CriticalPath {
     pub duration: Duration,
     /// A hypothetical critical path is just a path which wasn't critical
     pub is_hypothetical: bool,
+    // pub request_type: OSPRequestType,
     pub request_type: RequestType,
     /// The hash is lazily calculated at first access
     hash: String,
@@ -53,7 +54,7 @@ impl CriticalPath {
             end_node: NodeIndex::end(),
             is_hypothetical: false,
             hash: "".to_string(),
-            request_type: dag.request_type,
+            request_type: dag.request_type.clone(),
         };
         let mut cur_node = dag.end_node;
         let mut end_nidx = path.g.g.add_node(dag.g[cur_node].clone());
@@ -128,7 +129,7 @@ impl CriticalPath {
                 duration: Duration::new(0, 0),
                 is_hypothetical: true,
                 hash: "".to_string(),
-                request_type: dag.request_type,
+                request_type: dag.request_type.clone(),
             };
             let mut remaining_nodes = vec![(dag.start_node, dag.start_node, p.g.start_node, p)];
             while !remaining_nodes.is_empty() {

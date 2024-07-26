@@ -25,7 +25,7 @@ use petgraph::Direction;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use pythia_common::RequestType;
+use pythia_common::{OSPRequestType, RequestType};
 
 use crate::critical::CriticalPath;
 use crate::critical::Path;
@@ -74,6 +74,7 @@ pub struct HierarchicalCriticalPath {
     pub end_node: NodeIndex,
     /// Trace points at the top of the hierarchy
     pub hierarchy_starts: HashSet<NodeIndex>,
+    // pub request_type: OSPRequestType,
     pub request_type: RequestType,
     hash: String,
 }
@@ -114,7 +115,7 @@ impl HierarchicalCriticalPath {
             start_node,
             end_node: prev_node,
             hash: "".to_string(),
-            request_type: path.request_type,
+            request_type: path.request_type.clone(),
             hierarchy_starts: HashSet::new(),
         };
         result.add_hierarchical_edges();
