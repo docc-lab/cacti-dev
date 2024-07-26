@@ -317,9 +317,12 @@ impl JaegerReader {
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(query_str).unwrap();
 
+        let resp_text = resp.text().unwrap() as String;
+
+        println!("{}", resp_text.as_str());
+
         let resp_obj: JaegerPayload =
-            serde_json::from_str(
-                (resp.text().unwrap() as String).as_str()).unwrap();
+            serde_json::from_str(resp_text.as_str()).unwrap();
 
         resp_obj.data.into_iter()
             .map(|jt| jt.to_trace()).collect()
