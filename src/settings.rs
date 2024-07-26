@@ -176,7 +176,7 @@ impl Settings {
                 get_setting("problem_type").as_str(),
                 get_setting("application").as_str()).unwrap(),
             all_request_types: Vec::new(),
-            cycle_lookback: get_setting("uber_trace_dir").parse::<u128>().unwrap()
+            cycle_lookback: get_setting("cycle_lookback").parse::<u128>().unwrap()
         };
 
         to_return.all_request_types = match get_setting("application").as_str() {
