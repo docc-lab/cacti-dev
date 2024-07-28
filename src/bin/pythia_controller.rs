@@ -23,7 +23,7 @@ use std::time::Instant;
 use futures::Stream;
 use itertools::max;
 use petgraph::visit::IntoEdges;
-use pythia_common::OSPRequestType;
+use pythia_common::{OSPRequestType, RequestType};
 use stats::{mean, variance};
 
 use threadpool::ThreadPool;
@@ -80,10 +80,32 @@ fn main() {
 
         let filename = std::env::args().nth(1).unwrap();
         eprintln!("Printing results to {}", filename);
-        eprintln!("All args = [{:?}]", std::env::args().into_iter().collect::<Vec<String>>());
+        // eprintln!("All args = [{:?}]", std::env::args().into_iter().collect::<Vec<String>>());
         let mut output_file = File::create(filename).unwrap();
         writeln!(output_file, "{:?}", *SETTINGS).ok();
         writeln!(output_file, "Targets: {:?}", targets).ok();
+
+        let problem_type = std::env::args().nth(2).unwrap();
+
+        // let mut temp_settings = Settings::read();
+        // temp_settings.problem_type = RequestType::from_str(
+        //     problem_type.as_str(), &SETTINGS.application.as_str()).unwrap();
+
+        let mut reader = reader_from_settings(&SETTINGS);
+
+        let problem_traces = reader.get_recent_span_traces();
+
+        let problem_path_traces = problem_traces.iter().map(
+            |st| st.to_critical_path()).collect::<Vec<Trace>>();
+
+        let problem_paths = problem_path_traces
+            .iter().map(|ppt| CriticalPath::from_trace(ppt).unwrap())
+            .collect::<Vec<CriticalPath>>();
+
+        let groups = Group::from_critical_paths(problem_paths);
+
+        println!("GROUPS:");
+        println!("{:?}", groups);
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
