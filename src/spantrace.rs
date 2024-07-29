@@ -116,7 +116,8 @@ impl Span {
         if res.g.node_count() == 0 {
             res.end_node = res.g.add_node(Event {
                 // trace_id: IDType::STRING(st.req_id.clone()),
-                trace_id: IDType::STRING(self.span_id.clone()),
+                // trace_id: IDType::STRING(self.span_id.clone()),
+                trace_id: IDType::STRING(self.service.clone() + ":" + self.operation.as_str()),
                 tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
                 // timestamp: NaiveDateTime::from_timestamp(
                 //     self.end()/1000,
@@ -133,7 +134,8 @@ impl Span {
             res.start_node = res.g.add_node(
                 Event {
                     // trace_id: IDType::STRING(st.req_id.clone()),
-                    trace_id: IDType::STRING(self.span_id.clone()),
+                    // trace_id: IDType::STRING(self.span_id.clone()),
+                    trace_id: IDType::STRING(self.service.clone() + ":" + self.operation.as_str()),
                     tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
                     // timestamp: NaiveDateTime::from_timestamp(
                     //     self.end()/1000,
@@ -178,7 +180,8 @@ impl Span {
         res.start_node = res.g.add_node(
             Event {
                 // trace_id: IDType::STRING(st.req_id.clone()),
-                trace_id: IDType::STRING(self.span_id.clone()),
+                // trace_id: IDType::STRING(self.span_id.clone()),
+                trace_id: IDType::STRING(self.service.clone() + ":" + self.operation.as_str()),
                 tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_start").as_str()),
                 timestamp: self.start,
                 variant: EventType::Entry,

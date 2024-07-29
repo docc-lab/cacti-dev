@@ -198,10 +198,10 @@ impl CriticalPath {
                 EventType::Entry => match existing_node_id {
                     Some(_) => {
                         nodes_to_remove.push(cur_node.clone());
-                        if !exits.get(&cur_trace_id).is_none() {
-                            println!("{:?}", self);
-                            println!()
-                        }
+                        // if !exits.get(&cur_trace_id).is_none() {
+                        //     println!("{:?}", self);
+                        //     println!()
+                        // }
                         assert!(exits.get(&cur_trace_id).is_none());
                     }
                     None => {
