@@ -124,7 +124,9 @@ impl JaegerTrace {
         let root_span = root_span_list[0];
 
         Ok(SpanTrace::from_span_list(
-            spans, root_span.operationName.clone(),
+            spans, self.processes.get(
+                root_span.processID.as_str()).unwrap().serviceName.clone() + ":" +
+                root_span.operationName.as_str(),
             root_span.spanID.clone(), self.traceID.clone()))
     }
 }
