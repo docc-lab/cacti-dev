@@ -22,6 +22,7 @@ use crate::{Settings, Trace};
 use crate::spantrace::{Span, SpanTrace};
 use serde::{Serialize, Deserialize};
 use crate::trace::Event;
+use url::form_urlencoded;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct JaegerReference {
@@ -252,12 +253,17 @@ impl Reader for JaegerReader {
             let mut to_return = Vec::new();
 
             for service in self.all_operations() {
-                to_return.append(&mut self.get_span_traces(service.to_string(), self.cycle_lookback))
+                to_return.append(&mut self.get_span_traces(service.to_string(), None, self.cycle_lookback))
             }
 
             to_return
         } else {
-            self.get_span_traces(self.problem_type.to_string(), self.cycle_lookback)
+            self.get_span_traces(
+                self.problem_type.to_string().as_str().split(":")
+                    .collect::<Vec<&str>>()[0].to_string(),
+                Some(self.problem_type.to_string().as_str().split(":")
+                    .collect::<Vec<&str>>()[1].to_string()),
+                self.cycle_lookback)
         }
     }
 
@@ -287,7 +293,7 @@ impl Reader for JaegerReader {
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
 
-            for trace in self.get_span_traces(service, 60*60*1000000) {
+            for trace in self.get_span_traces(service, None, 60*60*1000000) {
                 for (_, span) in trace.spans {
                     if span.parent.is_empty() {
                         to_set_types.insert(
@@ -323,13 +329,17 @@ impl JaegerReader {
         }
     }
 
-    fn get_span_traces(&self, service: String, lookback: u128) -> Vec<SpanTrace> {
+    fn get_span_traces(&self, service: String, operation: Option<String>, lookback: u128) -> Vec<SpanTrace> {
         let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
 
         let query_str = format!(
             "http://localhost:16686/api/traces?end={}\
-            &limit=1000000000&lookback=custom&maxDuration&minDuration&service={}&start={}",
-            cur_time, service, cur_time - lookback
+            &limit=1000000000&lookback=custom&maxDuration&minDuration{}&service={}&start={}",
+            cur_time, match operation {
+                Some(s) => format!("&operation={}", form_urlencoded::byte_serialize(
+                    s.as_bytes()).collect::<String>().as_str()),
+                None => "".to_string()
+            }, service, cur_time - lookback
         );
 
         let resp: reqwest::blocking::Response =
