@@ -119,10 +119,6 @@ impl Span {
                 // trace_id: IDType::STRING(self.span_id.clone()),
                 trace_id: IDType::STRING(self.service.clone() + ":" + self.operation.as_str()),
                 tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
-                // timestamp: NaiveDateTime::from_timestamp(
-                //     self.end()/1000,
-                //     ((self.end()%1000)*1000) as u32
-                // ),
                 timestamp: DateTime::from_timestamp_nanos(self.end()).naive_utc(),
                 variant: EventType::Exit,
                 is_synthetic: false,
