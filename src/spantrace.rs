@@ -278,6 +278,9 @@ impl SpanTrace {
         let mut to_ret_trace = Trace::new(&IDType::STRING(self.req_id.clone()));
         self.spans.get(self.root_span_id.as_str()).unwrap().to_critical_path(
             self, &mut to_ret_trace, "".to_string(), "".to_string());
+
+        // if to_ret_trace.g.fre
+
         return to_ret_trace;
     }
 

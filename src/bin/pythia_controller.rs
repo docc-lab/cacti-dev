@@ -98,6 +98,14 @@ fn main() {
         let problem_path_traces = problem_traces.iter().map(
             |st| st.to_critical_path()).collect::<Vec<Trace>>();
 
+        println!("EXAMPLE PATH TRACE:");
+        println!("{:?}", problem_path_traces[0]);
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+
         let problem_paths = problem_path_traces
             .iter().map(|ppt| CriticalPath::from_trace(ppt).unwrap())
             .collect::<Vec<CriticalPath>>();
