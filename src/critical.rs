@@ -326,6 +326,7 @@ impl CriticalPath {
         start_dag_nidx: NodeIndex,
         dag: &Trace,
     ) -> Result<(), Box<dyn Error>> {
+        println!("ADDED SYNTHETIC START_NODE");
         let span_to_add = self.g.g[start_nidx].clone();
         // Find synch. point
         let mut cur_nidx = start_nidx;
