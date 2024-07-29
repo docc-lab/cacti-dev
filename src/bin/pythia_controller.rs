@@ -112,8 +112,8 @@ fn main() {
 
         let groups = Group::from_critical_paths(problem_paths);
 
-        println!("GROUPS:");
-        println!("{:?}", groups);
+        println!("SAMPLE GROUP:");
+        println!("{:?}", groups[0]);
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
