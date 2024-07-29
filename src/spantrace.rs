@@ -18,6 +18,8 @@ use std::ptr::null;
 use std::time::Duration;
 
 use chrono::{DateTime, NaiveDateTime};
+use pythia_common::jaeger::JaegerRequestType;
+use pythia_common::RequestType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::{IDType, Trace};
@@ -281,6 +283,10 @@ impl SpanTrace {
 
     pub fn to_critical_path(&self) -> Trace {
         let mut to_ret_trace = Trace::new(&IDType::STRING(self.req_id.clone()));
+        // TODO: Change the attribute "endpoint_type" to a RequestType type later
+        to_ret_trace.request_type = RequestType::Jaeger(JaegerRequestType{
+            rt: self.endpoint_type.clone()
+        });
         self.spans.get(self.root_span_id.as_str()).unwrap().to_critical_path(
             self, &mut to_ret_trace, "".to_string(), "".to_string());
 
