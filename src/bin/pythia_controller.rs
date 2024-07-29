@@ -85,7 +85,7 @@ fn main() {
         writeln!(output_file, "{:?}", *SETTINGS).ok();
         writeln!(output_file, "Targets: {:?}", targets).ok();
 
-        let problem_type = std::env::args().nth(2).unwrap();
+        // let problem_type = std::env::args().nth(2).unwrap();
 
         // let mut temp_settings = Settings::read();
         // temp_settings.problem_type = RequestType::from_str(
