@@ -21,7 +21,8 @@ pythia_clients = "http://ctl:3030"
 emit_events = "false"
 
 # Expected problematic endpoint/request type
-problem_type = "ServerCreate"
+#problem_type = "ServerCreate"
+problem_type = "nginx-web-server:/wrk2-api/post/compose"
 
 cycle_lookback = 600000000
 
