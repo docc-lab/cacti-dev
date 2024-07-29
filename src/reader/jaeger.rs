@@ -97,8 +97,8 @@ impl JaegerTrace {
             .filter(|&span| span.references.len() == 0).collect::<Vec<_>>();
 
         if root_span_list.len() == 0 {
-            println!("TRACE WITH NO ROOT:");
-            println!("{:?}", self.spans);
+            // println!("TRACE WITH NO ROOT:");
+            // println!("{:?}", self.spans);
 
             return Err("Could not find a root span!".to_string());
         }
@@ -281,8 +281,8 @@ impl Reader for JaegerReader {
             serde_json::from_str(
                 (resp.text().unwrap() as String).as_str()).unwrap();
 
-        println!("Services:");
-        println!("{:?}", resp_obj.data.clone());
+        // println!("Services:");
+        // println!("{:?}", resp_obj.data.clone());
 
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
@@ -337,7 +337,7 @@ impl JaegerReader {
 
         let resp_text = resp.text().unwrap() as String;
 
-        println!("{}", resp_text.as_str());
+        // println!("{}", resp_text.as_str());
 
         let resp_obj: JaegerPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
