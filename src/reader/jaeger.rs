@@ -282,7 +282,7 @@ impl Reader for JaegerReader {
                     if span.parent.is_empty() {
                         to_set_types.insert(
                             RequestType::Jaeger(JaegerRequestType{
-                                rt: span.operation.clone()
+                                rt: span.service + ":" + span.operation.as_str()
                             }));
                     }
                 }
