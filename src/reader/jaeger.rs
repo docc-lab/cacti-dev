@@ -87,14 +87,21 @@ struct JaegerTrace {
 }
 
 impl JaegerTrace {
-    pub fn to_trace(&self) -> SpanTrace {
+    pub fn to_trace(&self) -> Result<SpanTrace, String> {
         let spans: Vec<Span> = self.spans.iter().map(|span| span.to_span(&self.processes)).collect();
-        if self.spans.len() == 0 {
-            println!("{}", self.traceID);
-        }
+        // if self.spans.len() == 0 {
+        //     println!("{}", self.traceID);
+        // }
         // let root_span: &JaegerSpan = self.spans.iter().filter(|&span| span.traceID == span.spanID).collect::<Vec<_>>()[0];
-        let root_span: &JaegerSpan = self.spans.iter()
-            .filter(|&span| span.references.len() == 0).collect::<Vec<_>>()[0];
+        let root_span_list: Vec<&JaegerSpan> = self.spans.iter()
+            .filter(|&span| span.references.len() == 0).collect::<Vec<_>>();
+
+        if root_span_list.len() == 0 {
+            println!("TRACE WITH NO ROOT:");
+            println!("{:?}", self.spans);
+
+            return Err("Could not find a root span!".to_string());
+        }
         // let mut span_parents: HashMap<String, String> = HashMap::new();
         // for span in &self.spans {
         //     span_parents.insert(span.spanID, span.)
@@ -112,9 +119,12 @@ impl JaegerTrace {
         //     spans: to_ret_spans,
         //     children: Default::default()
         // }
-        return SpanTrace::from_span_list(
+
+        let root_span = root_span_list[0];
+
+        Ok(SpanTrace::from_span_list(
             spans, root_span.operationName.clone(),
-            root_span.spanID.clone(), self.traceID.clone());
+            root_span.spanID.clone(), self.traceID.clone()))
     }
 }
 
@@ -332,7 +342,14 @@ impl JaegerReader {
         let resp_obj: JaegerPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
+        // resp_obj.data.into_iter()
+        //     .map(|jt| jt.to_trace()).collect()
         resp_obj.data.into_iter()
-            .map(|jt| jt.to_trace()).collect()
+            .map(|jt| jt.to_trace())
+            .filter(|tt_res| match tt_res {
+                Ok(_) => true,
+                _ => false
+            })
+            .map(|st_ok| st_ok.unwrap()).collect()
     }
 }
