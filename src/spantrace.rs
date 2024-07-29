@@ -115,7 +115,8 @@ impl Span {
 
         if res.g.node_count() == 0 {
             res.end_node = res.g.add_node(Event {
-                trace_id: IDType::STRING(st.req_id.clone()),
+                // trace_id: IDType::STRING(st.req_id.clone()),
+                trace_id: IDType::STRING(self.span_id.clone()),
                 tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
                 // timestamp: NaiveDateTime::from_timestamp(
                 //     self.end()/1000,
@@ -131,7 +132,8 @@ impl Span {
             let connect_node = res.start_node.clone();
             res.start_node = res.g.add_node(
                 Event {
-                    trace_id: IDType::STRING(st.req_id.clone()),
+                    // trace_id: IDType::STRING(st.req_id.clone()),
+                    trace_id: IDType::STRING(self.span_id.clone()),
                     tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
                     // timestamp: NaiveDateTime::from_timestamp(
                     //     self.end()/1000,
@@ -175,7 +177,8 @@ impl Span {
         let connect_node = res.start_node.clone();
         res.start_node = res.g.add_node(
             Event {
-                trace_id: IDType::STRING(st.req_id.clone()),
+                // trace_id: IDType::STRING(st.req_id.clone()),
+                trace_id: IDType::STRING(self.span_id.clone()),
                 tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_start").as_str()),
                 timestamp: self.start,
                 variant: EventType::Entry,

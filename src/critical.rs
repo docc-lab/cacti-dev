@@ -200,6 +200,7 @@ impl CriticalPath {
                         nodes_to_remove.push(cur_node.clone());
                         if !exits.get(&cur_trace_id).is_none() {
                             println!("{:?}", self);
+                            println!()
                         }
                         assert!(exits.get(&cur_trace_id).is_none());
                     }
