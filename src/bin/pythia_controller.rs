@@ -142,7 +142,7 @@ fn main() {
 
         println!("TOTAL GROUPS --- {}", group_manager.all_groups().len());
         println!("PROBLEM GROUPS CV --- {}", group_manager.problem_groups_cv(0.05).len());
-        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(90.0).len());
+        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(0.9).len());
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
