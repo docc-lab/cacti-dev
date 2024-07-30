@@ -107,7 +107,13 @@ fn main() {
         println!();
 
         let problem_paths = problem_path_traces
-            .iter().map(|ppt| CriticalPath::from_trace(ppt).unwrap())
+            .iter().map(|ppt| {
+            let mut cp = CriticalPath::from_trace(ppt).unwrap();
+            cp.request_type = ppt.request_type.clone();
+            cp.start_node = ppt.start_node;
+            cp.end_node = ppt.end_node;
+            cp
+        })
             .collect::<Vec<CriticalPath>>();
 
         let groups = Group::from_critical_paths(problem_paths).into_iter()
