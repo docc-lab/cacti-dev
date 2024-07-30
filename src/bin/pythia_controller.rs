@@ -110,7 +110,8 @@ fn main() {
             .iter().map(|ppt| CriticalPath::from_trace(ppt).unwrap())
             .collect::<Vec<CriticalPath>>();
 
-        let groups = Group::from_critical_paths(problem_paths);
+        let groups = Group::from_critical_paths(problem_paths).into_iter()
+            .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
 
         println!("SAMPLE GROUP:");
         println!("{:?}", groups[0]);
