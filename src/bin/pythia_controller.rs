@@ -34,7 +34,7 @@ use pythia::controller::controller_from_settings;
 use pythia::controller::Controller;
 use pythia::critical::CriticalPath;
 use pythia::critical::Path;
-use pythia::grouping::{Group, GroupManager};
+use pythia::grouping::{Group, GroupEdge, GroupManager};
 use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
@@ -142,7 +142,23 @@ fn main() {
 
         println!("TOTAL GROUPS --- {}", group_manager.all_groups().len());
         println!("PROBLEM GROUPS CV --- {}", group_manager.problem_groups_cv(0.05).len());
-        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(0.9).len());
+        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(90.0).len());
+
+        let sample_problem_group = group_manager
+            .problem_groups_cv(0.05)[0];
+        let sample_problem_edges = sample_problem_group
+            .problem_edges()[..5].into_iter()
+            .map(|&ei| sample_problem_group.g.edge_weight(ei).unwrap().clone())
+            .collect::<Vec<GroupEdge>>();
+
+        println!();
+        println!();
+        println!();
+
+        println!("SAMPLE PROBLEM EDGES:");
+        for edge in sample_problem_edges {
+            println!("{:?}", edge);
+        }
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
