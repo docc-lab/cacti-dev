@@ -121,6 +121,15 @@ fn main() {
 
         println!("SAMPLE GROUP:");
         println!("{:?}", groups[0]);
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+
+        println!("PROBLEM EDGES:");
+        println!("{:?}", groups[0].problem_edges());
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
