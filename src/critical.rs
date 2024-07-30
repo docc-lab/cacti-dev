@@ -89,6 +89,9 @@ impl CriticalPath {
         path.duration = (path.g.g[path.end_node].timestamp - path.g.g[path.start_node].timestamp)
             .to_std()
             .unwrap();
+        path.g.request_type = dag.request_type.clone();
+        path.g.start_node = dag.start_node;
+        path.g.end_node = dag.end_node;
         path.filter_incomplete_spans()?;
         path.calculate_hash();
         Ok(path)
