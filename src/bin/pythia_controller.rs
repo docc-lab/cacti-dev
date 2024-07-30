@@ -40,7 +40,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
-use pythia::trace::{DAGEdge, Event, Trace, TracepointID};
+use pythia::trace::{DAGEdge, Event, IDType, Trace, TracepointID};
 
 // These are static because search strategy expects static references.
 lazy_static! {
@@ -198,7 +198,7 @@ fn main() {
         println!("SAMPLE LONG EDGE RID:");
         println!(
             "{:?}",
-            sample_problem_group.traces[0].request_id
+            sample_problem_group.traces.clone().into_iter().map(|tr| tr.request_id).collect::<Vec<IDType>>()
         )
     } else {
         // Initialize search strategies and group management
