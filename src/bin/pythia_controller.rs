@@ -195,11 +195,11 @@ fn main() {
         println!();
         println!();
 
-        // println!("SAMPLE LONG EDGE:");
-        // println!(
-        //     "{:?}",
-        //     sample_problem_group.traces[0].
-        // )
+        println!("SAMPLE LONG EDGE RID:");
+        println!(
+            "{:?}",
+            sample_problem_group.traces[0].request_id
+        )
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
