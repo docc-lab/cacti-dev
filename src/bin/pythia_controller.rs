@@ -39,7 +39,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
-use pythia::trace::{Trace, TracepointID};
+use pythia::trace::{DAGEdge, Trace, TracepointID};
 
 // These are static because search strategy expects static references.
 lazy_static! {
@@ -157,6 +157,20 @@ fn main() {
 
         println!("SAMPLE PROBLEM EDGES:");
         for edge in sample_problem_edges {
+            println!("{:?}", edge);
+        }
+
+        let sample_problem_edges_dag = sample_problem_group
+            .problem_edges()[..5].into_iter()
+            .map(|&ei| sample_problem_group.traces[0].g.g.edge_weight(ei).unwrap().clone())
+            .collect::<Vec<DAGEdge>>();
+
+        println!();
+        println!();
+        println!();
+
+        println!("SAMPLE PROBLEM EDGES (RAW):");
+        for edge in sample_problem_edges_dag {
             println!("{:?}", edge);
         }
     } else {
