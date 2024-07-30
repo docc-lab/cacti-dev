@@ -40,7 +40,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
-use pythia::trace::{DAGEdge, Event, IDType, Trace, TracepointID};
+use pythia::trace::{DAGEdge, Event, IDType, Trace, TraceNode, TracepointID};
 
 // These are static because search strategy expects static references.
 lazy_static! {
@@ -161,33 +161,50 @@ fn main() {
             println!("{:?}", edge);
         }
 
-        let sample_problem_edges_dag = sample_problem_group
-            .problem_edges()[..5].into_iter()
-            .map(|&ei| sample_problem_group.traces[0].g.g.edge_weight(ei).unwrap().clone())
-            .collect::<Vec<DAGEdge>>();
+        // let sample_problem_edges_dag = sample_problem_group
+        //     .problem_edges()[..5].into_iter()
+        //     .map(|&ei| sample_problem_group.traces[0].g.g.edge_weight(ei).unwrap().clone())
+        //     .collect::<Vec<DAGEdge>>();
+
+        // let sample_problem_edge_endpoints = sample_problem_group
+        //     .problem_edges()[..5].into_iter()
+        //     .map(|&ei| {
+        //         let ee = sample_problem_group.traces[0].g.g
+        //             .edge_endpoints(ei).unwrap().clone();
+        //         let ee_start = sample_problem_group.traces[0].g.g
+        //             .node_weight(ee.0).unwrap().clone();
+        //         let ee_end = sample_problem_group.traces[0].g.g
+        //             .node_weight(ee.1).unwrap().clone();
+        //
+        //         (ee_start, ee_end)
+        //     })
+        //     .collect::<Vec<(Event, Event)>>();
         let sample_problem_edge_endpoints = sample_problem_group
             .problem_edges()[..5].into_iter()
             .map(|&ei| {
-                let ee = sample_problem_group.traces[0].g.g
+                let ee = sample_problem_group.g
                     .edge_endpoints(ei).unwrap().clone();
-                let ee_start = sample_problem_group.traces[0].g.g
+                let ee_start = sample_problem_group.g
                     .node_weight(ee.0).unwrap().clone();
-                let ee_end = sample_problem_group.traces[0].g.g
+                let ee_end = sample_problem_group.g
                     .node_weight(ee.1).unwrap().clone();
 
                 (ee_start, ee_end)
             })
-            .collect::<Vec<(Event, Event)>>();
+            .collect::<Vec<(TraceNode, TraceNode)>>();
 
         println!();
         println!();
         println!();
 
         println!("SAMPLE PROBLEM EDGES (RAW):");
-        for (i, edge) in sample_problem_edges_dag.into_iter().enumerate() {
-            println!("{:?}", sample_problem_edge_endpoints[i].0);
-            println!("{:?}", edge);
-            println!("{:?}", sample_problem_edge_endpoints[i].1);
+        // for (i, edge) in sample_problem_edges_dag.into_iter().enumerate() {
+        for (i, edge) in sample_problem_edge_endpoints.into_iter().enumerate() {
+            // println!("{:?}", sample_problem_edge_endpoints[i].0);
+            // println!("{:?}", edge);
+            // println!("{:?}", sample_problem_edge_endpoints[i].1);
+            println!("{:?}", edge.0);
+            println!("{:?}", edge.1);
             println!();
         }
 
