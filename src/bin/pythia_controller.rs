@@ -116,7 +116,7 @@ fn main() {
         })
             .collect::<Vec<CriticalPath>>();
 
-        let groups = Group::from_critical_paths(problem_paths).into_iter()
+        let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
             .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
 
         println!("SAMPLE GROUP:");
@@ -130,6 +130,19 @@ fn main() {
 
         println!("PROBLEM EDGES:");
         println!("{:?}", groups[0].problem_edges());
+
+        let mut group_manager = GroupManager::new();
+        group_manager.update(&problem_paths);
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+
+        println!("TOTAL GROUPS --- {}", group_manager.all_groups().len());
+        println!("PROBLEM GROUPS CV --- {}", group_manager.problem_groups_cv(0.05).len());
+        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(90.0).len());
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();

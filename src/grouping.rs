@@ -202,8 +202,6 @@ impl Group {
         let sum: f64 = result.iter().map(|a| a.1).sum();
         println!("*New Metric: hash {:?}, reqtype {:?}, total var {:?}, edge_total: {:?}", self.hash, self.request_type, self.variance, sum);
         result.iter().map(|a| a.0).collect()
-
-       
     }
 
     /// Adds a trace to a group
@@ -399,9 +397,7 @@ impl GroupManager {
             .collect();
         sorted_groups.sort_by(|a, b| b.mean.partial_cmp(&a.mean).unwrap());
         sorted_groups
-
     }
-
 
     /// Mark a group as "used": reset its performance data
     pub fn used(&mut self, group: &str) {
