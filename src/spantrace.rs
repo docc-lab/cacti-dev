@@ -183,7 +183,7 @@ impl Span {
                 // trace_id: IDType::STRING(self.span_id.clone()),
                 trace_id: IDType::STRING(self.service.clone() + ":" + self.operation.as_str()),
                 // tracepoint_id: TracepointID::from_str((self.span_id.clone() + "_end").as_str()),
-                tracepoint_id: TracepointID::from_str((self.service.clone() + ":" + self.operation.as_str() + "_end").as_str()),
+                tracepoint_id: TracepointID::from_str((self.service.clone() + ":" + self.operation.as_str() + "_start").as_str()),
                 timestamp: self.start,
                 variant: EventType::Entry,
                 is_synthetic: false,
