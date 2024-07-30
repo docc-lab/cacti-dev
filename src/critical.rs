@@ -41,6 +41,7 @@ pub struct CriticalPath {
     pub is_hypothetical: bool,
     // pub request_type: OSPRequestType,
     pub request_type: RequestType,
+    pub request_id: IDType,
     /// The hash is lazily calculated at first access
     hash: String,
 }
@@ -55,6 +56,7 @@ impl CriticalPath {
             is_hypothetical: false,
             hash: "".to_string(),
             request_type: dag.request_type.clone(),
+            request_id: dag.base_id.clone()
         };
         let mut cur_node = dag.end_node;
         let mut end_nidx = path.g.g.add_node(dag.g[cur_node].clone());
@@ -133,6 +135,7 @@ impl CriticalPath {
                 is_hypothetical: true,
                 hash: "".to_string(),
                 request_type: dag.request_type.clone(),
+                request_id: dag.base_id.clone()
             };
             let mut remaining_nodes = vec![(dag.start_node, dag.start_node, p.g.start_node, p)];
             while !remaining_nodes.is_empty() {

@@ -190,6 +190,16 @@ fn main() {
             println!("{:?}", sample_problem_edge_endpoints[i].1);
             println!();
         }
+
+        println!();
+        println!();
+        println!();
+
+        // println!("SAMPLE LONG EDGE:");
+        // println!(
+        //     "{:?}",
+        //     sample_problem_group.traces[0].
+        // )
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
