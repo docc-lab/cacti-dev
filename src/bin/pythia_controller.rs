@@ -173,7 +173,7 @@ fn main() {
                 let ee_start = sample_problem_group.traces[0].g.g
                     .node_weight(ee.0).unwrap().clone();
                 let ee_end = sample_problem_group.traces[0].g.g
-                    .node_weight(ee.0).unwrap().clone();
+                    .node_weight(ee.1).unwrap().clone();
 
                 (ee_start, ee_end)
             })
