@@ -34,7 +34,7 @@ use crate::reader::zipkin::ZipkinReader;
 use crate::settings::ApplicationType;
 use crate::settings::Settings;
 use crate::spantrace::SpanTrace;
-use crate::trace::Trace;
+use crate::trace::{Event, Trace};
 
 pub trait Reader {
     /// The file can contain a trace json, written by serde or by the tracing
@@ -81,9 +81,13 @@ pub trait Reader {
         traces
     }
 
-    fn all_operations(&self) -> Vec<RequestType>;
+    fn all_operations(&mut self) -> Vec<RequestType>;
 
     fn set_fetch_all(&mut self);
+
+    fn get_candidate_events(&self, start: u64, end: u64, host: String) -> Vec<(String, String)> {
+        Vec::new()
+    }
 }
 
 /// Constructor for Reader

@@ -314,16 +314,16 @@ impl SpanTrace {
 
 pub struct SpanCache {
     // pub span_refs: Vec<Span>,
-    pub span_times: Vec<(i64, i64)>,
-    pub span_refs: Vec<(String, String)>
+    pub span_times: HashMap<String, Vec<(u64, u64)>>,
+    pub span_refs: HashMap<String, Vec<(String, String)>>
 }
 
 impl SpanCache {
     pub fn init_cache() -> SpanCache {
         return SpanCache {
             // span_refs: Vec::new()
-            span_times: Vec::new(),
-            span_refs: Vec::new()
+            span_times: HashMap::new(),
+            span_refs: HashMap::new()
         };
     }
 
@@ -335,10 +335,20 @@ impl SpanCache {
 
     // "context" variable represents a trace ID
     pub fn add_span(&mut self, to_add: Span, trace_id: String) {
-        let start_time = to_add.start.timestamp_nanos();
-        let end_time = start_time + (to_add.duration.as_nanos() as i64);
-        self.span_times.push((start_time.clone(), end_time));
-        self.span_refs.push((trace_id, to_add.span_id));
+        let start_time = to_add.start.timestamp_nanos() as u64;
+        let end_time = start_time + (to_add.duration.as_nanos() as u64);
+        // self.span_times.push((start_time.clone(), end_time));
+        match self.span_refs.get_mut(to_add.host.as_str()) {
+            Some (v) => {
+                v.push((trace_id, to_add.span_id));
+                self.span_times.get_mut(to_add.host.as_str()).unwrap()
+                    .push((start_time.clone(), end_time));
+            },
+            None => {
+                self.span_refs.insert(to_add.host.clone(), vec![(trace_id, to_add.span_id)]);
+                self.span_times.insert(to_add.host, vec![(start_time.clone(), end_time)]);
+            }
+        }
     }
 
     // pub fn add_spans(&mut self, to_add: Vec<Span>) {
@@ -350,36 +360,68 @@ impl SpanCache {
     pub fn find_overlaps(&self, target: &Span) -> Vec<(String, String)> {
         let mut to_return = Vec::new();
         let mut i = 0;
-        for &time in self.span_times.iter() {
-            // if span.overlaps(target) {
-            //     to_return.push(span)
-            // }
-            let target_start = target.start.timestamp_nanos();
-            let target_end = target_start + (target.duration.as_nanos() as i64);
+        match self.span_times.get(target.host.as_str()) {
+            Some(v) => {
+                let refs = self.span_refs.get(target.host.as_str()).unwrap();
+                for &time in v.iter() {
+                    // if span.overlaps(target) {
+                    //     to_return.push(span)
+                    // }
+                    let target_start = target.start.and_utc().timestamp_nanos_opt().unwrap() as u64;
+                    let target_end = target_start + (target.duration.as_nanos() as u64);
 
-            if (target_end > time.0) && (target_start < time.1) {
-                to_return.push(self.span_refs[i.clone()].clone())
-            }
-            i += 1;
+                    if (target_end > time.0) && (target_start < time.1) {
+                        to_return.push(refs[i.clone()].clone())
+                    }
+                    i += 1;
+                }
+                to_return
+            },
+            None => Vec::new()
         }
-        return to_return;
+        // for &time in self.span_times.iter() {
+        //     // if span.overlaps(target) {
+        //     //     to_return.push(span)
+        //     // }
+        //     let target_start = target.start.timestamp_nanos();
+        //     let target_end = target_start + (target.duration.as_nanos() as i64);
+        //
+        //     if (target_end > time.0) && (target_start < time.1) {
+        //         to_return.push(self.span_refs[i.clone()].clone())
+        //     }
+        //     i += 1;
+        // }
+        // return to_return;
     }
 
-    pub fn find_overlaps_raw(&self, target_start: i64, target_end: i64) -> Vec<(String, String)> {
+    pub fn find_overlaps_raw(&self, target_start: u64, target_end: u64, host: String) -> Vec<(String, String)> {
         let mut to_return = Vec::new();
         let mut i = 0;
-        for &time in self.span_times.iter() {
-            // if span.overlaps(target) {
-            //     to_return.push(span)
-            // }
-            let target_start = target_start;
-
-            if (target_end > time.0) && (target_start < time.1) {
-                to_return.push(self.span_refs[i.clone()].clone())
-            }
-            i += 1;
+        match self.span_times.get(host.as_str()) {
+            Some(v) => {
+                let refs = self.span_refs.get(host.as_str()).unwrap();
+                for &time in v.iter() {
+                    if (target_end > time.0) && (target_start < time.1) {
+                        to_return.push(refs[i.clone()].clone())
+                    }
+                    i += 1;
+                }
+                to_return
+            },
+            None => Vec::new()
         }
-        return to_return;
+        // for &time in self.span_times.iter() {
+        //     // if span.overlaps(target) {
+        //     //     to_return.push(span)
+        //     // }
+        //     let target_start = target_start;
+        //
+        //     if (target_end > time.0) && (target_start < time.1) {
+        //         to_return.push(self.span_refs[i.clone()].clone())
+        //     }
+        //     i += 1;
+        // }
+        // return to_return;
     }
 }
 

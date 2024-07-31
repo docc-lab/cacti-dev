@@ -15,8 +15,9 @@ use std::time::Duration;
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use genawaiter::{rc::gen, yield_};
-use petgraph::visit::EdgeRef;
-use petgraph::{dot::Dot, graph::NodeIndex, Direction};
+use petgraph::visit::{EdgeRef, IntoEdgesDirected};
+use petgraph::{dot::Dot, graph::NodeIndex, Direction, Outgoing};
+use petgraph::data::DataMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -555,6 +556,27 @@ impl CriticalPath {
                 self.end_node = new_node;
             }
         }
+    }
+
+    pub fn get_by_tracepoints(&self, start: TracepointID, end: TracepointID) -> (Event, Event, DAGEdge) {
+        let mut start_nidx = self.start_node;
+        loop {
+            if self.g.g.node_weight(start_nidx).unwrap().tracepoint_id == start {
+                break;
+            }
+            start_nidx = self.next_node(start_nidx).unwrap();
+        }
+
+        let end_nidx = self.next_node(start_nidx).unwrap();
+        if self.g.g.node_weight(end_nidx).unwrap().tracepoint_id != end {
+            panic!("Impossible case!");
+        }
+
+        (
+            self.g.g.node_weight(start_nidx).unwrap().clone(),
+            self.g.g.node_weight(end_nidx).unwrap().clone(),
+            self.g.g.edges_directed(start_nidx, Outgoing).next().unwrap().weight().clone()
+        )
     }
 }
 

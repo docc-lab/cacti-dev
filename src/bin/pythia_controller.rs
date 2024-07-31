@@ -22,6 +22,7 @@ use std::time::Duration;
 use std::time::Instant;
 use futures::Stream;
 use itertools::max;
+use petgraph::csr::EdgeIndex;
 use petgraph::data::DataMap;
 use petgraph::visit::IntoEdges;
 use pythia_common::{OSPRequestType, RequestType};
@@ -40,6 +41,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
+use pythia::spantrace::SpanTrace;
 use pythia::trace::{DAGEdge, Event, IDType, Trace, TraceNode, TracepointID};
 
 // These are static because search strategy expects static references.
@@ -161,24 +163,6 @@ fn main() {
             println!("{:?}", edge);
         }
 
-        // let sample_problem_edges_dag = sample_problem_group
-        //     .problem_edges()[..5].into_iter()
-        //     .map(|&ei| sample_problem_group.traces[0].g.g.edge_weight(ei).unwrap().clone())
-        //     .collect::<Vec<DAGEdge>>();
-
-        // let sample_problem_edge_endpoints = sample_problem_group
-        //     .problem_edges()[..5].into_iter()
-        //     .map(|&ei| {
-        //         let ee = sample_problem_group.traces[0].g.g
-        //             .edge_endpoints(ei).unwrap().clone();
-        //         let ee_start = sample_problem_group.traces[0].g.g
-        //             .node_weight(ee.0).unwrap().clone();
-        //         let ee_end = sample_problem_group.traces[0].g.g
-        //             .node_weight(ee.1).unwrap().clone();
-        //
-        //         (ee_start, ee_end)
-        //     })
-        //     .collect::<Vec<(Event, Event)>>();
         let sample_problem_edge_endpoints = sample_problem_group
             .problem_edges()[..5].into_iter()
             .map(|&ei| {
@@ -216,7 +200,106 @@ fn main() {
         println!(
             "{:?}",
             sample_problem_group.traces.clone().into_iter().map(|tr| tr.request_id).collect::<Vec<IDType>>()
-        )
+        );
+
+        let problem_groups = group_manager.problem_groups_cv(0.05);
+        // let top_problem_edges = problem_groups.into_iter()
+        //     .map(|g| {
+        //         let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
+        //         let ee_start = sample_problem_group.g
+        //             .node_weight(ee.0).unwrap().clone();
+        //         let ee_end = sample_problem_group.g
+        //             .node_weight(ee.1).unwrap().clone();
+        //
+        //         (ee_start, ee_end)
+        //     })
+        //     .collect::<Vec<(TraceNode, TraceNode)>>();
+
+        // TODO: Make the # of groups selected a configurable parameter
+        let top_problem_groups = group_manager.problem_groups_cv(0.05)[..10]
+            .into_iter().map(|&g| g.clone()).collect::<Vec<Group>>();
+
+        let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
+        for g in top_problem_groups {
+            let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
+            let ee_start = sample_problem_group.g
+                .node_weight(ee.0).unwrap().clone();
+            let ee_end = sample_problem_group.g
+                .node_weight(ee.1).unwrap().clone();
+
+            top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
+        }
+
+        sleep(Duration::from_micros(SETTINGS.cycle_lookback as u64));
+
+        reader.set_fetch_all();
+
+        let off_pl_traces = reader.get_recent_span_traces();
+
+        let mut problem_type_traces = Vec::new();
+        // let mut non_problem_traces = Vec::new();
+        let mut non_problem_traces = HashMap::new();
+
+        for tr in off_pl_traces {
+            if RequestType::from_str(
+                tr.endpoint_type.as_str(),
+                SETTINGS.application.as_str()
+            ).unwrap() == SETTINGS.problem_type.clone() {
+                problem_type_traces.push(tr);
+            }
+            else {
+                // non_problem_traces.push(tr);
+                non_problem_traces.insert(tr.req_id.clone(), tr);
+            }
+        }
+
+        let pt_traces = problem_traces.iter().map(
+            |st| st.to_critical_path()).collect::<Vec<Trace>>();
+
+        let pt_crits = pt_traces
+            .iter().map(|ppt| {
+            let mut cp = CriticalPath::from_trace(ppt).unwrap();
+            cp.request_type = ppt.request_type.clone();
+            cp.start_node = ppt.start_node;
+            cp.end_node = ppt.end_node;
+            cp
+        })
+            .collect::<Vec<CriticalPath>>();
+
+        // for s in top_problem_edges.into_iter() {
+        //
+        // }
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+
+        for cp in pt_crits {
+            match top_problem_edges.get(cp.hash()) {
+                Some ((tns, tne)) => {
+                    let (ts, te, edge) = cp.get_by_tracepoints(
+                        tns.tracepoint_id, tne.tracepoint_id);
+
+                    let overlaps = reader.get_candidate_events(
+                        ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+                        te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+                        edge.host.unwrap()
+                    );
+
+                    println!("OVERLAPPING EDGES:");
+                    for o in overlaps {
+                        println!(
+                            "{:?}",
+                            non_problem_traces.get(o.0.as_str()).unwrap()
+                                .spans.get(o.1.as_str()).unwrap()
+                        )
+                    }
+                },
+                None => continue
+            }
+        }
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();

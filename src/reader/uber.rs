@@ -51,7 +51,7 @@ pub struct UberReader {
 }
 
 impl Reader for UberReader {
-    fn all_operations(&self) -> Vec<RequestType> {
+    fn all_operations(&mut self) -> Vec<RequestType> {
         Vec::new()
     }
     fn set_fetch_all(&mut self) {}

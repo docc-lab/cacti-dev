@@ -21,7 +21,7 @@ pub struct ZipkinReader {
 }
 
 impl Reader for ZipkinReader {
-    fn all_operations(&self) -> Vec<RequestType> {
+    fn all_operations(&mut self) -> Vec<RequestType> {
         Vec::new()
     }
 

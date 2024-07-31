@@ -19,7 +19,7 @@ use pythia_common::jaeger::JaegerRequestType;
 use pythia_common::RequestType;
 use crate::reader::Reader;
 use crate::{Settings, Trace};
-use crate::spantrace::{Span, SpanTrace};
+use crate::spantrace::{Span, SpanCache, SpanTrace};
 use serde::{Serialize, Deserialize};
 use crate::trace::Event;
 use url::form_urlencoded;
@@ -88,7 +88,7 @@ struct JaegerTrace {
 }
 
 impl JaegerTrace {
-    pub fn to_trace(&self) -> Result<SpanTrace, String> {
+    pub fn to_trace(&self, cache: &mut SpanCache) -> Result<SpanTrace, String> {
         let spans: Vec<Span> = self.spans.iter().map(|span| span.to_span(&self.processes)).collect();
         // if self.spans.len() == 0 {
         //     println!("{}", self.traceID);
@@ -121,6 +121,10 @@ impl JaegerTrace {
         //     children: Default::default()
         // }
 
+        for span in &spans {
+            cache.add_span(span.clone(), self.traceID.clone())
+        }
+
         let root_span = root_span_list[0];
 
         Ok(SpanTrace::from_span_list(
@@ -143,6 +147,7 @@ pub struct JaegerReader {
     fetch_all: bool,
     for_searchspace: bool,
     cycle_lookback: u128,
+    span_cache: SpanCache
     // current_traces: HashMap<String, i64>
 }
 
@@ -278,7 +283,7 @@ impl Reader for JaegerReader {
         self.for_searchspace = true;
     }
 
-    fn all_operations(&self) -> Vec<RequestType> {
+    fn all_operations(&mut self) -> Vec<RequestType> {
         let mut to_set_types = HashSet::new();
 
         let resp: reqwest::blocking::Response =
@@ -313,6 +318,20 @@ impl Reader for JaegerReader {
     fn set_fetch_all(&mut self) {
         self.fetch_all = true;
     }
+
+    fn get_candidate_events(&self, start: u64, end: u64, host: String) -> Vec<(String, String)> {
+        // let overlap_refs = self.span_cache.find_overlaps_raw(start, end, host);
+        //
+        // let to_return = Vec::new();
+        //
+        // for (tid, sid) in overlap_refs {
+        //
+        // }
+        //
+        // to_return
+
+        self.span_cache.find_overlaps_raw(start, end, host)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -328,10 +347,11 @@ impl JaegerReader {
             for_searchspace: false,
             fetch_all: false,
             cycle_lookback: settings.cycle_lookback,
+            span_cache: SpanCache::init_cache()
         }
     }
 
-    fn get_span_traces(&self, service: String, operation: Option<String>, lookback: u128) -> Vec<SpanTrace> {
+    fn get_span_traces(&mut self, service: String, operation: Option<String>, lookback: u128) -> Vec<SpanTrace> {
         let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
 
         let query_str = format!(
@@ -357,7 +377,7 @@ impl JaegerReader {
         // resp_obj.data.into_iter()
         //     .map(|jt| jt.to_trace()).collect()
         resp_obj.data.into_iter()
-            .map(|jt| jt.to_trace())
+            .map(|jt| jt.to_trace(&mut self.span_cache))
             .filter(|tt_res| match tt_res {
                 Ok(_) => true,
                 _ => false

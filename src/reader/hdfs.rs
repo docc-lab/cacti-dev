@@ -66,7 +66,7 @@ impl Reader for HDFSReader {
 
     fn reset_state(&mut self) {}
 
-    fn all_operations(&self) -> Vec<RequestType> {
+    fn all_operations(&mut self) -> Vec<RequestType> {
         Vec::new()
     }
 

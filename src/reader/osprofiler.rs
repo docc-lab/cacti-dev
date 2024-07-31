@@ -58,7 +58,7 @@ pub struct OSProfilerReader {
 }
 
 impl Reader for OSProfilerReader {
-    fn all_operations(&self) -> Vec<RequestType> {
+    fn all_operations(&mut self) -> Vec<RequestType> {
         Vec::new()
     }
 
