@@ -359,6 +359,7 @@ impl JaegerReader {
         let mut looked_back = 0;
 
         loop {
+            println!("Querying with lookback = {}", lookback);
             if looked_back == lookback {
                 break;
             }
