@@ -390,6 +390,18 @@ fn main() {
         })
             .collect::<Vec<CriticalPath>>();
 
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!("{:?}", non_problem_traces);
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+
         for cp in pt_crits {
             match top_problem_edges.get(cp.hash()) {
                 Some ((tns, tne)) => {
@@ -404,6 +416,7 @@ fn main() {
 
                     println!("OVERLAPPING EDGES:");
                     for o in overlaps {
+                        println!("Getting overlaps for: [{:?}]", o);
                         println!(
                             "{:?}",
                             non_problem_traces.get(o.0.as_str()).unwrap()
