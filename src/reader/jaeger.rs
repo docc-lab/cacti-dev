@@ -355,9 +355,9 @@ impl JaegerReader {
     fn get_span_traces(&mut self, service: String, operation: Option<String>, lookback: u128) -> Vec<SpanTrace> {
         let cur_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros();
 
-        let mut to_ret_map = HashMap::new();
+        // let mut to_ret_map = HashMap::new();
 
-        let mut looked_back = 0;
+        // let mut looked_back = 0;
 
         // loop {
         //     println!("Querying with lookback = {}", lookback);
