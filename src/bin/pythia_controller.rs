@@ -322,6 +322,8 @@ fn main() {
             cp
         })
             .collect::<Vec<CriticalPath>>();
+        
+        println!("# problem traces = {}", problem_paths.len());
 
         // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
         //     .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
