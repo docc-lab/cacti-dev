@@ -273,7 +273,7 @@ impl Reader for JaegerReader {
                 );
                 println!("TRACES LEN: {}", traces.len());
                 for tr in traces {
-                    println!("TRACE TRACE TRACE: [{:?}]", tr);
+                    // println!("TRACE TRACE TRACE: [{:?}]", tr);
                     if !seen.contains(tr.req_id.as_str()) {
                         seen.insert(tr.req_id.clone());
                         to_return.push(tr);

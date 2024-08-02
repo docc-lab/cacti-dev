@@ -396,17 +396,17 @@ fn main() {
         })
             .collect::<Vec<CriticalPath>>();
 
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-        println!("{:?}", non_problem_traces);
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!("{:?}", non_problem_traces);
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
 
         for cp in pt_crits {
             match top_problem_edges.get(cp.hash()) {
