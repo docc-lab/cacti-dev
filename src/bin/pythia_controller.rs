@@ -364,6 +364,9 @@ fn main() {
         let mut non_problem_traces = HashMap::new();
 
         for tr in off_pl_traces {
+            println!();
+            println!("INSERTING TRACE: [[{:?}]]", tr.clone());
+            println!();
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
