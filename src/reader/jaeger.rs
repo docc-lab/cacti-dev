@@ -268,7 +268,7 @@ impl Reader for JaegerReader {
                 let op_parts = op_str.split(":").into_iter().collect::<Vec<&str>>();
                 let traces = self.get_span_traces(
                     op_parts[0].to_string(),
-                    op_parts[1].to_string(),
+                    Some(op_parts[1].to_string()),
                     self.cycle_lookback
                 );
                 println!("TRACES LEN: {}", traces.len());
