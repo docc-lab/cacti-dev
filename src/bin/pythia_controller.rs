@@ -358,6 +358,8 @@ fn main() {
         reader.set_fetch_all();
 
         let off_pl_traces = reader.get_recent_span_traces();
+        
+        println!("off_pl_traces.len() = {}", off_pl_traces.len());
 
         let mut problem_type_traces = Vec::new();
         // let mut non_problem_traces = Vec::new();
