@@ -264,7 +264,9 @@ impl Reader for JaegerReader {
 
             println!("Calling all_operations() - jaeger.rs:263");
             for service in self.all_operations() {
-                for tr in self.get_span_traces(service.to_string(), None, self.cycle_lookback) {
+                let traces = self.get_span_traces(service.to_string(), None, self.cycle_lookback);
+                println!("TRACES LEN: {}", traces.len());
+                for tr in traces {
                     println!("TRACE TRACE TRACE: [{:?}]", tr);
                     if !seen.contains(tr.req_id.as_str()) {
                         seen.insert(tr.req_id.clone());
