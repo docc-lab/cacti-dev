@@ -374,6 +374,9 @@ impl JaegerReader {
                     None => "".to_string()
                 }, service, cur_time - 10000000 - looked_back
             );
+            
+            println!("Query String:");
+            println!("{}", query_str);
 
             let resp: reqwest::blocking::Response =
                 reqwest::blocking::get(query_str).unwrap();
