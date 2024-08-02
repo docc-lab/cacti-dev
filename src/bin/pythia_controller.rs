@@ -96,18 +96,222 @@ fn main() {
 
         let mut reader = reader_from_settings(&SETTINGS);
 
+        // let problem_traces = reader.get_recent_span_traces();
+        //
+        // let problem_path_traces = problem_traces.iter().map(
+        //     |st| st.to_critical_path()).collect::<Vec<Trace>>();
+        //
+        // println!("EXAMPLE PATH TRACE:");
+        // println!("{:?}", problem_path_traces[0]);
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        //
+        // let problem_paths = problem_path_traces
+        //     .iter().map(|ppt| {
+        //     let mut cp = CriticalPath::from_trace(ppt).unwrap();
+        //     cp.request_type = ppt.request_type.clone();
+        //     cp.start_node = ppt.start_node;
+        //     cp.end_node = ppt.end_node;
+        //     cp
+        // })
+        //     .collect::<Vec<CriticalPath>>();
+        //
+        // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
+        //     .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
+        //
+        // println!("SAMPLE GROUP:");
+        // println!("{:?}", groups[0]);
+        //
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        //
+        // println!("PROBLEM EDGES:");
+        // println!("{:?}", groups[0].problem_edges());
+
+        // let mut group_manager = GroupManager::new();
+        // group_manager.update(&problem_paths);
+        //
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        //
+        // println!("TOTAL GROUPS --- {}", group_manager.all_groups().len());
+        // println!("PROBLEM GROUPS CV --- {}", group_manager.problem_groups_cv(0.05).len());
+        // println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(90.0).len());
+        //
+        // let sample_problem_group = group_manager
+        //     .problem_groups_cv(0.05)[0];
+        // let sample_problem_edges = sample_problem_group
+        //     .problem_edges()[..5].into_iter()
+        //     .map(|&ei| sample_problem_group.g.edge_weight(ei).unwrap().clone())
+        //     .collect::<Vec<GroupEdge>>();
+        //
+        // println!();
+        // println!();
+        // println!();
+        //
+        // println!("SAMPLE PROBLEM EDGES:");
+        // for edge in sample_problem_edges {
+        //     println!("{:?}", edge);
+        // }
+        //
+        // let sample_problem_edge_endpoints = sample_problem_group
+        //     .problem_edges()[..5].into_iter()
+        //     .map(|&ei| {
+        //         let ee = sample_problem_group.g
+        //             .edge_endpoints(ei).unwrap().clone();
+        //         let ee_start = sample_problem_group.g
+        //             .node_weight(ee.0).unwrap().clone();
+        //         let ee_end = sample_problem_group.g
+        //             .node_weight(ee.1).unwrap().clone();
+        //
+        //         (ee_start, ee_end)
+        //     })
+        //     .collect::<Vec<(TraceNode, TraceNode)>>();
+        //
+        // println!();
+        // println!();
+        // println!();
+        //
+        // println!("SAMPLE PROBLEM EDGES (RAW):");
+        // // for (i, edge) in sample_problem_edges_dag.into_iter().enumerate() {
+        // for (i, edge) in sample_problem_edge_endpoints.into_iter().enumerate() {
+        //     // println!("{:?}", sample_problem_edge_endpoints[i].0);
+        //     // println!("{:?}", edge);
+        //     // println!("{:?}", sample_problem_edge_endpoints[i].1);
+        //     println!("{:?}", edge.0);
+        //     println!("{:?}", edge.1);
+        //     println!();
+        // }
+        //
+        // println!();
+        // println!();
+        // println!();
+        //
+        // println!("SAMPLE LONG EDGE RID:");
+        // println!(
+        //     "{:?}",
+        //     sample_problem_group.traces.clone().into_iter().map(|tr| tr.request_id).collect::<Vec<IDType>>()
+        // );
+
+        // let problem_groups = group_manager.problem_groups_cv(0.05);
+        // // let top_problem_edges = problem_groups.into_iter()
+        // //     .map(|g| {
+        // //         let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
+        // //         let ee_start = sample_problem_group.g
+        // //             .node_weight(ee.0).unwrap().clone();
+        // //         let ee_end = sample_problem_group.g
+        // //             .node_weight(ee.1).unwrap().clone();
+        // //
+        // //         (ee_start, ee_end)
+        // //     })
+        // //     .collect::<Vec<(TraceNode, TraceNode)>>();
+
+        // // TODO: Make the # of groups selected a configurable parameter
+        // let top_problem_groups = group_manager.problem_groups_cv(0.05)[..10]
+        //     .into_iter().map(|&g| g.clone()).collect::<Vec<Group>>();
+        //
+        // let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
+        // for g in top_problem_groups {
+        //     let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
+        //     let ee_start = sample_problem_group.g
+        //         .node_weight(ee.0).unwrap().clone();
+        //     let ee_end = sample_problem_group.g
+        //         .node_weight(ee.1).unwrap().clone();
+        //
+        //     top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
+        // }
+        //
+        // sleep(Duration::from_micros(SETTINGS.cycle_lookback as u64));
+        //
+        // reader.set_fetch_all();
+        //
+        // let off_pl_traces = reader.get_recent_span_traces();
+        //
+        // let mut problem_type_traces = Vec::new();
+        // // let mut non_problem_traces = Vec::new();
+        // let mut non_problem_traces = HashMap::new();
+        //
+        // for tr in off_pl_traces {
+        //     if RequestType::from_str(
+        //         tr.endpoint_type.as_str(),
+        //         SETTINGS.application.as_str()
+        //     ).unwrap() == SETTINGS.problem_type.clone() {
+        //         problem_type_traces.push(tr);
+        //     }
+        //     else {
+        //         // non_problem_traces.push(tr);
+        //         non_problem_traces.insert(tr.req_id.clone(), tr);
+        //     }
+        // }
+        //
+        // let pt_traces = problem_traces.iter().map(
+        //     |st| st.to_critical_path()).collect::<Vec<Trace>>();
+        //
+        // let pt_crits = pt_traces
+        //     .iter().map(|ppt| {
+        //     let mut cp = CriticalPath::from_trace(ppt).unwrap();
+        //     cp.request_type = ppt.request_type.clone();
+        //     cp.start_node = ppt.start_node;
+        //     cp.end_node = ppt.end_node;
+        //     cp
+        // })
+        //     .collect::<Vec<CriticalPath>>();
+        //
+        // // for s in top_problem_edges.into_iter() {
+        // //
+        // // }
+        //
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+        // println!();
+
+        // for cp in pt_crits {
+        //     match top_problem_edges.get(cp.hash()) {
+        //         Some ((tns, tne)) => {
+        //             let (ts, te, edge) = cp.get_by_tracepoints(
+        //                 tns.tracepoint_id, tne.tracepoint_id);
+        //
+        //             let overlaps = reader.get_candidate_events(
+        //                 ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+        //                 te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+        //                 edge.host.unwrap()
+        //             );
+        //
+        //             println!("OVERLAPPING EDGES:");
+        //             for o in overlaps {
+        //                 println!(
+        //                     "{:?}",
+        //                     non_problem_traces.get(o.0.as_str()).unwrap()
+        //                         .spans.get(o.1.as_str()).unwrap()
+        //                 )
+        //             }
+        //         },
+        //         None => continue
+        //     }
+        // }
+
+        ////////////////////////////////////////
+
+        println!();
+        println!();
+        println!("PHASE 1");
+        println!();
+        println!();
         let problem_traces = reader.get_recent_span_traces();
 
         let problem_path_traces = problem_traces.iter().map(
             |st| st.to_critical_path()).collect::<Vec<Trace>>();
-
-        println!("EXAMPLE PATH TRACE:");
-        println!("{:?}", problem_path_traces[0]);
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
 
         let problem_paths = problem_path_traces
             .iter().map(|ppt| {
@@ -122,98 +326,10 @@ fn main() {
         let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
             .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
 
-        println!("SAMPLE GROUP:");
-        println!("{:?}", groups[0]);
-
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-
-        println!("PROBLEM EDGES:");
-        println!("{:?}", groups[0].problem_edges());
-
         let mut group_manager = GroupManager::new();
         group_manager.update(&problem_paths);
 
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
-
-        println!("TOTAL GROUPS --- {}", group_manager.all_groups().len());
-        println!("PROBLEM GROUPS CV --- {}", group_manager.problem_groups_cv(0.05).len());
-        println!("SLOW GROUPS --- {}", group_manager.problem_groups_slow(90.0).len());
-
-        let sample_problem_group = group_manager
-            .problem_groups_cv(0.05)[0];
-        let sample_problem_edges = sample_problem_group
-            .problem_edges()[..5].into_iter()
-            .map(|&ei| sample_problem_group.g.edge_weight(ei).unwrap().clone())
-            .collect::<Vec<GroupEdge>>();
-
-        println!();
-        println!();
-        println!();
-
-        println!("SAMPLE PROBLEM EDGES:");
-        for edge in sample_problem_edges {
-            println!("{:?}", edge);
-        }
-
-        let sample_problem_edge_endpoints = sample_problem_group
-            .problem_edges()[..5].into_iter()
-            .map(|&ei| {
-                let ee = sample_problem_group.g
-                    .edge_endpoints(ei).unwrap().clone();
-                let ee_start = sample_problem_group.g
-                    .node_weight(ee.0).unwrap().clone();
-                let ee_end = sample_problem_group.g
-                    .node_weight(ee.1).unwrap().clone();
-
-                (ee_start, ee_end)
-            })
-            .collect::<Vec<(TraceNode, TraceNode)>>();
-
-        println!();
-        println!();
-        println!();
-
-        println!("SAMPLE PROBLEM EDGES (RAW):");
-        // for (i, edge) in sample_problem_edges_dag.into_iter().enumerate() {
-        for (i, edge) in sample_problem_edge_endpoints.into_iter().enumerate() {
-            // println!("{:?}", sample_problem_edge_endpoints[i].0);
-            // println!("{:?}", edge);
-            // println!("{:?}", sample_problem_edge_endpoints[i].1);
-            println!("{:?}", edge.0);
-            println!("{:?}", edge.1);
-            println!();
-        }
-
-        println!();
-        println!();
-        println!();
-
-        println!("SAMPLE LONG EDGE RID:");
-        println!(
-            "{:?}",
-            sample_problem_group.traces.clone().into_iter().map(|tr| tr.request_id).collect::<Vec<IDType>>()
-        );
-
         let problem_groups = group_manager.problem_groups_cv(0.05);
-        // let top_problem_edges = problem_groups.into_iter()
-        //     .map(|g| {
-        //         let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
-        //         let ee_start = sample_problem_group.g
-        //             .node_weight(ee.0).unwrap().clone();
-        //         let ee_end = sample_problem_group.g
-        //             .node_weight(ee.1).unwrap().clone();
-        //
-        //         (ee_start, ee_end)
-        //     })
-        //     .collect::<Vec<(TraceNode, TraceNode)>>();
 
         // TODO: Make the # of groups selected a configurable parameter
         let top_problem_groups = group_manager.problem_groups_cv(0.05)[..10]
@@ -230,7 +346,12 @@ fn main() {
             top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
         }
 
-        sleep(Duration::from_micros(SETTINGS.cycle_lookback as u64));
+        // sleep(Duration::from_micros(SETTINGS.cycle_lookback as u64));
+        println!();
+        println!();
+        println!("PHASE 2");
+        println!();
+        println!();
 
         reader.set_fetch_all();
 
@@ -265,16 +386,6 @@ fn main() {
             cp
         })
             .collect::<Vec<CriticalPath>>();
-
-        // for s in top_problem_edges.into_iter() {
-        //
-        // }
-
-        println!();
-        println!();
-        println!();
-        println!();
-        println!();
 
         for cp in pt_crits {
             match top_problem_edges.get(cp.hash()) {
