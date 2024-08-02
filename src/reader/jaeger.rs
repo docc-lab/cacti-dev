@@ -364,7 +364,7 @@ impl JaegerReader {
         //     if looked_back == lookback {
         //         break;
         //     }
-        // 
+        //
         //     let query_str = format!(
         //         "http://localhost:16686/api/traces?end={}\
         //     &limit=1000000000&lookback=custom&maxDuration&minDuration{}&service={}&start={}",
@@ -374,20 +374,20 @@ impl JaegerReader {
         //             None => "".to_string()
         //         }, service, cur_time - 10000000 - looked_back
         //     );
-        //     
+        //
         //     println!("Query String:");
         //     println!("{}", query_str);
-        // 
+        //
         //     let resp: reqwest::blocking::Response =
         //         reqwest::blocking::get(query_str).unwrap();
-        // 
+        //
         //     let resp_text = resp.text().unwrap() as String;
-        // 
+        //
         //     // println!("{}", resp_text.as_str());
-        // 
+        //
         //     let resp_obj: JaegerPayload =
         //         serde_json::from_str(resp_text.as_str()).unwrap();
-        // 
+        //
         //     // resp_obj.data.into_iter()
         //     //     .map(|jt| jt.to_trace()).collect()
         //     let traces = resp_obj.data.into_iter()
@@ -397,16 +397,16 @@ impl JaegerReader {
         //             _ => false
         //         })
         //         .map(|st_ok| st_ok.unwrap()).collect::<Vec<SpanTrace>>();
-        // 
+        //
         //     for trace in traces {
         //         if !to_ret_map.contains_key(trace.req_id.as_str()) {
         //             to_ret_map.insert(trace.req_id.clone(), trace);
         //         }
         //     }
-        // 
+        //
         //     looked_back += 5000000;
         // }
-        // 
+        //
         // to_ret_map.into_iter().map(|(_, v)| v).collect::<Vec<SpanTrace>>()
 
         let query_str = format!(
@@ -418,17 +418,20 @@ impl JaegerReader {
                 None => "".to_string()
             }, service, cur_time - lookback
         );
-        
+
+        println!("Query String:");
+        println!("{}", query_str);
+
         let resp: reqwest::blocking::Response =
             reqwest::blocking::get(query_str).unwrap();
-        
+
         let resp_text = resp.text().unwrap() as String;
-        
+
         // println!("{}", resp_text.as_str());
-        
+
         let resp_obj: JaegerPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
-        
+
         // resp_obj.data.into_iter()
         //     .map(|jt| jt.to_trace()).collect()
         resp_obj.data.into_iter()
