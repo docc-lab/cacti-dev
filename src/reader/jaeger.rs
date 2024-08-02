@@ -440,6 +440,8 @@ impl JaegerReader {
         let resp_obj: JaegerPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
+        println!("resp data len = {}", resp_obj.data.len());
+
         // resp_obj.data.into_iter()
         //     .map(|jt| jt.to_trace()).collect()
         resp_obj.data.into_iter()
