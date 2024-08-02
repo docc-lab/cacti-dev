@@ -366,9 +366,9 @@ fn main() {
         let mut non_problem_traces = HashMap::new();
 
         for tr in off_pl_traces {
-            println!();
-            println!("INSERTING TRACE: [[{:?}]]", tr.clone());
-            println!();
+            // println!();
+            // println!("INSERTING TRACE: [[{:?}]]", tr.clone());
+            // println!();
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
@@ -421,17 +421,25 @@ fn main() {
 
                     println!("OVERLAPPING EDGES:");
                     for o in overlaps {
-                        println!("Getting overlaps for: [{:?}]", o);
+                        println!();
+                        println!();
+                        println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
+                        tns.tracepoint_id, tne.tracepoint_id));
+                        println!();
                         println!(
                             "{:?}",
                             non_problem_traces.get(o.0.as_str()).unwrap()
                                 .spans.get(o.1.as_str()).unwrap()
-                        )
+                        );
+                        println!();
+                        println!();
                     }
                 },
                 None => continue
             }
         }
+        
+        
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
