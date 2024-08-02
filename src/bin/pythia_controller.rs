@@ -323,13 +323,13 @@ fn main() {
         })
             .collect::<Vec<CriticalPath>>();
 
-        let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
-            .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
+        // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
+        //     .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
 
         let mut group_manager = GroupManager::new();
         group_manager.update(&problem_paths);
 
-        let problem_groups = group_manager.problem_groups_cv(0.05);
+        // let problem_groups = group_manager.problem_groups_cv(0.05);
 
         // TODO: Make the # of groups selected a configurable parameter
         let top_problem_groups = group_manager.problem_groups_cv(0.05)[..10]

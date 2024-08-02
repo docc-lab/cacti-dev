@@ -300,7 +300,7 @@ impl Reader for JaegerReader {
 
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
-
+            println!("Service: {}", service);
             for trace in self.get_span_traces(service, None, 60000000) {
                 for (_, span) in trace.spans {
                     if span.parent.is_empty() {
