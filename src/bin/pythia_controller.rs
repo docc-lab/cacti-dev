@@ -322,7 +322,7 @@ fn main() {
             cp
         })
             .collect::<Vec<CriticalPath>>();
-        
+
         println!("# problem traces = {}", problem_paths.len());
 
         // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
@@ -370,10 +370,11 @@ fn main() {
             ).unwrap() == SETTINGS.problem_type.clone() {
                 problem_type_traces.push(tr);
             }
-            else {
-                // non_problem_traces.push(tr);
-                non_problem_traces.insert(tr.req_id.clone(), tr);
-            }
+            // else {
+            //     // non_problem_traces.push(tr);
+            //     non_problem_traces.insert(tr.req_id.clone(), tr);
+            // }
+            non_problem_traces.insert(tr.req_id.clone(), tr);
         }
 
         let pt_traces = problem_traces.iter().map(
