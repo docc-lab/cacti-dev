@@ -263,8 +263,14 @@ impl Reader for JaegerReader {
             let mut to_return = Vec::new();
 
             println!("Calling all_operations() - jaeger.rs:263");
-            for service in self.all_operations() {
-                let traces = self.get_span_traces(service.to_string(), None, self.cycle_lookback);
+            for operation in self.all_operations() {
+                let op_str = operation.to_string();
+                let op_parts = op_str.split(":").into_iter().collect::<Vec<&str>>();
+                let traces = self.get_span_traces(
+                    op_parts[0].to_string(),
+                    op_parts[1].to_string(),
+                    self.cycle_lookback
+                );
                 println!("TRACES LEN: {}", traces.len());
                 for tr in traces {
                     println!("TRACE TRACE TRACE: [{:?}]", tr);
