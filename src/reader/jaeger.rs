@@ -257,11 +257,18 @@ impl Reader for JaegerReader {
 
     fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
         if self.fetch_all {
+            let mut seen = HashSet::new();
+
             let mut to_return = Vec::new();
 
             println!("Calling all_operations() - jaeger.rs:263");
             for service in self.all_operations() {
-                to_return.append(&mut self.get_span_traces(service.to_string(), None, self.cycle_lookback))
+                for tr in self.get_span_traces(service.to_string(), None, self.cycle_lookback) {
+                    if !seen.contains(tr.req_id.as_str()) {
+                        seen.insert(tr.req_id.clone());
+                        to_return.push(tr);
+                    }
+                }
             }
 
             to_return
