@@ -335,7 +335,7 @@ fn main() {
 
         // TODO: Make the # of groups selected a configurable parameter
         let problem_groups = group_manager.problem_groups_cv(0.05);
-        let top_problem_groups = problem_groups[..std::cmp::max(10, problem_groups.len())]
+        let top_problem_groups = problem_groups[..std::cmp::min(10, problem_groups.len())]
             .into_iter().map(|&g| g.clone()).collect::<Vec<Group>>();
 
         let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
