@@ -338,9 +338,9 @@ fn main() {
         let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
         for g in top_problem_groups {
             let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
-            let ee_start = sample_problem_group.g
+            let ee_start = g.g
                 .node_weight(ee.0).unwrap().clone();
-            let ee_end = sample_problem_group.g
+            let ee_end = g.g
                 .node_weight(ee.1).unwrap().clone();
 
             top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
