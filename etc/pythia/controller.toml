@@ -25,6 +25,6 @@ emit_events = "false"
 problem_type = "nginx-web-server:/wrk2-api/post/compose"
 
 #cycle_lookback = 600000000
-cycle_lookback = 600000000
+cycle_lookback = 3600000000
 
 
