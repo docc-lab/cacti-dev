@@ -368,7 +368,7 @@ fn main() {
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
             ).unwrap() == SETTINGS.problem_type.clone() {
-                problem_type_traces.push(tr);
+                problem_type_traces.push(tr.clone());
             }
             // else {
             //     // non_problem_traces.push(tr);
