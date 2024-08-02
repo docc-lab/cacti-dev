@@ -100,6 +100,7 @@ impl JaegerTrace {
         if root_span_list.len() == 0 {
             // println!("TRACE WITH NO ROOT:");
             // println!("{:?}", self.spans);
+            println!("Could not find a root span!");
 
             return Err("Could not find a root span!".to_string());
         }

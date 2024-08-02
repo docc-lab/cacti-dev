@@ -73,8 +73,8 @@ impl Span {
     // }
 
     pub fn end(&self) -> i64 {
-        eprintln!("START = {}", self.start.and_utc().timestamp_nanos_opt().unwrap());
-        eprintln!("DURATION = {}", self.duration.as_nanos() as i64);
+        // eprintln!("START = {}", self.start.and_utc().timestamp_nanos_opt().unwrap());
+        // eprintln!("DURATION = {}", self.duration.as_nanos() as i64);
         return self.start.and_utc().timestamp_nanos_opt().unwrap() + (self.duration.as_nanos() as i64);
     }
 
