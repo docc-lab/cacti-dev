@@ -182,7 +182,10 @@ impl Settings {
         to_return.all_request_types = match get_setting("application").as_str() {
             "OpenStack" =>  REQUEST_TYPES.clone().into_iter()
                 .map(|rt| RequestType::OSP(rt)).collect(),
-            "Jaeger" => reader_from_settings(&to_return).all_operations(),
+            "Jaeger" => {
+                println!("Calling all_operations() - settings.rs:187");
+                reader_from_settings(&to_return).all_operations()
+            },
             _ => Vec::new()
             // _ => panic!("Unknown application type"),
         };
@@ -278,7 +281,10 @@ impl Settings {
         to_return.all_request_types = match get_setting("application").as_str() {
             "OpenStack" =>  REQUEST_TYPES.clone().into_iter()
                 .map(|rt| RequestType::OSP(rt)).collect(),
-            "Jaeger" => reader_from_settings(&to_return).all_operations(),
+            "Jaeger" => {
+                println!("Calling all_operations() - settings.rs:286");
+                reader_from_settings(&to_return).all_operations()
+            },
             _ => Vec::new()
             // _ => panic!("Unknown application type"),
         };

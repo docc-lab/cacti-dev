@@ -259,6 +259,7 @@ impl Reader for JaegerReader {
         if self.fetch_all {
             let mut to_return = Vec::new();
 
+            println!("Calling all_operations() - jaeger.rs:263");
             for service in self.all_operations() {
                 to_return.append(&mut self.get_span_traces(service.to_string(), None, self.cycle_lookback))
             }
@@ -300,7 +301,7 @@ impl Reader for JaegerReader {
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
 
-            for trace in self.get_span_traces(service, None, 60*60*1000000) {
+            for trace in self.get_span_traces(service, None, 60000000) {
                 for (_, span) in trace.spans {
                     if span.parent.is_empty() {
                         to_set_types.insert(
