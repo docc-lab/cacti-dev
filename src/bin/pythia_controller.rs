@@ -21,12 +21,12 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
 use futures::Stream;
-use itertools::max;
+use itertools::{Itertools, max};
 use petgraph::csr::EdgeIndex;
 use petgraph::data::DataMap;
 use petgraph::visit::IntoEdges;
 use pythia_common::{OSPRequestType, RequestType};
-use stats::{mean, variance};
+use stats::{mean, median, variance};
 
 use threadpool::ThreadPool;
 
@@ -43,6 +43,9 @@ use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
 use pythia::spantrace::SpanTrace;
 use pythia::trace::{DAGEdge, Event, IDType, Trace, TraceNode, TracepointID};
+
+// // use keccak_hash::keccak256;
+// use sha3;
 
 // These are static because search strategy expects static references.
 lazy_static! {
@@ -388,7 +391,8 @@ fn main() {
 
         let pt_crits = pt_traces
             .iter().map(|ppt| {
-            let mut cp = CriticalPath::from_trace(ppt).unwrap();
+            // let mut cp = CriticalPath::from_trace(ppt).unwrap();
+            let mut cp = CriticalPath::from_cp_trace(ppt);
             cp.request_type = ppt.request_type.clone();
             cp.start_node = ppt.start_node;
             cp.end_node = ppt.end_node;
@@ -408,7 +412,115 @@ fn main() {
         // println!();
         // println!();
 
-        for cp in pt_crits {
+        /*~
+         * Edge grouping code:
+         * Extracts all edges from all problem-trace critical paths and puts them into groups
+         * Gathers summary stats for each edge group, as well as PCC with
+        ~*/
+
+        // Contains identifying information about a particular edge (by ID)
+        #[derive(Clone, Debug)]
+        struct EdgeGroup {
+            pub ts: String,
+            pub te: String,
+            pub mean: u64,
+            pub var: u64,
+            pub latencies: Vec<(IDType, u64, u64)>
+        }
+        
+        impl EdgeGroup {
+            pub fn new(edge: &DAGEdge, ts: &Event, te: &Event, parent_lat: u64) -> EdgeGroup {
+                return EdgeGroup{
+                    ts: ts.tracepoint_id.to_string(),
+                    te: te.tracepoint_id.to_string(),
+                    mean: edge.duration.as_nanos() as u64,
+                    var: 0,
+                    latencies: vec![(ts.trace_id.clone(), edge.duration.as_nanos() as u64, parent_lat)],
+                }
+            }
+
+            pub fn add_edge(&mut self, edge: &DAGEdge, trace_id: &IDType, trace_lat: u64) {
+                self.latencies.push((trace_id.clone(), edge.duration.as_nanos() as u64, trace_lat));
+            }
+
+            pub fn compute_stats(&mut self) {
+                let latencies_iter = self.latencies.clone().into_iter()
+                    .map(|e| e.1).collect::<Vec<u64>>()
+                    .into_iter();
+                
+                self.var = variance(latencies_iter.clone()) as u64;
+                self.mean = mean(latencies_iter) as u64;
+            }
+            
+            pub fn get_median(&self) -> u64 {
+                median(
+                    self.latencies.clone().into_iter()
+                        .map(|e| e.1).collect::<Vec<u64>>()
+                        .into_iter()
+                ).unwrap() as u64
+            }
+            
+            pub fn slow_med_diff(&self) -> u64 {
+                let mut lats_sorted= self.latencies.clone().into_iter()
+                    .map(|e| e.1).collect::<Vec<u64>>();
+                
+                lats_sorted.sort_by(|a, b| b.partial_cmp(a).unwrap());
+                
+                lats_sorted[0] - self.get_median()
+            }
+        }
+
+        let mut edge_groups: HashMap<String, EdgeGroup> = HashMap::new();
+        let mut eg_keys = HashSet::new();
+        for cp in &pt_crits {
+            for ei in cp.g.g.edge_indices() {
+                let edge = cp.g.g.edge_weight(ei).unwrap();
+                let (epi_s, epi_e) = cp.g.g.edge_endpoints(ei).unwrap();
+                let t_start = cp.g.g.node_weight(epi_s).unwrap();
+                let t_end = cp.g.g.node_weight(epi_e).unwrap();
+
+                let key = t_start.tracepoint_id.to_string() + "::" + t_end.tracepoint_id.to_string().as_str();
+                eg_keys.insert(key.clone());
+                match edge_groups.get_mut(key.as_str()) {
+                    Some(eg) => {
+                        eg.add_edge(edge, &t_start.trace_id, cp.duration.as_nanos() as u64);
+                    }
+                    None => {
+                        edge_groups.insert(
+                            key,
+                            EdgeGroup::new(edge, t_start, t_end, cp.duration.as_nanos() as u64)
+                        );
+                    }
+                }
+            }
+        }
+        
+        for (_, e) in edge_groups.iter_mut() {
+            e.compute_stats();
+        }
+
+        let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        for k in &eg_keys {
+            eg_var_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+        }
+        eg_var_sorted.sort_by(
+            |a, b| b.1.var.partial_cmp(&a.1.var).unwrap()
+        );
+
+        let mut eg_diff_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        for k in &eg_keys {
+            eg_diff_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+        }
+        eg_diff_sorted.sort_by(
+            |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
+        );
+
+        /*~ End edge grouping code ~*/
+
+        let hhe_parts = eg_var_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
+
+        for cp in &pt_crits {
             match top_problem_edges.get(cp.hash()) {
                 Some ((tns, tne)) => {
                     let (ts, te, edge) = cp.get_by_tracepoints(
@@ -427,6 +539,7 @@ fn main() {
                         println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
                         tns.tracepoint_id, tne.tracepoint_id));
                         println!();
+                        println!("{:?}", o.0.as_str());
                         println!(
                             "{:?}",
                             non_problem_traces.get(o.0.as_str()).unwrap()

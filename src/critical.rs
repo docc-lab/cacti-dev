@@ -99,6 +99,29 @@ impl CriticalPath {
         path.calculate_hash();
         Ok(path)
     }
+    
+    pub fn from_cp_trace(dag: &Trace) -> CriticalPath {
+        let mut path = CriticalPath {
+            duration: Duration::new(0, 0),
+            g: dag.clone(),
+            start_node: dag.start_node,
+            end_node: dag.end_node,
+            is_hypothetical: false,
+            hash: "".to_string(),
+            request_type: dag.request_type.clone(),
+            request_id: dag.base_id.clone()
+        };
+
+        path.duration = (path.g.g[path.end_node].timestamp - path.g.g[path.start_node].timestamp)
+            .to_std()
+            .unwrap();
+
+        path.g.request_type = dag.request_type.clone();
+
+        path.calculate_hash();
+        
+        path
+    }
 
     pub fn count_possible_paths(dag: &Trace) -> u64 {
         let mut count = 0;

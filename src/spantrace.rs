@@ -26,6 +26,12 @@ use crate::{IDType, Trace};
 use crate::trace::{DAGEdge, EdgeType, Event, EventType, TracepointID};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Feature {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Span {
     pub span_id: String,
     pub parent: String,
@@ -202,6 +208,21 @@ impl Span {
             }
         );
     }
+    
+    pub fn get_features(&self) -> Vec<Feature> {
+        let mut to_return = Vec::new();
+        
+        to_return.push(Feature{
+            name: "service".to_string(),
+            value: self.service.clone(),
+        });
+        to_return.push(Feature{
+            name: "endpoint".to_string(),
+            value: self.operation.clone(),
+        });
+        
+        to_return
+    }
 }
 
 // pub struct SpanTrace {
@@ -309,6 +330,12 @@ impl SpanTrace {
             cur_id = cur_parent;
         }
         return to_return;
+    }
+    
+    fn backtrace_features(&self, from: String) -> Vec<Feature> {
+        self.get_backtrace(from).into_iter()
+            .map(|s| s.get_features()).collect::<Vec<Vec<Feature>>>()
+            .into_iter().flatten().collect()
     }
 }
 
