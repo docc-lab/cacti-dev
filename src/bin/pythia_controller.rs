@@ -412,6 +412,8 @@ fn main() {
         // println!();
         // println!();
 
+        println!("PHASE 2.1");
+
         /*~
          * Edge grouping code:
          * Extracts all edges from all problem-trace critical paths and puts them into groups
@@ -427,7 +429,7 @@ fn main() {
             pub var: u64,
             pub latencies: Vec<(IDType, u64, u64)>
         }
-        
+
         impl EdgeGroup {
             pub fn new(edge: &DAGEdge, ts: &Event, te: &Event, parent_lat: u64) -> EdgeGroup {
                 return EdgeGroup{
@@ -469,6 +471,8 @@ fn main() {
                 lats_sorted[0] - self.get_median()
             }
         }
+
+        println!("PHASE 2.2");
 
         let mut edge_groups: HashMap<String, EdgeGroup> = HashMap::new();
         let mut eg_keys = HashSet::new();
