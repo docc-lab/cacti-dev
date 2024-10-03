@@ -386,7 +386,7 @@ fn main() {
             non_problem_traces.insert(tr.req_id.clone(), tr);
         }
 
-        let pt_traces = problem_traces.iter().map(
+        let pt_traces = problem_type_traces.iter().map(
             |st| st.to_critical_path()).collect::<Vec<Trace>>();
 
         let pt_crits = pt_traces
@@ -399,6 +399,8 @@ fn main() {
             cp
         })
             .collect::<Vec<CriticalPath>>();
+
+        println!("pt_crits.len() = {}", pt_crits.len());
 
         // println!();
         // println!();
