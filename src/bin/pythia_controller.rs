@@ -378,7 +378,7 @@ fn main() {
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
             ).unwrap());
-            
+
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
@@ -565,7 +565,7 @@ fn main() {
             }
         }
         
-        
+        println!("PHASE 2.3");
     } else {
         // Initialize search strategies and group management
         let now = Instant::now();
