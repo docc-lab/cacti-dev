@@ -373,6 +373,12 @@ fn main() {
             // println!();
             // println!("INSERTING TRACE: [[{:?}]]", tr.clone());
             // println!();
+
+            println!("TRACE TYPE = {}", RequestType::from_str(
+                tr.endpoint_type.as_str(),
+                SETTINGS.application.as_str()
+            ).unwrap());
+            
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
