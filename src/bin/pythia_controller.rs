@@ -507,6 +507,8 @@ fn main() {
             }
         }
         
+        println!("# of edge groups: {}", eg_keys.len());
+        
         for (_, e) in edge_groups.iter_mut() {
             e.compute_stats();
         }
