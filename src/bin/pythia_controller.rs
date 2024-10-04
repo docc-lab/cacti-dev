@@ -552,7 +552,7 @@ fn main() {
         }
 
         for k in &eg_keys {
-            if edge_groups.get(k.as_str()).unwrap().latencies.len() == 0 {
+            if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 1 {
                 edge_groups.remove(k.as_str());
             }
         }
