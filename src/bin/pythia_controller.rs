@@ -570,7 +570,10 @@ fn main() {
             eg_pcc_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
         }
         eg_pcc_sorted.sort_by(
-            |a, b| b.1.pcc.partial_cmp(&a.1.pcc).unwrap()
+            |a, b| { 
+                println!("{} : {}", b.1.pcc, &a.1.pcc);
+                b.1.pcc.partial_cmp(&a.1.pcc).unwrap() 
+            }
         );
 
         let mut eg_diff_sorted: Vec<(String, EdgeGroup)> = Vec::new();
