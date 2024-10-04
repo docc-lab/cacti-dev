@@ -614,6 +614,7 @@ fn main() {
         );
 
         println!("HHE Metric (PCC) = {}", eg_pcc_sorted[0].1.pcc);
+        println!("HHE Winner Len (PCC) = {}", eg_pcc_sorted[0].1.latencies.len());
         let hhe_parts_pcc = eg_pcc_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
         println!();
