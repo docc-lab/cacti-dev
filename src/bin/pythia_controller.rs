@@ -26,7 +26,7 @@ use petgraph::csr::EdgeIndex;
 use petgraph::data::DataMap;
 use petgraph::visit::IntoEdges;
 use pythia_common::{OSPRequestType, RequestType};
-use stats::{mean, median, variance};
+use stats::{mean, median, stddev, variance};
 
 use threadpool::ThreadPool;
 
@@ -443,31 +443,65 @@ fn main() {
             pub te: String,
             pub mean: u64,
             pub var: u64,
+            pub pcc: f64,
             pub latencies: Vec<(IDType, u64, u64)>
         }
 
         impl EdgeGroup {
             pub fn new(edge: &DAGEdge, ts: &Event, te: &Event, parent_lat: u64) -> EdgeGroup {
-                return EdgeGroup{
+                let mut to_return = EdgeGroup{
                     ts: ts.tracepoint_id.to_string(),
                     te: te.tracepoint_id.to_string(),
-                    mean: edge.duration.as_nanos() as u64,
+                    mean: 0,
                     var: 0,
-                    latencies: vec![(ts.trace_id.clone(), edge.duration.as_nanos() as u64, parent_lat)],
+                    pcc: 0,
+                    latencies: vec![],
+                };
+
+                // TODO: fix this hacky stuff soon
+                if (edge.duration.as_nanos() as u64) < 10000000000000000000 {
+                    to_return.latencies.push(
+                        (ts.trace_id.clone(), edge.duration.as_nanos() as u64, parent_lat));
+                    // to_return.mean = edge.duration.as_nanos() as u64;
                 }
+
+                // return EdgeGroup{
+                //     ts: ts.tracepoint_id.to_string(),
+                //     te: te.tracepoint_id.to_string(),
+                //     mean: edge.duration.as_nanos() as u64,
+                //     var: 0,
+                //     pcc: 0,
+                //     latencies: vec![(ts.trace_id.clone(), edge.duration.as_nanos() as u64, parent_lat)],
+                // }
+                return to_return;
             }
 
             pub fn add_edge(&mut self, edge: &DAGEdge, trace_id: &IDType, trace_lat: u64) {
-                self.latencies.push((trace_id.clone(), edge.duration.as_nanos() as u64, trace_lat));
+                // TODO: fix this hacky stuff soon
+                if (edge.duration.as_nanos() as u64) < 10000000000000000000 {
+                    self.latencies.push(
+                        (trace_id.clone(), edge.duration.as_nanos() as u64, trace_lat));
+                }
             }
 
             pub fn compute_stats(&mut self) {
                 let latencies_iter = self.latencies.clone().into_iter()
                     .map(|e| e.1).collect::<Vec<u64>>()
                     .into_iter();
+                let resp_times_iter = self.latencies.clone().into_iter()
+                    .map(|e| e.2).collect::<Vec<u64>>()
+                    .into_iter();
                 
                 self.var = variance(latencies_iter.clone()) as u64;
-                self.mean = mean(latencies_iter) as u64;
+                self.mean = mean(latencies_iter.clone()) as u64;
+                let rt_mean = mean(resp_times_iter.clone()) as u64;
+
+                let mut pcc_num = 0u128;
+                for (_, ed, rt) in &self.latencies {
+                    pcc_num += (*ed as u128 - self.mean as u128)*(*rt as u128 - rt_mean as u128);
+                }
+
+                self.pcc = (pcc_num as f64)/(stddev(latencies_iter.clone())*stddev(resp_times_iter.clone())).sqrt();
             }
             
             pub fn get_median(&self) -> u64 {
@@ -523,12 +557,20 @@ fn main() {
             e.compute_stats();
         }
 
-        let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        // let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        // for k in &eg_keys {
+        //     eg_var_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+        // }
+        // eg_var_sorted.sort_by(
+        //     |a, b| b.1.var.partial_cmp(&a.1.var).unwrap()
+        // );
+
+        let mut eg_pcc_sorted: Vec<(String, EdgeGroup)> = Vec::new();
         for k in &eg_keys {
-            eg_var_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+            eg_pcc_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
         }
-        eg_var_sorted.sort_by(
-            |a, b| b.1.var.partial_cmp(&a.1.var).unwrap()
+        eg_pcc_sorted.sort_by(
+            |a, b| b.1.pcc.partial_cmp(&a.1.pcc).unwrap()
         );
 
         let mut eg_diff_sorted: Vec<(String, EdgeGroup)> = Vec::new();
@@ -539,7 +581,12 @@ fn main() {
             |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
         );
 
-
+        println!("HHE Metric (Var) = {}", eg_pcc_sorted[0].1.var);
+        let hhe_parts_pcc = eg_pcc_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+        println!();
+        println!();
+        println!("HHE (Var) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
 
         /*~ End edge grouping code ~*/
 
@@ -552,7 +599,7 @@ fn main() {
             hhe_index += 1;
         }
 
-        println!("HHE Metric = {}", eg_diff_sorted[hhe_index].1.slow_med_diff());
+        println!("HHE Metric (Diff) = {}", eg_diff_sorted[hhe_index].1.slow_med_diff());
         // println!("HHE Metric = {}", eg_diff_sorted[1].1.slow_med_diff());
         // println!("HHE Metric = {}", eg_diff_sorted[2].1.slow_med_diff());
         // let mut hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
@@ -572,11 +619,11 @@ fn main() {
         // println!();
         // println!();
 
-        let mut hhe_parts = eg_diff_sorted[hhe_index].0.split("::").collect::<Vec<&str>>();
+        let hhe_parts = eg_diff_sorted[hhe_index].0.split("::").collect::<Vec<&str>>();
         let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
         println!();
         println!();
-        println!("HHE = ({}, {})", hhe_start, hhe_end);
+        println!("HHE (Diff) = ({}, {})", hhe_start, hhe_end);
 
         for cp in &pt_crits {
             match top_problem_edges.get(cp.hash()) {
