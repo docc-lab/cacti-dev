@@ -443,6 +443,7 @@ fn main() {
             pub te: String,
             pub mean: u64,
             pub var: u64,
+            pub cov: f64,
             pub pcc: f64,
             pub latencies: Vec<(IDType, u64, u64)>
         }
@@ -454,6 +455,7 @@ fn main() {
                     te: te.tracepoint_id.to_string(),
                     mean: 0,
                     var: 0,
+                    cov: 0.0,
                     pcc: 0.0,
                     latencies: vec![],
                 };
@@ -501,6 +503,7 @@ fn main() {
                     pcc_num += (*ed as i128 - self.mean as i128)*(*rt as i128 - rt_mean as i128);
                 }
 
+                self.cov = (pcc_num as f64)/((self.latencies.len() as f64));
 
                 self.pcc = (pcc_num as f64)/
                     ((self.latencies.len() as f64)*
