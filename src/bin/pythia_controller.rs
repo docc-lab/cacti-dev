@@ -560,7 +560,8 @@ fn main() {
 
         for k in &eg_keys {
             // if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 1 {
-            if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 3 {
+            // if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 3 {
+            if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 10 {
                 edge_groups.remove(k.as_str());
             }
         }
