@@ -501,7 +501,7 @@ fn main() {
                     pcc_num += (*ed as i128 - self.mean as i128)*(*rt as i128 - rt_mean as i128);
                 }
 
-                
+
                 self.pcc = (pcc_num as f64)/
                     ((self.latencies.len() as f64)*
                         (stddev(latencies_iter.clone())*
@@ -556,7 +556,8 @@ fn main() {
         }
 
         for k in &eg_keys {
-            if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 1 {
+            // if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 1 {
+            if edge_groups.get(k.as_str()).unwrap().latencies.len() <= 3 {
                 edge_groups.remove(k.as_str());
             }
         }
