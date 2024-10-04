@@ -25,7 +25,7 @@ use uuid::Uuid;
 use crate::{IDType, Trace};
 use crate::trace::{DAGEdge, EdgeType, Event, EventType, TracepointID};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Feature {
     pub name: String,
     pub value: String,
@@ -316,7 +316,7 @@ impl SpanTrace {
         return to_ret_trace;
     }
 
-    fn get_backtrace(&self, from: String) -> Vec<Span> {
+    pub fn get_backtrace(&self, from: String) -> Vec<Span> {
         let mut to_return = Vec::new();
         let mut cur_id = from;
         loop {
@@ -332,7 +332,7 @@ impl SpanTrace {
         return to_return;
     }
     
-    fn backtrace_features(&self, from: String) -> Vec<Feature> {
+    pub fn backtrace_features(&self, from: String) -> Vec<Feature> {
         self.get_backtrace(from).into_iter()
             .map(|s| s.get_features()).collect::<Vec<Vec<Feature>>>()
             .into_iter().flatten().collect()

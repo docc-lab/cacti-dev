@@ -41,7 +41,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
-use pythia::spantrace::SpanTrace;
+use pythia::spantrace::{Feature, Span, SpanTrace};
 use pythia::trace::{DAGEdge, Event, IDType, Trace, TraceNode, TracepointID};
 
 // // use keccak_hash::keccak256;
@@ -693,13 +693,18 @@ fn main() {
         println!();
         println!("HHE (Diff) = ({}, {})", hhe_start, hhe_end);
 
+        let mut all_overlaps: HashMap<String, Vec<(String, String)>> = HashMap::new();
+        let mut all_hhe_crits: Vec<CriticalPath> = Vec::new();
+
         for cp in &pt_crits {
             let cp_edge = cp.get_by_tracepoints(
                 TracepointID::from_str(hhe_start.as_str()), TracepointID::from_str(hhe_end.as_str())
             );
-            
+
             match cp_edge {
                 Some(cpe) => {
+                    all_hhe_crits.push(cp.clone());
+
                     let (ts, te, edge) = cpe;
 
                     let overlaps = reader.get_candidate_events(
@@ -710,39 +715,95 @@ fn main() {
 
                     println!("Num Overlaps = {}", overlaps.len());
 
-                    println!("OVERLAPPING EDGES:");
+                    // println!("OVERLAPPING EDGES:");
                     for o in overlaps {
-                        println!();
-                        println!();
-                        println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
-                            ts.tracepoint_id, te.tracepoint_id));
-                        println!();
-                        println!("{:?}", o.0.as_str());
-                        println!(
-                            "{:?}",
-                            non_problem_traces.get(o.0.as_str()).unwrap()
-                                .spans.get(o.1.as_str()).unwrap()
-                        );
-                        println!();
-                        println!();
+                        // println!();
+                        // println!();
+                        // println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
+                        //     ts.tracepoint_id, te.tracepoint_id));
+                        // println!();
+                        // println!("{:?}", o.0.as_str());
+                        // println!(
+                        //     "{:?}",
+                        //     non_problem_traces.get(o.0.as_str()).unwrap()
+                        //         .spans.get(o.1.as_str()).unwrap()
+                        // );
+                        // println!();
+                        // println!();
+                        match all_overlaps.get_mut(cp.hash()) {
+                            Some(v) => {
+                                v.push(o.clone());
+                            }
+                            None => {
+                                all_overlaps.insert(cp.hash().to_string(), vec![o.clone()]);
+                            }
+                        }
                     }
                 }
                 None => continue
             }
         }
 
+        all_hhe_crits.sort_by(|a, b| {
+            a.duration.partial_cmp(&b.duration).unwrap()
+        });
+
+        let victim_crits: Vec<CriticalPath> = all_hhe_crits
+            .drain((((all_hhe_crits.len() as f64)*0.9) as usize)..).collect();
+        let survivor_crits: Vec<CriticalPath> = all_hhe_crits.drain(..).collect();
+
+        let victim_hashes = victim_crits.into_iter()
+            .map(|cp| cp.hash().to_string()).collect::<Vec<String>>();
+        let survivor_hashes = survivor_crits.into_iter()
+            .map(|cp| cp.hash().to_string()).collect::<Vec<String>>();
+
+        let mut backtraces: HashMap<String, Vec<Vec<Span>>> = HashMap::new();
+        for (k, v) in all_overlaps {
+            for o in v {
+                let overlapping_trace = non_problem_traces
+                    .get(o.0.as_str()).unwrap();
+                
+                match backtraces.get_mut(o.0.as_str()) {
+                    Some(v) => {
+                        v.push(overlapping_trace.get_backtrace(o.1))
+                    }
+                    None => {
+                        backtraces.insert(k.clone(), vec![overlapping_trace.get_backtrace(o.1)]);
+                    }
+                }
+            }
+        }
+        
+        let mut backtrace_features = HashSet::new();
+        for (_, v) in backtraces.into_iter() {
+            for backtrace in v {
+                for span in backtrace {
+                    let features = span.get_features();
+                    for feature in features {
+                        backtrace_features.insert(feature);
+                    }
+                }
+            }
+        }
+
+        println!();
+        println!();
+        println!("# Backtrace Features = {}", backtrace_features.len());
+        println!();
+        println!();
+
         // for cp in &pt_crits {
         //     match top_problem_edges.get(cp.hash()) {
         //         Some ((tns, tne)) => {
         //             let (ts, te, edge) = cp.get_by_tracepoints(
         //                 tns.tracepoint_id, tne.tracepoint_id);
-        // 
+        //
         //             let overlaps = reader.get_candidate_events(
         //                 ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
         //                 te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
         //                 edge.host.unwrap()
         //             );
-        // 
+        //
         //             println!("OVERLAPPING EDGES:");
         //             for o in overlaps {
         //                 println!();
