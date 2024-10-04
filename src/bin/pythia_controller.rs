@@ -552,6 +552,14 @@ fn main() {
         println!();
         println!();
         println!("HHE = ({}, {})", hhe_start, hhe_end);
+
+        let hhe_parts_2 = eg_diff_sorted[1].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_2, hhe_end_2) = (hhe_parts_2[0].to_string(), hhe_parts_2[1].to_string());
+        println!("HHE = ({}, {})", hhe_start_2, hhe_end_2);
+
+        let hhe_parts_3 = eg_diff_sorted[2].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_3, hhe_end_3) = (hhe_parts_3[0].to_string(), hhe_parts_3[1].to_string());
+        println!("HHE = ({}, {})", hhe_start_3, hhe_end_3);
         println!();
         println!();
 
