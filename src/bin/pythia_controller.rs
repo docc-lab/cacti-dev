@@ -601,6 +601,28 @@ fn main() {
             }
         );
 
+        let mut eg_cov_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        for k in &eg_keys {
+            match edge_groups.get(k.as_str()) {
+                Some(eg) => {
+                    eg_cov_sorted.push((k.clone(), eg.clone()));
+                }
+                _ => {}
+            }
+        }
+        eg_cov_sorted.sort_by(
+            |a, b| {
+                if b.1.cov.is_nan() {
+                    println!("NaN Edge Group Len: {}", b.1.latencies.len());
+                }
+                if a.1.cov.is_nan() {
+                    println!("NaN Edge Group Len: {}", a.1.latencies.len());
+                }
+                println!("{} : {}", b.1.cov, &a.1.cov);
+                b.1.cov.partial_cmp(&a.1.cov).unwrap()
+            }
+        );
+
         let mut eg_diff_sorted: Vec<(String, EdgeGroup)> = Vec::new();
         // for k in &eg_keys {
         //     eg_diff_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
@@ -624,6 +646,14 @@ fn main() {
         println!();
         println!();
         println!("HHE (PCC) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
+
+        println!("HHE Metric (Cov) = {}", eg_pcc_sorted[0].1.cov);
+        println!("HHE Winner Len (Cov) = {}", eg_pcc_sorted[0].1.latencies.len());
+        let hhe_parts_pcc = eg_pcc_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+        println!();
+        println!();
+        println!("HHE (Cov) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
 
         /*~ End edge grouping code ~*/
 
