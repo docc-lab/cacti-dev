@@ -454,7 +454,7 @@ fn main() {
                     te: te.tracepoint_id.to_string(),
                     mean: 0,
                     var: 0,
-                    pcc: 0,
+                    pcc: 0.0,
                     latencies: vec![],
                 };
 
