@@ -504,8 +504,8 @@ fn main() {
                 
                 self.pcc = (pcc_num as f64)/
                     ((self.latencies.len() as f64)*
-                        ((stddev(latencies_iter.clone())*
-                            stddev(resp_times_iter.clone())).sqrt()));
+                        (stddev(latencies_iter.clone())*
+                            stddev(resp_times_iter.clone())));
             }
             
             pub fn get_median(&self) -> u64 {
