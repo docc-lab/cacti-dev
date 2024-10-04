@@ -361,7 +361,8 @@ fn main() {
 
         println!();
         println!("Sleep start");
-        sleep(Duration::from_millis(60000));
+        // sleep(Duration::from_millis(60000));
+        sleep(Duration::from_millis(6000));
         println!("Sleep end");
         println!();
         println!();
@@ -543,6 +544,8 @@ fn main() {
         /*~ End edge grouping code ~*/
 
         println!("HHE Metric = {}", eg_diff_sorted[0].1.slow_med_diff());
+        println!("HHE Metric = {}", eg_diff_sorted[1].1.slow_med_diff());
+        println!("HHE Metric = {}", eg_diff_sorted[2].1.slow_med_diff());
         let hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
 
