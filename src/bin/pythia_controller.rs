@@ -609,12 +609,12 @@ fn main() {
             |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
         );
 
-        println!("HHE Metric (Var) = {}", eg_pcc_sorted[0].1.var);
+        println!("HHE Metric (PCC) = {}", eg_pcc_sorted[0].1.pcc);
         let hhe_parts_pcc = eg_pcc_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
         println!();
         println!();
-        println!("HHE (Var) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
+        println!("HHE (PCC) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
 
         /*~ End edge grouping code ~*/
 
