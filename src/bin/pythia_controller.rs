@@ -790,6 +790,10 @@ fn main() {
         println!();
         println!("# Backtrace Features = {}", backtrace_features.len());
         println!();
+        for feature in backtrace_features.into_iter() {
+            println!("FEATURE:\n{:?}", feature);
+        }
+        println!();
         println!();
 
         // for cp in &pt_crits {
