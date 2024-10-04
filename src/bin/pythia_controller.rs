@@ -536,9 +536,11 @@ fn main() {
             |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
         );
 
+
+
         /*~ End edge grouping code ~*/
 
-        let hhe_parts = eg_var_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
 
         println!();
