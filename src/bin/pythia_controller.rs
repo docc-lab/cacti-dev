@@ -496,9 +496,9 @@ fn main() {
                 self.mean = mean(latencies_iter.clone()) as u64;
                 let rt_mean = mean(resp_times_iter.clone()) as u64;
 
-                let mut pcc_num = 0u128;
+                let mut pcc_num = 0i128;
                 for (_, ed, rt) in &self.latencies {
-                    pcc_num += (*ed as u128 - self.mean as u128)*(*rt as u128 - rt_mean as u128);
+                    pcc_num += (*ed as i128 - self.mean as i128)*(*rt as i128 - rt_mean as i128);
                 }
 
                 self.pcc = (pcc_num as f64)/(stddev(latencies_iter.clone())*stddev(resp_times_iter.clone())).sqrt();
