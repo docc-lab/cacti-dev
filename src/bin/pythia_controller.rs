@@ -705,6 +705,23 @@ fn main() {
             );
             
             println!("Num Overlaps = {}", overlaps.len());
+
+            println!("OVERLAPPING EDGES:");
+            for o in overlaps {
+                println!();
+                println!();
+                println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
+                ts.tracepoint_id, te.tracepoint_id));
+                println!();
+                println!("{:?}", o.0.as_str());
+                println!(
+                    "{:?}",
+                    non_problem_traces.get(o.0.as_str()).unwrap()
+                        .spans.get(o.1.as_str()).unwrap()
+                );
+                println!();
+                println!();
+            }
         }
 
         // for cp in &pt_crits {
