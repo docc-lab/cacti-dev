@@ -543,25 +543,40 @@ fn main() {
 
         /*~ End edge grouping code ~*/
 
-        println!("HHE Metric = {}", eg_diff_sorted[0].1.slow_med_diff());
-        println!("HHE Metric = {}", eg_diff_sorted[1].1.slow_med_diff());
-        println!("HHE Metric = {}", eg_diff_sorted[2].1.slow_med_diff());
-        let hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
-        let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
+        let mut hhe_index = 0;
+        loop {
+            if eg_diff_sorted[hhe_index].1.slow_med_diff() < 10000000000000000000 {
+                break;
+            }
 
+            hhe_index += 1;
+        }
+
+        println!("HHE Metric = {}", eg_diff_sorted[hhe_index].1.slow_med_diff());
+        // println!("HHE Metric = {}", eg_diff_sorted[1].1.slow_med_diff());
+        // println!("HHE Metric = {}", eg_diff_sorted[2].1.slow_med_diff());
+        // let mut hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
+        // let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
+        //
+        // println!();
+        // println!();
+        // println!("HHE = ({}, {})", hhe_start, hhe_end);
+        //
+        // let hhe_parts_2 = eg_diff_sorted[1].0.split("::").collect::<Vec<&str>>();
+        // let (hhe_start_2, hhe_end_2) = (hhe_parts_2[0].to_string(), hhe_parts_2[1].to_string());
+        // println!("HHE = ({}, {})", hhe_start_2, hhe_end_2);
+        //
+        // let hhe_parts_3 = eg_diff_sorted[2].0.split("::").collect::<Vec<&str>>();
+        // let (hhe_start_3, hhe_end_3) = (hhe_parts_3[0].to_string(), hhe_parts_3[1].to_string());
+        // println!("HHE = ({}, {})", hhe_start_3, hhe_end_3);
+        // println!();
+        // println!();
+
+        let mut hhe_parts = eg_diff_sorted[hhe_index].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
         println!();
         println!();
         println!("HHE = ({}, {})", hhe_start, hhe_end);
-
-        let hhe_parts_2 = eg_diff_sorted[1].0.split("::").collect::<Vec<&str>>();
-        let (hhe_start_2, hhe_end_2) = (hhe_parts_2[0].to_string(), hhe_parts_2[1].to_string());
-        println!("HHE = ({}, {})", hhe_start_2, hhe_end_2);
-
-        let hhe_parts_3 = eg_diff_sorted[2].0.split("::").collect::<Vec<&str>>();
-        let (hhe_start_3, hhe_end_3) = (hhe_parts_3[0].to_string(), hhe_parts_3[1].to_string());
-        println!("HHE = ({}, {})", hhe_start_3, hhe_end_3);
-        println!();
-        println!();
 
         for cp in &pt_crits {
             match top_problem_edges.get(cp.hash()) {
