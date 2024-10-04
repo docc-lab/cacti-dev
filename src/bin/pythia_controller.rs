@@ -482,6 +482,8 @@ fn main() {
                     .map(|e| e.1).collect::<Vec<u64>>();
                 
                 lats_sorted.sort_by(|a, b| b.partial_cmp(a).unwrap());
+
+                println!("ls0 = {}; sgm = {}", lats_sorted[0], self.get_median());
                 
                 lats_sorted[0] - self.get_median()
             }
