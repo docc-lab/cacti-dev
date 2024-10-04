@@ -694,33 +694,40 @@ fn main() {
         println!("HHE (Diff) = ({}, {})", hhe_start, hhe_end);
 
         for cp in &pt_crits {
-            let (ts, te, edge) = cp.get_by_tracepoints(
+            let cp_edge = cp.get_by_tracepoints(
                 TracepointID::from_str(hhe_start.as_str()), TracepointID::from_str(hhe_end.as_str())
             );
-
-            let overlaps = reader.get_candidate_events(
-                ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
-                te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
-                edge.host.unwrap()
-            );
             
-            println!("Num Overlaps = {}", overlaps.len());
+            match cp_edge {
+                Some(cpe) => {
+                    let (ts, te, edge) = cpe;
 
-            println!("OVERLAPPING EDGES:");
-            for o in overlaps {
-                println!();
-                println!();
-                println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
-                ts.tracepoint_id, te.tracepoint_id));
-                println!();
-                println!("{:?}", o.0.as_str());
-                println!(
-                    "{:?}",
-                    non_problem_traces.get(o.0.as_str()).unwrap()
-                        .spans.get(o.1.as_str()).unwrap()
-                );
-                println!();
-                println!();
+                    let overlaps = reader.get_candidate_events(
+                        ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+                        te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
+                        edge.host.unwrap()
+                    );
+
+                    println!("Num Overlaps = {}", overlaps.len());
+
+                    println!("OVERLAPPING EDGES:");
+                    for o in overlaps {
+                        println!();
+                        println!();
+                        println!("Getting overlaps for: [\n{:?}\n]", cp.get_by_tracepoints(
+                            ts.tracepoint_id, te.tracepoint_id));
+                        println!();
+                        println!("{:?}", o.0.as_str());
+                        println!(
+                            "{:?}",
+                            non_problem_traces.get(o.0.as_str()).unwrap()
+                                .spans.get(o.1.as_str()).unwrap()
+                        );
+                        println!();
+                        println!();
+                    }
+                }
+                None => continue
             }
         }
 

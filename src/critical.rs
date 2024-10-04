@@ -581,13 +581,20 @@ impl CriticalPath {
         }
     }
 
-    pub fn get_by_tracepoints(&self, start: TracepointID, end: TracepointID) -> (Event, Event, DAGEdge) {
+    pub fn get_by_tracepoints(&self, start: TracepointID, end: TracepointID) -> Option<(Event, Event, DAGEdge)> {
         let mut start_nidx = self.start_node;
         loop {
             if self.g.g.node_weight(start_nidx).unwrap().tracepoint_id == start {
                 break;
             }
-            start_nidx = self.next_node(start_nidx).unwrap();
+            match self.next_node(start_nidx) {
+                Some(new_nidx) => {
+                    start_nidx = new_nidx;
+                }
+                None => {
+                    return None;
+                }
+            }
         }
 
         let end_nidx = self.next_node(start_nidx).unwrap();
@@ -595,11 +602,11 @@ impl CriticalPath {
             panic!("Impossible case!");
         }
 
-        (
+        Some((
             self.g.g.node_weight(start_nidx).unwrap().clone(),
             self.g.g.node_weight(end_nidx).unwrap().clone(),
             self.g.g.edges_directed(start_nidx, Outgoing).next().unwrap().weight().clone()
-        )
+        ))
     }
 }
 
