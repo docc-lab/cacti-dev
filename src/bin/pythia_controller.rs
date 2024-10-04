@@ -540,6 +540,7 @@ fn main() {
 
         /*~ End edge grouping code ~*/
 
+        println!("HHE Metric = {}", eg_diff_sorted[0].1.slow_med_diff());
         let hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
 
