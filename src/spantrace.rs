@@ -18,6 +18,7 @@ use std::ptr::null;
 use std::time::Duration;
 
 use chrono::{DateTime, NaiveDateTime};
+use indexmap::Equivalent;
 use pythia_common::jaeger::JaegerRequestType;
 use pythia_common::RequestType;
 use serde::{Deserialize, Serialize};
@@ -222,6 +223,16 @@ impl Span {
         });
         
         to_return
+    }
+    
+    pub fn has_feature(&self, feature: Feature) -> bool {
+        if feature.name == "service".to_string() {
+            feature.value == self.service
+        } else if feature.name == "endpoint".to_string() {
+            feature.value == self.operation
+        } else {
+            false
+        }
     }
 }
 

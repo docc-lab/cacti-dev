@@ -762,7 +762,7 @@ fn main() {
             for o in v {
                 let overlapping_trace = non_problem_traces
                     .get(o.0.as_str()).unwrap();
-                
+
                 match backtraces.get_mut(o.0.as_str()) {
                     Some(v) => {
                         v.push(overlapping_trace.get_backtrace(o.1))
@@ -773,9 +773,9 @@ fn main() {
                 }
             }
         }
-        
+
         let mut backtrace_features = HashSet::new();
-        for (_, v) in backtraces.into_iter() {
+        for (_, v) in backtraces.clone().into_iter() {
             for backtrace in v {
                 for span in backtrace {
                     let features = span.get_features();
@@ -790,9 +790,69 @@ fn main() {
         println!();
         println!("# Backtrace Features = {}", backtrace_features.len());
         println!();
-        for feature in backtrace_features.into_iter() {
+        for feature in backtrace_features.clone().into_iter() {
             println!("FEATURE:\n{:?}", feature);
         }
+        println!();
+        println!();
+
+        let mut feature_occupancy_dists: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
+
+        for feature in &backtrace_features {
+            let mut victim_occupancy_counts = Vec::new();
+            let mut survivor_occupancy_counts = Vec::new();
+
+            for vh in &victim_hashes {
+                let mut occurrences = 0u64;
+                for backtrace in backtraces.get(vh.as_str()).unwrap() {
+                    // let mut to_break = false;
+                    for span in backtrace {
+                        if span.has_feature(feature.clone()) {
+                            occurrences += 1;
+                            break;
+                        }
+                    }
+                }
+                victim_occupancy_counts.push(occurrences);
+            }
+
+            for sh in &survivor_hashes {
+                let mut occurrences = 0u64;
+                for backtrace in backtraces.get(sh.as_str()).unwrap() {
+                    // let mut to_break = false;
+                    for span in backtrace {
+                        if span.has_feature(feature.clone()) {
+                            occurrences += 1;
+                            break;
+                        }
+                    }
+                }
+                survivor_occupancy_counts.push(occurrences);
+            }
+            
+            feature_occupancy_dists.insert(
+                feature.clone(), (victim_occupancy_counts, survivor_occupancy_counts));
+        }
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        for feature in &backtrace_features {
+            println!("Feature:\n{:?}", feature);
+            println!();
+            let dists = feature_occupancy_dists.get(feature).unwrap();
+            println!("Victim Occupancies:\n{:?}", dists.0);
+            println!();
+            println!("Survivor Occupancies:\n{:?}", dists.1);
+            println!();
+            println!();
+            println!();
+        }
+        println!();
+        println!();
+        println!();
         println!();
         println!();
 
