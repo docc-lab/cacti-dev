@@ -551,6 +551,12 @@ fn main() {
             }
         }
 
+        for k in &eg_keys {
+            if edge_groups.get(k.as_str()).unwrap().latencies.len() == 0 {
+                edge_groups.remove(k.as_str());
+            }
+        }
+
         println!("# of edge groups: {}", eg_keys.len());
         
         for (_, e) in edge_groups.iter_mut() {
@@ -567,7 +573,12 @@ fn main() {
 
         let mut eg_pcc_sorted: Vec<(String, EdgeGroup)> = Vec::new();
         for k in &eg_keys {
-            eg_pcc_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+            match edge_groups.get(k.as_str()) {
+                Some(eg) => {
+                    eg_pcc_sorted.push((k.clone(), eg.clone()));
+                }
+                _ => {}
+            }
         }
         eg_pcc_sorted.sort_by(
             |a, b| { 
@@ -577,8 +588,16 @@ fn main() {
         );
 
         let mut eg_diff_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        // for k in &eg_keys {
+        //     eg_diff_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+        // }
         for k in &eg_keys {
-            eg_diff_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+            match edge_groups.get(k.as_str()) {
+                Some(eg) => {
+                    eg_diff_sorted.push((k.clone(), eg.clone()));
+                }
+                _ => {}
+            }
         }
         eg_diff_sorted.sort_by(
             |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
