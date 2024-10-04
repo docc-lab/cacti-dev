@@ -359,6 +359,13 @@ fn main() {
         println!();
         println!();
 
+        println!();
+        println!("Sleep start");
+        sleep(Duration::from_millis(60000));
+        println!("Sleep end");
+        println!();
+        println!();
+
         reader.set_fetch_all();
 
         let off_pl_traces = reader.get_recent_span_traces();
@@ -506,7 +513,7 @@ fn main() {
                 }
             }
         }
-        
+
         println!("# of edge groups: {}", eg_keys.len());
         
         for (_, e) in edge_groups.iter_mut() {
@@ -533,6 +540,12 @@ fn main() {
 
         let hhe_parts = eg_var_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
+
+        println!();
+        println!();
+        println!("HHE = ({}, {})", hhe_start, hhe_end);
+        println!();
+        println!();
 
         for cp in &pt_crits {
             match top_problem_edges.get(cp.hash()) {

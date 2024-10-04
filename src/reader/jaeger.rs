@@ -318,7 +318,7 @@ impl Reader for JaegerReader {
         for service in resp_obj.data {
             // let traces = self.get_span_traces(service, 60*60*1000000);
             println!("Service: {}", service);
-            for trace in self.get_span_traces(service, None, 60000000) {
+            for trace in self.get_span_traces(service, None, 600000000) {
                 for (_, span) in trace.spans {
                     if span.parent.is_empty() {
                         to_set_types.insert(
@@ -433,7 +433,8 @@ impl JaegerReader {
                 Some(s) => format!("&operation={}", form_urlencoded::byte_serialize(
                     s.as_bytes()).collect::<String>().as_str()),
                 None => "".to_string()
-            }, service, cur_time - lookback
+            // }, service, cur_time - lookback
+            }, service, cur_time - 600000000
         );
 
         println!("Query String:");
