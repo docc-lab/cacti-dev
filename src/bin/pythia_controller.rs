@@ -581,9 +581,15 @@ fn main() {
             }
         }
         eg_pcc_sorted.sort_by(
-            |a, b| { 
+            |a, b| {
+                if b.1.pcc.is_nan() {
+                    println!("NaN Edge Group Len: {}", b.1.latencies.len());
+                }
+                if a.1.pcc.is_nan() {
+                    println!("NaN Edge Group Len: {}", a.1.latencies.len());
+                }
                 println!("{} : {}", b.1.pcc, &a.1.pcc);
-                b.1.pcc.partial_cmp(&a.1.pcc).unwrap() 
+                b.1.pcc.partial_cmp(&a.1.pcc).unwrap()
             }
         );
 
