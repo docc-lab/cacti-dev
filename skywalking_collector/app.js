@@ -15,7 +15,7 @@ app.post('/traces', (req, res) => {
     console.log(req.body);
 
     const singleQueryBuilder = (i) => {
-        return `res{i}: queryTrace(traceId: $traceId${i}) { spans { traceId segmentId spanId parentSpanId serviceCode startTime endTime endpointName type peer component isError layer } } `;
+        return `res${i}: queryTrace(traceId: $traceId${i}) { spans { traceId segmentId spanId parentSpanId serviceCode startTime endTime endpointName type peer component isError layer } } `;
     }
 
     const multiQueryHeader = () => {
@@ -76,6 +76,8 @@ app.post('/traces', (req, res) => {
             "Content-Type": "application/json"
         }
     }).then((resp) => {
+        console.log(resp.data);
+        
         const { data } = resp.data;
 
         let toReturn = [];
@@ -84,7 +86,7 @@ app.post('/traces', (req, res) => {
             toReturn.push(JSON.parse(data[key]));
         }
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: toReturn,
             message: '',
