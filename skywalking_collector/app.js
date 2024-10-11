@@ -12,6 +12,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/traces', (req, res) => {
+    console.log(req.body);
+
     const singleQueryBuilder = (i) => {
         return `res{i}: queryTrace(traceId: $traceId${i}) { spans { traceId segmentId spanId parentSpanId serviceCode startTime endTime endpointName type peer component isError layer } } `;
     }
@@ -66,6 +68,10 @@ app.post('/traces', (req, res) => {
     axios.post(`http://localhost:${process.env.SKYWALKING_PORT}/graphql`, {
         query: queryBuilder(),
         variables: variableBuilder(),
+    }, {
+        headers: {
+            "Content-Type": "application/json"
+        }
     }).then((resp) => {
         const { data } = resp.data;
 
