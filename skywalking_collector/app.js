@@ -82,9 +82,28 @@ app.post('/traces', (req, res) => {
 
         let toReturn = [];
 
-        for (let key in data) {
+        for (let result of Object.values(data)) {
             // toReturn.push(JSON.parse(data[key]));
-            toReturn.push(data[key]);
+            let trVal = {}
+            for (let key in result) {
+                if (key === 'spans') {
+                    let trvSpans = [];
+                    for (let span of result['spans']) {
+                        let toPush = {};
+                        for (let attr in span) {
+                            if (attr === 'type') {
+                                toPush['spanType'] = span['type'];
+                            } else {
+                                toPush[attr] = span[attr];
+                            }
+                        }
+                    }
+                    trVal['spans'] = trvSpans;
+                } else {
+                    trVal[key] = result[key];
+                }
+            }
+            toReturn.push(trVal);
         }
 
         res.status(200).json({

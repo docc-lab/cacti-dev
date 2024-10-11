@@ -23,3 +23,19 @@ use crate::spantrace::{Span, SpanCache, SpanTrace};
 use serde::{Serialize, Deserialize};
 use crate::trace::Event;
 use url::form_urlencoded;
+
+struct SWSpan {
+    traceId: String,
+    segmentId: String,
+    spanId: i64,
+    parentSpanId: i64,
+    serviceCode: String,
+    startTime: u64,
+    endTime: u64,
+    endpointName: String,
+    `type`: String,
+    peer: String,
+    component: String,
+    isError: bool,
+    layer: String
+}
