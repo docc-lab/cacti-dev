@@ -77,13 +77,14 @@ app.post('/traces', (req, res) => {
         }
     }).then((resp) => {
         console.log(resp.data);
-        
+
         const { data } = resp.data;
 
         let toReturn = [];
 
         for (let key in data) {
-            toReturn.push(JSON.parse(data[key]));
+            // toReturn.push(JSON.parse(data[key]));
+            toReturn.push(data[key]);
         }
 
         res.status(200).json({
