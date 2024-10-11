@@ -25,3 +25,4 @@ sample_data
 ./.idea
 
 skywalking_collector/package-lock.json
+skywalking_collector/node_modules
