@@ -20,5 +20,8 @@ pythia_common/target/
 pythia_server/target/
 pythia_server/Cargo.lock
 .DS_Store
+sample_data
 
 ./.idea
+
+skywalking_collector/package-lock.json

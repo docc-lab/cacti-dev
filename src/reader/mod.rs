@@ -14,6 +14,7 @@ mod osprofiler;
 mod uber;
 mod zipkin;
 mod jaeger;
+mod skywalking;
 
 use std::error::Error;
 use std::fmt;
