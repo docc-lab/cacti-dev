@@ -97,6 +97,7 @@ app.post('/traces', (req, res) => {
                                 toPush[attr] = span[attr];
                             }
                         }
+                        trvSpans.push(toPush);
                     }
                     trVal['spans'] = trvSpans;
                 } else {
