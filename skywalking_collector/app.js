@@ -15,7 +15,7 @@ app.post('/traces', (req, res) => {
     console.log(req.body);
 
     const singleQueryBuilder = (i) => {
-        return `res${i}: queryTrace(traceId: $traceId${i}) { spans { traceId segmentId spanId parentSpanId serviceCode startTime endTime endpointName type peer component isError layer } } `;
+        return `res${i}: queryTrace(traceId: $traceId${i}) { spans { traceId segmentId spanId parentSpanId serviceCode startTime endTime endpointName type peer component isError layer refs { traceId parentSegmentId parentSpanId type } } } `;
     }
 
     const multiQueryHeader = () => {

@@ -24,6 +24,7 @@ use serde::{Serialize, Deserialize};
 use crate::trace::Event;
 use url::form_urlencoded;
 
+#[derive(Debug, Serialize, Deserialize)]
 struct SWSpan {
     traceId: String,
     segmentId: String,
@@ -33,9 +34,51 @@ struct SWSpan {
     startTime: u64,
     endTime: u64,
     endpointName: String,
-    `type`: String,
+    spanType: String,
     peer: String,
     component: String,
     isError: bool,
     layer: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct SWResult {
+    spans: Vec<SWSpan>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct SWPayload {
+    success: bool,
+    data: Vec<SWResult>,
+    message: String
+}
+
+impl SWSpan {
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct TFTraceItem {
+    key: String,
+    endpointNames: Vec<String>,
+    duration: u64,
+    start: u64,
+    isError: bool,
+    traceIds: Vec<String>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct TFTraceData {
+    traces: Vec<TFTraceItem>,
+    total: u64
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct SWTFInner {
+    traceData: TFTraceData
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct SWTimedFetch {
+    data: SWTFInner
 }
