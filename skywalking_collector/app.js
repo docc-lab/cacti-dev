@@ -93,6 +93,17 @@ app.post('/traces', (req, res) => {
                         for (let attr in span) {
                             if (attr === 'type') {
                                 toPush['spanType'] = span['type'];
+                            } else if (attr === 'refs') {
+                                let refs = []
+                                for (let ref of span['refs']) {
+                                    let newRef = { ...ref };
+                                    if (newRef.hasOwnProperty('type')) {
+                                        newRef['refType'] = newRef['type'];
+                                        delete newRef['type'];
+                                    }
+                                    refs.push(newRef)
+                                }
+                                toPush['refs'] = refs;
                             } else {
                                 toPush[attr] = span[attr];
                             }
