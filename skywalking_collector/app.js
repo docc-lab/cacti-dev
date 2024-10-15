@@ -68,6 +68,11 @@ app.post('/traces', (req, res) => {
     console.log(queryBuilder());
     console.log(variableBuilder());
 
+    console.log(JSON.stringify({
+        query: queryBuilder(),
+        variables: variableBuilder(),
+    }));
+
     axios.post(`http://localhost:${process.env.SKYWALKING_PORT}/graphql`, {
         query: queryBuilder(),
         variables: variableBuilder(),
