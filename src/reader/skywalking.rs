@@ -96,20 +96,28 @@ struct SWBasicSpan {
     traceIds: Vec<String>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct SWBSInner {
-    traces: Vec<SWBasicSpan>,
-    total: u64
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct SWBSOuter {
-    data: SWBSInner
-}
+// #[derive(Debug, Serialize, Deserialize)]
+// struct SWBSInner {
+//     traces: Vec<SWBasicSpan>,
+//     total: u64
+// }
+//
+// #[derive(Debug, Serialize, Deserialize)]
+// struct SWBSOuter {
+//     data: SWBSInner
+// }
+//
+// #[derive(Debug, Serialize, Deserialize)]
+// struct SWBSPayload {
+//     data: SWBSOuter
+// }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct SWBSPayload {
-    data: SWBSOuter
+    success: bool,
+    traces: Vec<SWBasicSpan>,
+    total: u64,
+    message: String,
 }
 
 ////////////////////////////////////////
@@ -233,45 +241,12 @@ impl Reader for SWReader {
                 end_minute: fmt_two_digit(end_time.minute()),
             }).send().unwrap();
 
-        let spans_query_str = resp.text().unwrap();
-        
-        #[derive(Serialize, Deserialize)]
-        struct GraphQLQuery {
-            query: String,
-            variables: String,
-        }
-        
-        let spans_query: GraphQLQuery =
-            serde_json::from_str(spans_query_str.as_str()).unwrap();
-
-        // let spans_query_str = format!(
-        //     "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
-        //     start_time.year(), start_time.month(), start_time.day(),
-        //     fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-        //     end_time.year(), end_time.month(), end_time.day(),
-        //     fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
-        // );
-
-        // client = reqwest::blocking::Client::new();
-
-        resp = client.post("http://localhost:12800/graphql")
-            .json(&spans_query)
-            .send().unwrap();
-
         let mut resp_text = resp.text().unwrap();
-
-        println!();
-        println!();
-        println!("SPAN QUERY STRING:\n{}", spans_query_str.clone());
-        println!();
-        println!("SPAN QUERY RESPONSE TEXT:\n{}", resp_text);
-        println!();
-        println!();
 
         let resp_obj: SWBSPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
-        let trace_ids = resp_obj.data.data.traces.into_iter()
+        let trace_ids = resp_obj.traces.into_iter()
             .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
         #[derive(Serialize)]
@@ -279,17 +254,12 @@ impl Reader for SWReader {
             traceIds: Vec<String>
         }
 
-        // let traces_query_str = serde_json::to_string(&TraceQueryPayload{
-        //     traceIds: trace_ids
-        // }).unwrap();
-
         client = reqwest::blocking::Client::new();
 
         resp = client.post("http://localhost:3000/traces")
             .json(&TraceQueryPayload{
                 traceIds: trace_ids.clone()
             })
-            // .json(traces_query_str)
             .send().unwrap();
 
         resp_text = resp.text().unwrap();
@@ -393,26 +363,42 @@ impl Reader for SWReader {
         let start_time = cur_date - Duration::from_secs(60*60*24);
         let end_time = cur_date + Duration::from_secs(60*60*24);
 
-        let spans_query_str = format!(
-                "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
-                start_time.year(), start_time.month(), start_time.day(),
-                fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-                end_time.year(), end_time.month(), end_time.day(),
-                fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
-            );
+        #[derive(Serialize)]
+        struct SpanQueryFormatReq {
+            start_year: i32,
+            start_month: u32,
+            start_day: u32,
+            start_hour: String,
+            start_minute: String,
+            end_year: i32,
+            end_month: u32,
+            end_day: u32,
+            end_hour: String,
+            end_minute: String,
+        }
 
         let mut client = reqwest::blocking::Client::new();
 
-        let mut resp: reqwest::blocking::Response = client.post("http://localhost:12800/graphql")
-            .body(spans_query_str)
-            .send().unwrap();
+        let mut resp: reqwest::blocking::Response  = client.post("http://localhost:3000/spanquery")
+            .json(&SpanQueryFormatReq{
+                start_year: start_time.year(),
+                start_month: start_time.month(),
+                start_day: start_time.day(),
+                start_hour: fmt_two_digit(start_time.hour()),
+                start_minute: fmt_two_digit(start_time.minute()),
+                end_year: end_time.year(),
+                end_month: end_time.month(),
+                end_day: end_time.day(),
+                end_hour: fmt_two_digit(end_time.hour()),
+                end_minute: fmt_two_digit(end_time.minute()),
+            }).send().unwrap();
 
         let mut resp_text = resp.text().unwrap();
 
         let resp_obj: SWBSPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
-        let trace_ids = resp_obj.data.data.traces.into_iter()
+        let trace_ids = resp_obj.traces.into_iter()
             .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
         #[derive(Serialize)]
@@ -420,14 +406,12 @@ impl Reader for SWReader {
             traceIds: Vec<String>
         }
 
-        let traces_query_str = serde_json::to_string(&TraceQueryPayload{
-            traceIds: trace_ids
-        }).unwrap();
-
         client = reqwest::blocking::Client::new();
 
         resp = client.post("http://localhost:3000/traces")
-            .body(traces_query_str)
+            .json(&TraceQueryPayload{
+                traceIds: trace_ids.clone()
+            })
             .send().unwrap();
 
         resp_text = resp.text().unwrap();
