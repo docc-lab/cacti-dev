@@ -154,7 +154,12 @@ impl Settings {
                 "Zipkin" => ApplicationType::Zipkin,
                 "Jaeger" => ApplicationType::Jaeger,
                 "SkyWalking" => ApplicationType::SkyWalking,
-                _ => panic!("Unknown application type"),
+                _ => panic!(
+                    format!(
+                        "Unknown application type - {}",
+                        get_setting("application").as_str()
+                    )
+                ),
             },
             // xtrace_url: results.get("xtrace_url").unwrap().to_string(),
             xtrace_url: get_setting("xtrace_url"),
@@ -255,7 +260,12 @@ impl Settings {
                 "Zipkin" => ApplicationType::Zipkin,
                 "Jaeger" => ApplicationType::Jaeger,
                 "SkyWalking" => ApplicationType::SkyWalking,
-                _ => panic!("Unknown application type"),
+                _ => panic!(
+                    format!(
+                        "Unknown application type - {}",
+                        get_setting("application").as_str()
+                    )
+                ),
             },
             // xtrace_url: results.get("xtrace_url").unwrap().to_string(),
             xtrace_url: get_setting("xtrace_url"),

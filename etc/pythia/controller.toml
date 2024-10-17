@@ -1,6 +1,6 @@
-#application = "OpenStack" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger
-#application = "Jaeger" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger
-application = "SkyWalking" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger
+#application = "OpenStack" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger, SkyWalking
+#application = "Jaeger" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger, SkyWalking
+application = "SkyWalking" # can be HDFS, OpenStack, Uber, DEATHSTAR, Zipkin, Jaeger, SkyWalking
 search_strategy = "Hierarchical" # can be Flat, Hierarchical, Historic
 
 manifest_file = "/opt/stack/manifest.json"
