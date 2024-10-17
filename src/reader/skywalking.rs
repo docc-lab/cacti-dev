@@ -291,6 +291,8 @@ impl Reader for SWReader {
                 } else {
                     trace_id_parts.push(root_id_parts[i]);
                 }
+                
+                i += 1;
             }
 
             let trace_id = trace_id_parts.iter().join(".");
