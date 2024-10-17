@@ -245,7 +245,7 @@ impl Reader for SWReader {
         // client = reqwest::blocking::Client::new();
 
         // let resp = client.post("http://localhost:12800/graphql")
-        let resp = client.post("http://localhost:3000/spanquery")
+        let mut resp = client.post("http://localhost:3000/spanquery")
             .body(spans_query_str.clone())
             .send().unwrap();
 
