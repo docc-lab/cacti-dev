@@ -35,8 +35,23 @@ app.post('/spanquery', (req, res) => {
     // });
 
     axios.post(`http://localhost:${process.env.SKYWALKING_PORT}/graphql`, {
-        query: `"query queryTraces($condition: TraceQueryCondition) { data: queryBasicTraces(condition: $condition) { traces { key: segmentId endpointNames duration start isError traceIds } total } }"`,
-        variables: `{ "condition": { "queryDuration": { "start": "${start_year}-${start_month}-${start_day} ${start_hour}${start_minute}", "end": "${end_year}-${end_month}-${end_day} ${end_hour}${end_minute}", "step": "DAY"}, "traceState": "ALL", "paging": { "pageNum": 1, "pageSize": 10000, "needTotal": true }, "queryOrder": "BY_DURATION" } }`,
+        query: `query queryTraces($condition: TraceQueryCondition) { data: queryBasicTraces(condition: $condition) { traces { key: segmentId endpointNames duration start isError traceIds } total } }`,
+        variables: {
+            condition: {
+                queryDuration: {
+                    start: `${start_year}-${start_month}-${start_day} ${start_hour}${start_minute}`,
+                    end: ``${end_year}-${end_month}-${end_day} ${end_hour}${end_minute}``,
+                    step: "DAY"
+                },
+                traceState: "ALL",
+                paging: {
+                    pageNum: 1,
+                    pageSize: 10000,
+                    needTotal: true
+                },
+                queryOrder: "BY_DURATION"
+            }
+        },
     }, {
         headers: {
             "Content-Type": "application/json"
