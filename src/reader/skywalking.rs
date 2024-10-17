@@ -191,10 +191,10 @@ impl Reader for SWReader {
     fn get_recent_span_traces(&mut self) -> Vec<SpanTrace> {
         let fmt_two_digit = |i: u32| {
             if i < 10 {
-                format!("0{}", i);
+                return format!("0{}", i);
             }
 
-            format!("{}", i);
+            return format!("{}", i);
         };
 
         // if self.fetch_all {
@@ -206,7 +206,7 @@ impl Reader for SWReader {
                 "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
                 start_time.year(), start_time.month(), start_time.day(),
                 fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-                end_time.year(), end_time.month(), end_time.day()
+                end_time.year(), end_time.month(), end_time.day(),
                 fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
             );
 
@@ -220,45 +220,45 @@ impl Reader for SWReader {
 
             let resp_obj: SWBSPayload =
                 serde_json::from_str(resp_text.as_str()).unwrap();
-            
+
             let trace_ids = resp_obj.data.data.traces.into_iter()
-                .map(|bs| bs.traceIds[0]).collect::<Vec<String>>();
-            
+                .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
+
             #[derive(Serialize)]
             struct TraceQueryPayload {
                 traceIds: Vec<String>
             }
-            
+
             let traces_query_str = serde_json::to_string(&TraceQueryPayload{
                 traceIds: trace_ids
             }).unwrap();
 
             client = reqwest::blocking::Client::new();
-            
+
             resp = client.post("http://localhost:3000/traces")
                 .body(traces_query_str)
                 .send().unwrap();
-            
+
             resp_text = resp.text().unwrap();
-            
+
             let traces_payload: SWPayload =
                 serde_json::from_str(resp_text.as_str()).unwrap();
-            
+
             let traces = traces_payload.data;
-            
+
             let mut to_return = Vec::new();
-            
+
             for trace in traces {
                 let spans = trace.spans.into_iter()
                     .map(|s| s.to_span()).collect::<Vec<Span>>();
-                
+
                 let mut root_span = spans[0].clone();
                 for span in &spans {
                     if span.parent.is_empty() {
                         root_span = span.clone();
                     }
                 }
-                
+
                 let root_id_parts = root_span.span_id.split(".").collect::<Vec<&str>>();
                 let mut trace_id_parts = Vec::new();
                 let mut i = 1;
@@ -269,13 +269,13 @@ impl Reader for SWReader {
                         trace_id_parts.push(root_id_parts[i]);
                     }
                 }
-                
+
                 let trace_id = trace_id_parts.iter().join(".");
 
                 for span in &spans {
                     self.span_cache.add_span(span.clone(), trace_id.clone());
                 }
-                
+
                 to_return.push(
                     SpanTrace::from_span_list(
                         spans, root_span.operation, root_span.span_id,
@@ -283,13 +283,13 @@ impl Reader for SWReader {
                     )
                 );
             }
-            
+
             to_return
         // } else {
         //     let cur_date = chrono::Utc::now();
         //     let start_time = cur_date - Duration::from_secs(60*20);
         //     let end_time = cur_date + Duration::from_secs(60*20);
-        // 
+        //
         //     let services_query_str = format!(
         //         "{{ \"query\": \"query queryServices($duration: Duration!,$keyword: String!) {{ services: getAllServices(duration: $duration, group: $keyword) {{ key: id label: name group }} }}\", \"variables\": {{ \"duration\": {{ \"start\": \"{}-{}-{} {}{}\",\"end\": \"{}-{}-{} {}{}\", \"step\": \"MINUTE\" }}, \"keyword\":\"\" }} }}",
         //         start_time.year(), start_time.month(), start_time.day(),
@@ -297,22 +297,22 @@ impl Reader for SWReader {
         //         end_time.year(), end_time.month(), end_time.day()
         //         fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
         //     );
-        // 
+        //
         //     let client = reqwest::blocking::Client::new();
-        // 
+        //
         //     let resp: reqwest::blocking::Response = client.post("http://localhost:12800/graphql")
         //         .body(services_query_str)
         //         .send().unwrap();
-        // 
+        //
         //     let resp_text = resp.text().unwrap();
-        // 
+        //
         //     let resp_obj: SWServices =
         //         serde_json::from_str(resp_text.as_str()).unwrap();
-        // 
+        //
         //     let service_names = resp_obj.data.services.into_iter().map(
         //         |service| service.label
         //     ).collect::<Vec<String>>();
-        //     
+        //
         //     Vec::new()
         // }
     }
@@ -329,10 +329,10 @@ impl Reader for SWReader {
     fn all_operations(&mut self) -> Vec<RequestType> {
         let fmt_two_digit = |i: u32| {
             if i < 10 {
-                format!("0{}", i);
+                return format!("0{}", i);
             }
 
-            format!("{}", i);
+            return format!("{}", i);
         };
 
         // if self.fetch_all {
@@ -344,7 +344,7 @@ impl Reader for SWReader {
                 "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
                 start_time.year(), start_time.month(), start_time.day(),
                 fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-                end_time.year(), end_time.month(), end_time.day()
+                end_time.year(), end_time.month(), end_time.day(),
                 fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
             );
 
@@ -360,7 +360,7 @@ impl Reader for SWReader {
             serde_json::from_str(resp_text.as_str()).unwrap();
 
         let trace_ids = resp_obj.data.data.traces.into_iter()
-            .map(|bs| bs.traceIds[0]).collect::<Vec<String>>();
+            .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
         #[derive(Serialize)]
         struct TraceQueryPayload {
@@ -383,19 +383,19 @@ impl Reader for SWReader {
             serde_json::from_str(resp_text.as_str()).unwrap();
 
         let traces = traces_payload.data;
-        
+
         let mut rt_set = HashSet::new();
-        
+
         for trace in traces {
             for sw_span in trace.spans {
                 let span = sw_span.to_span();
-                
+
                 if span.parent.is_empty() {
                     rt_set.insert(span.service + ":" + span.operation.as_str());
                 }
             }
         }
-        
+
         rt_set.into_iter().map(|rt_str: String| RequestType::SW(SWRequestType{ rt: rt_str }))
             .collect::<Vec<RequestType>>()
     }
