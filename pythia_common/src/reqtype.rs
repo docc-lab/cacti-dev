@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::PythiaError;
 use crate::osprofiler::OSPRequestType;
 use crate::jaeger::JaegerRequestType;
+use crate::skywalking::SWRequestType;
 
 use std::fmt;
 
@@ -10,6 +11,7 @@ use std::fmt;
 pub enum RequestType {
     OSP(OSPRequestType),
     Jaeger(JaegerRequestType),
+    SW(SWRequestType),
     Unknown,
 }
 
@@ -25,6 +27,9 @@ impl RequestType {
             "Jaeger" => Ok(RequestType::Jaeger(JaegerRequestType {
                 rt: typ.to_string()
             })),
+            "SkyWalking" => Ok(RequestType::SW(SWRequestType {
+                rt: typ.to_string()
+            })),
             _ => Err(("Unknown request type!").to_string())
         }
     }
@@ -33,6 +38,7 @@ impl RequestType {
         match self {
             RequestType::OSP(osprt) => osprt.to_string(),
             RequestType::Jaeger(jrt) => jrt.rt.clone(),
+            RequestType::SW(swrt) => swrt.rt.clone(),
             _ => "".to_string()
         }
     }
@@ -43,6 +49,7 @@ impl fmt::Display for RequestType {
         match self {
             RequestType::OSP(ort) => write!(f, "{:?}", ort),
             RequestType::Jaeger(jrt) => write!(f, "{:?}", jrt),
+            RequestType::SW(swrt) => write!(f, "{:?}", swrt),
             RequestType::Unknown => write!(f, "UnknownRT"),
         }
     }

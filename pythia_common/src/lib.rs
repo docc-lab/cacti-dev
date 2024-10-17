@@ -15,6 +15,7 @@ extern crate lazy_static;
 mod budget;
 pub mod osprofiler;
 pub mod jaeger;
+pub mod skywalking;
 pub mod reqtype;
 
 use std::error::Error;

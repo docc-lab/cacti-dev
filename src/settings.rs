@@ -41,6 +41,7 @@ pub struct Settings {
     pub redis_url: String,
     pub zipkin_url: String,
     pub jaeger_url: String,
+    pub skywalking_url: String,
     pub xtrace_url: String,
     pub uber_trace_dir: PathBuf,
     pub DEATHSTAR_trace_dir: PathBuf,
@@ -73,6 +74,7 @@ pub enum ApplicationType {
     DEATHSTAR,
     Zipkin,
     Jaeger,
+    SkyWalking,
 }
 
 impl ApplicationType {
@@ -84,6 +86,7 @@ impl ApplicationType {
             ApplicationType::Uber => "Uber",
             ApplicationType::Jaeger => "Jaeger",
             ApplicationType::Zipkin => "Zipkin",
+            ApplicationType::SkyWalking => "SkyWalking",
         }
     }
 }
@@ -140,6 +143,7 @@ impl Settings {
             redis_url: get_setting("redis_url"),
             zipkin_url: get_setting("zipkin_url"),
             jaeger_url: get_setting("jaeger_url"),
+            skywalking_url: get_setting("skywalking_url"),
             uber_trace_dir: PathBuf::from(get_setting("uber_trace_dir")),
             DEATHSTAR_trace_dir: PathBuf::from(get_setting("DEATHSTAR_trace_dir")),
             application: match get_setting("application").as_str() {
@@ -149,6 +153,7 @@ impl Settings {
                 "DEATHSTAR" => ApplicationType::DEATHSTAR,
                 "Zipkin" => ApplicationType::Zipkin,
                 "Jaeger" => ApplicationType::Jaeger,
+                "SkyWalking" => ApplicationType::SkyWalking,
                 _ => panic!("Unknown application type"),
             },
             // xtrace_url: results.get("xtrace_url").unwrap().to_string(),
@@ -239,6 +244,7 @@ impl Settings {
             redis_url: get_setting("redis_url"),
             zipkin_url: get_setting("zipkin_url"),
             jaeger_url: get_setting("jaeger_url"),
+            skywalking_url: get_setting("skywalking_url"),
             uber_trace_dir: PathBuf::from(get_setting("uber_trace_dir")),
             DEATHSTAR_trace_dir: PathBuf::from(get_setting("DEATHSTAR_trace_dir")),
             application: match get_setting("application").as_str() {
@@ -248,6 +254,7 @@ impl Settings {
                 "DEATHSTAR" => ApplicationType::DEATHSTAR,
                 "Zipkin" => ApplicationType::Zipkin,
                 "Jaeger" => ApplicationType::Jaeger,
+                "SkyWalking" => ApplicationType::SkyWalking,
                 _ => panic!("Unknown application type"),
             },
             // xtrace_url: results.get("xtrace_url").unwrap().to_string(),
