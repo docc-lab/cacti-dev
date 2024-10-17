@@ -198,93 +198,99 @@ impl Reader for SWReader {
         };
 
         // if self.fetch_all {
-            let cur_date = chrono::Utc::now();
-            let start_time = cur_date - Duration::from_secs(60*20);
-            let end_time = cur_date + Duration::from_secs(60*20);
+        let cur_date = chrono::Utc::now();
+        let start_time = cur_date - Duration::from_secs(60*20);
+        let end_time = cur_date + Duration::from_secs(60*20);
 
-            let spans_query_str = format!(
-                "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
-                start_time.year(), start_time.month(), start_time.day(),
-                fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-                end_time.year(), end_time.month(), end_time.day(),
-                fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
+        let spans_query_str = format!(
+            "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
+            start_time.year(), start_time.month(), start_time.day(),
+            fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
+            end_time.year(), end_time.month(), end_time.day(),
+            fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
+        );
+
+        let mut client = reqwest::blocking::Client::new();
+
+        let mut resp: reqwest::blocking::Response = client.post("http://localhost:12800/graphql")
+            .body(spans_query_str)
+            .send().unwrap();
+
+        let mut resp_text = resp.text().unwrap();
+
+        println!();
+        println!();
+        println!("SPAN QUERY RESPONSE TEXT:\n{}", resp_text);
+        println!();
+        println!();
+
+        let resp_obj: SWBSPayload =
+            serde_json::from_str(resp_text.as_str()).unwrap();
+
+        let trace_ids = resp_obj.data.data.traces.into_iter()
+            .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
+
+        #[derive(Serialize)]
+        struct TraceQueryPayload {
+            traceIds: Vec<String>
+        }
+
+        let traces_query_str = serde_json::to_string(&TraceQueryPayload{
+            traceIds: trace_ids
+        }).unwrap();
+
+        client = reqwest::blocking::Client::new();
+
+        resp = client.post("http://localhost:3000/traces")
+            .body(traces_query_str)
+            .send().unwrap();
+
+        resp_text = resp.text().unwrap();
+
+        let traces_payload: SWPayload =
+            serde_json::from_str(resp_text.as_str()).unwrap();
+
+        let traces = traces_payload.data;
+
+        let mut to_return = Vec::new();
+
+        for trace in traces {
+            let spans = trace.spans.into_iter()
+                .map(|s| s.to_span()).collect::<Vec<Span>>();
+
+            let mut root_span = spans[0].clone();
+            for span in &spans {
+                if span.parent.is_empty() {
+                    root_span = span.clone();
+                }
+            }
+
+            let root_id_parts = root_span.span_id.split(".").collect::<Vec<&str>>();
+            let mut trace_id_parts = Vec::new();
+            let mut i = 1;
+            loop {
+                if i == root_id_parts.len() {
+                    break;
+                } else {
+                    trace_id_parts.push(root_id_parts[i]);
+                }
+            }
+
+            let trace_id = trace_id_parts.iter().join(".");
+
+            for span in &spans {
+                self.span_cache.add_span(span.clone(), trace_id.clone());
+            }
+
+            to_return.push(
+                SpanTrace::from_span_list(
+                    spans, root_span.operation, root_span.span_id,
+                    trace_id
+                )
             );
+        }
 
-            let mut client = reqwest::blocking::Client::new();
-
-            let mut resp: reqwest::blocking::Response = client.post("http://localhost:12800/graphql")
-                .body(spans_query_str)
-                .send().unwrap();
-
-            let mut resp_text = resp.text().unwrap();
-
-            let resp_obj: SWBSPayload =
-                serde_json::from_str(resp_text.as_str()).unwrap();
-
-            let trace_ids = resp_obj.data.data.traces.into_iter()
-                .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
-
-            #[derive(Serialize)]
-            struct TraceQueryPayload {
-                traceIds: Vec<String>
-            }
-
-            let traces_query_str = serde_json::to_string(&TraceQueryPayload{
-                traceIds: trace_ids
-            }).unwrap();
-
-            client = reqwest::blocking::Client::new();
-
-            resp = client.post("http://localhost:3000/traces")
-                .body(traces_query_str)
-                .send().unwrap();
-
-            resp_text = resp.text().unwrap();
-
-            let traces_payload: SWPayload =
-                serde_json::from_str(resp_text.as_str()).unwrap();
-
-            let traces = traces_payload.data;
-
-            let mut to_return = Vec::new();
-
-            for trace in traces {
-                let spans = trace.spans.into_iter()
-                    .map(|s| s.to_span()).collect::<Vec<Span>>();
-
-                let mut root_span = spans[0].clone();
-                for span in &spans {
-                    if span.parent.is_empty() {
-                        root_span = span.clone();
-                    }
-                }
-
-                let root_id_parts = root_span.span_id.split(".").collect::<Vec<&str>>();
-                let mut trace_id_parts = Vec::new();
-                let mut i = 1;
-                loop {
-                    if i == root_id_parts.len() {
-                        break;
-                    } else {
-                        trace_id_parts.push(root_id_parts[i]);
-                    }
-                }
-
-                let trace_id = trace_id_parts.iter().join(".");
-
-                for span in &spans {
-                    self.span_cache.add_span(span.clone(), trace_id.clone());
-                }
-
-                to_return.push(
-                    SpanTrace::from_span_list(
-                        spans, root_span.operation, root_span.span_id,
-                        trace_id
-                    )
-                );
-            }
-
-            to_return
+        to_return
         // } else {
         //     let cur_date = chrono::Utc::now();
         //     let start_time = cur_date - Duration::from_secs(60*20);
