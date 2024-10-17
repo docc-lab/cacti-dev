@@ -15,6 +15,7 @@ use chrono::{DateTime, NaiveDate, NaiveDateTime, Datelike, Timelike};
 use futures::Sink;
 use hyper::http;
 use itertools::Itertools;
+use petgraph::Graph;
 use pythia_common::skywalking::SWRequestType;
 use pythia_common::RequestType;
 use crate::reader::Reader;
@@ -233,6 +234,15 @@ impl Reader for SWReader {
             }).send().unwrap();
 
         let spans_query_str = resp.text().unwrap();
+        
+        #[derive(Serialize, Deserialize)]
+        struct GraphQLQuery {
+            query: String,
+            variables: String,
+        }
+        
+        let spans_query: GraphQLQuery =
+            serde_json::from_str(spans_query_str.as_str()).unwrap();
 
         // let spans_query_str = format!(
         //     "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
@@ -245,7 +255,7 @@ impl Reader for SWReader {
         // client = reqwest::blocking::Client::new();
 
         resp = client.post("http://localhost:12800/graphql")
-            .json(&spans_query_str)
+            .json(&spans_query)
             .send().unwrap();
 
         let mut resp_text = resp.text().unwrap();
