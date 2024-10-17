@@ -312,9 +312,17 @@ fn main() {
         println!();
         println!();
         let problem_traces = reader.get_recent_span_traces();
+        
+        println!();
+        println!("PT Len = {}", problem_traces.len());
+        println!();
 
         let problem_path_traces = problem_traces.iter().map(
             |st| st.to_critical_path()).collect::<Vec<Trace>>();
+
+        println!();
+        println!("PPT Len = {}", problem_traces.len());
+        println!();
 
         let problem_paths = problem_path_traces
             .iter().map(|ppt| {
