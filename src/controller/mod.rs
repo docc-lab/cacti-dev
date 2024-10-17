@@ -51,6 +51,7 @@ pub fn controller_from_settings(settings: &Settings) -> Box<dyn Controller> {
         ApplicationType::Uber => panic!("Can't control uber"),
         ApplicationType::Zipkin => Box::new(OTelController::from_settings(settings)),
         ApplicationType::Jaeger => Box::new(OTelController::from_settings(settings)),
+        ApplicationType::SkyWalking => Box::new(OTelController::from_settings(settings)),
     }
 }
 
