@@ -218,35 +218,33 @@ impl Reader for SWReader {
 
         let mut client = reqwest::blocking::Client::new();
 
-        // let mut resp: reqwest::blocking::Response  = client.post("http://localhost:3000/spanquery")
-        //     .body(serde_json::to_string(&SpanQueryFormatReq{
-        //         start_year: start_time.year(),
-        //         start_month: start_time.month(),
-        //         start_day: start_time.day(),
-        //         start_hour: fmt_two_digit(start_time.hour()),
-        //         start_minute: fmt_two_digit(start_time.minute()),
-        //         end_year: end_time.year(),
-        //         end_month: end_time.month(),
-        //         end_day: end_time.day(),
-        //         end_hour: fmt_two_digit(end_time.hour()),
-        //         end_minute: fmt_two_digit(end_time.minute()),
-        //     }).unwrap()).send().unwrap();
-        // 
-        // let spans_query_str = resp.text().unwrap();
+        let mut resp: reqwest::blocking::Response  = client.post("http://localhost:3000/spanquery")
+            .body(serde_json::to_string(&SpanQueryFormatReq{
+                start_year: start_time.year(),
+                start_month: start_time.month(),
+                start_day: start_time.day(),
+                start_hour: fmt_two_digit(start_time.hour()),
+                start_minute: fmt_two_digit(start_time.minute()),
+                end_year: end_time.year(),
+                end_month: end_time.month(),
+                end_day: end_time.day(),
+                end_hour: fmt_two_digit(end_time.hour()),
+                end_minute: fmt_two_digit(end_time.minute()),
+            }).unwrap()).send().unwrap();
+        
+        let spans_query_str = resp.text().unwrap();
 
-        let spans_query_str = format!(
-            "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
-            start_time.year(), start_time.month(), start_time.day(),
-            fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
-            end_time.year(), end_time.month(), end_time.day(),
-            fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
-        );
+        // let spans_query_str = format!(
+        //     "{{ \"query\": \"query queryTraces($condition: TraceQueryCondition) {{ data: queryBasicTraces(condition: $condition) {{ traces {{ key: segmentId endpointNames duration start isError traceIds }} total }} }}\", \"variables\": {{ \"condition\": {{ \"queryDuration\": {{ \"start\": \"{}-{}-{} {}{}\", \"end\": \"{}-{}-{} {}{}\", \"step\": \"DAY\"}}, \"traceState\": \"ALL\", \"paging\": {{ \"pageNum\": 1, \"pageSize\": 15, \"needTotal\": true }}, \"queryOrder\": \"BY_DURATION\" }} }} }}",
+        //     start_time.year(), start_time.month(), start_time.day(),
+        //     fmt_two_digit(start_time.hour()), fmt_two_digit(start_time.minute()),
+        //     end_time.year(), end_time.month(), end_time.day(),
+        //     fmt_two_digit(end_time.hour()), fmt_two_digit(end_time.minute()),
+        // );
 
         // client = reqwest::blocking::Client::new();
 
-        // let resp = client.post("http://localhost:12800/graphql")
-        let mut resp = client.post("http://localhost:3000/spanquery")
-            // .body(spans_query_str.clone())
+        resp = client.post("http://localhost:12800/graphql")
             .json(&spans_query_str)
             .send().unwrap();
 
