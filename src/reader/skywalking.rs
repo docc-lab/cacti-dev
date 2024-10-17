@@ -217,6 +217,19 @@ impl Reader for SWReader {
         }
 
         let mut client = reqwest::blocking::Client::new();
+        
+        println!("{}", serde_json::to_string(&SpanQueryFormatReq{
+                start_year: start_time.year(),
+                start_month: start_time.month(),
+                start_day: start_time.day(),
+                start_hour: fmt_two_digit(start_time.hour()),
+                start_minute: fmt_two_digit(start_time.minute()),
+                end_year: end_time.year(),
+                end_month: end_time.month(),
+                end_day: end_time.day(),
+                end_hour: fmt_two_digit(end_time.hour()),
+                end_minute: fmt_two_digit(end_time.minute()),
+            }).unwrap());
 
         let mut resp: reqwest::blocking::Response  = client.post("http://localhost:3000/spanquery")
             .body(serde_json::to_string(&SpanQueryFormatReq{
