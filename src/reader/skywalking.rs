@@ -246,7 +246,8 @@ impl Reader for SWReader {
 
         // let resp = client.post("http://localhost:12800/graphql")
         let mut resp = client.post("http://localhost:3000/spanquery")
-            .body(spans_query_str.clone())
+            // .body(spans_query_str.clone())
+            .json(&spans_query_str)
             .send().unwrap();
 
         let mut resp_text = resp.text().unwrap();
@@ -270,14 +271,17 @@ impl Reader for SWReader {
             traceIds: Vec<String>
         }
 
-        let traces_query_str = serde_json::to_string(&TraceQueryPayload{
-            traceIds: trace_ids
-        }).unwrap();
+        // let traces_query_str = serde_json::to_string(&TraceQueryPayload{
+        //     traceIds: trace_ids
+        // }).unwrap();
 
         client = reqwest::blocking::Client::new();
 
         resp = client.post("http://localhost:3000/traces")
-            .body(traces_query_str)
+            .json(&TraceQueryPayload{
+                traceIds: trace_ids.clone()
+            })
+            // .json(traces_query_str)
             .send().unwrap();
 
         resp_text = resp.text().unwrap();
