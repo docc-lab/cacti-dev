@@ -25,6 +25,8 @@ app.post('/spanquery', (req, res) => {
         end_minute,
     } = req.body;
 
+    console.log(req.body);
+
     res.status(200).send(`{ "query": "query queryTraces($condition: TraceQueryCondition) { data: queryBasicTraces(condition: $condition) { traces { key: segmentId endpointNames duration start isError traceIds } total } }", "variables": { "condition": { "queryDuration": { "start": "${start_year}-${start_month}-${start_day} ${start_hour}${start_minute}", "end": "${end_year}-${end_month}-${end_day} ${end_hour}${end_minute}", "step": "DAY"}, "traceState": "ALL", "paging": { "pageNum": 1, "pageSize": 10000, "needTotal": true }, "queryOrder": "BY_DURATION" } } }`);
 });
 
