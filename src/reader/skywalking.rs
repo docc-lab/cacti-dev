@@ -127,7 +127,7 @@ struct TFTraceItem {
     key: String,
     endpointNames: Vec<String>,
     duration: u64,
-    start: u64,
+    start: String,
     isError: bool,
     traceIds: Vec<String>
 }
