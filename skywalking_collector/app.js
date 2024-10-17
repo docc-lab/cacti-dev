@@ -40,7 +40,7 @@ app.post('/spanquery', (req, res) => {
             condition: {
                 queryDuration: {
                     start: `${start_year}-${start_month}-${start_day} ${start_hour}${start_minute}`,
-                    end: ``${end_year}-${end_month}-${end_day} ${end_hour}${end_minute}``,
+                    end: `${end_year}-${end_month}-${end_day} ${end_hour}${end_minute}`,
                     step: "DAY"
                 },
                 traceState: "ALL",
