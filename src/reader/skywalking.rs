@@ -213,14 +213,14 @@ impl Reader for SWReader {
         let mut client = reqwest::blocking::Client::new();
 
         let mut resp: reqwest::blocking::Response = client.post("http://localhost:12800/graphql")
-            .body(spans_query_str)
+            .body(spans_query_str.clone())
             .send().unwrap();
 
         let mut resp_text = resp.text().unwrap();
 
         println!();
         println!();
-        println!("SPAN QUERY STRING:\n{}", spans_query_str);
+        println!("SPAN QUERY STRING:\n{}", spans_query_str.clone());
         println!();
         println!("SPAN QUERY RESPONSE TEXT:\n{}", resp_text);
         println!();
