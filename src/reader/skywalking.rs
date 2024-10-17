@@ -220,6 +220,8 @@ impl Reader for SWReader {
 
         println!();
         println!();
+        println!("SPAN QUERY STRING:\n{}", spans_query_str);
+        println!();
         println!("SPAN QUERY RESPONSE TEXT:\n{}", resp_text);
         println!();
         println!();
