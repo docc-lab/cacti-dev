@@ -11,6 +11,7 @@ DEATHSTAR_trace_dir = "/Users/merttoslali/Desktop/ec900/denemeHDFS/recons/deaths
 hdfs_control_file = "/local/hdfs/tracing-framework/pythia.txt"
 zipkin_url="http://localhost:16686"
 jaeger_url="http://localhost:16686"
+skywalking_url="http://localhost:12800"
 
 # Split by commas, of the form http://localhost:3030
 #pythia_clients = "http://ctl:3030,http://cp-1:3030"
