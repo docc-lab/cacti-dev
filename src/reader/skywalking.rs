@@ -300,6 +300,8 @@ impl Reader for SWReader {
             for span in &spans {
                 self.span_cache.add_span(span.clone(), trace_id.clone());
             }
+            
+            println!("skywalking.rs - get_recent_span_traces - root_span.operation = {}", root_span.operation);
 
             to_return.push(
                 SpanTrace::from_span_list(
