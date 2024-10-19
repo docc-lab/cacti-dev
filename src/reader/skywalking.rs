@@ -176,8 +176,9 @@ pub struct SWReader {
     fetch_all: bool,
     for_searchspace: bool,
     cycle_lookback: u128,
-    span_cache: SpanCache
+    span_cache: SpanCache,
     // current_traces: HashMap<String, i64>
+    operations: Vec<String>
 }
 
 impl Reader for SWReader {
@@ -354,6 +355,12 @@ impl Reader for SWReader {
     }
 
     fn all_operations(&mut self) -> Vec<RequestType> {
+        println!();
+        println!();
+        println!("==========\nSKYWALKING READER -- GETTING ALL OPERATIONS\n==========");
+        println!();
+        println!();
+        
         let fmt_two_digit = |i: u32| {
             if i < 10 {
                 return format!("0{}", i);
@@ -437,7 +444,55 @@ impl Reader for SWReader {
             }
         }
 
-        rt_set.into_iter().map(|rt_str: String| RequestType::SW(SWRequestType{ rt: rt_str }))
+        // rt_set.into_iter().map(|rt_str: String| RequestType::SW(SWRequestType{ rt: rt_str }))
+        //     .collect::<Vec<RequestType>>()
+        
+        let mut with_generics = HashSet::new();
+        let mut without_generics = HashSet::new();
+        for rt in rt_set {
+            let num_generics = (rt.split("/{").collect::<Vec<&str>>().len() - 1) as u64;
+            
+            if num_generics > 0 {
+                with_generics.insert(rt);
+            } else {
+                without_generics.insert(rt);
+            }
+        }
+        
+        let mut to_return = with_generics.clone();
+        let mut generic_prefixes = HashSet::new();
+        // for rt in &with_generics {
+        //     generic_prefixes.insert(
+        //         (rt.split("/{").collect::<Vec<&str>>()[0], rt.clone()));
+        // }
+
+        for rt in &with_generics {
+            generic_prefixes.insert(rt.split("/{").collect::<Vec<&str>>()[0],);
+        }
+        
+        for rt in without_generics {
+            let mut contains_generic = false;
+            // let mut generic = "".to_string();
+            for gp in &generic_prefixes {
+                if rt.contains(gp) {
+                    contains_generic = true;
+                    // generic = g.clone();
+                    break;
+                }
+            }
+            // if contains_generic {
+            //     to_return.insert(generic);
+            // } else {
+            //     to_return.insert(rt);
+            // }
+            if !contains_generic {
+                to_return.insert(rt);
+            }
+        }
+        
+        self.operations = to_return.clone().into_iter().collect();
+
+        to_return.into_iter().map(|rt_str: String| RequestType::SW(SWRequestType{ rt: rt_str }))
             .collect::<Vec<RequestType>>()
     }
 
@@ -458,7 +513,8 @@ impl SWReader {
             for_searchspace: false,
             fetch_all: false,
             cycle_lookback: settings.cycle_lookback,
-            span_cache: SpanCache::init_cache()
+            span_cache: SpanCache::init_cache(),
+            operations: Vec::new(),
         }
     }
 }
