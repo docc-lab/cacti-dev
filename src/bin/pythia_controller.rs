@@ -306,59 +306,59 @@ fn main() {
 
         ////////////////////////////////////////
 
-        println!();
-        println!();
-        println!("PHASE 1");
-        println!();
-        println!();
-        let problem_traces = reader.get_recent_span_traces();
-        
-        println!();
-        println!("PT Len = {}", problem_traces.len());
-        println!();
-
-        let problem_path_traces = problem_traces.iter().map(
-            |st| st.to_critical_path()).collect::<Vec<Trace>>();
-
-        println!();
-        println!("PPT Len = {}", problem_traces.len());
-        println!();
-
-        let problem_paths = problem_path_traces
-            .iter().map(|ppt| {
-            let mut cp = CriticalPath::from_trace(ppt).unwrap();
-            cp.request_type = ppt.request_type.clone();
-            cp.start_node = ppt.start_node;
-            cp.end_node = ppt.end_node;
-            cp
-        })
-            .collect::<Vec<CriticalPath>>();
-
-        println!("# problem traces = {}", problem_paths.len());
-
-        // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
-        //     .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
-
-        let mut group_manager = GroupManager::new();
-        group_manager.update(&problem_paths);
-
+        // println!();
+        // println!();
+        // println!("PHASE 1");
+        // println!();
+        // println!();
+        // let problem_traces = reader.get_recent_span_traces();
+        // 
+        // println!();
+        // println!("PT Len = {}", problem_traces.len());
+        // println!();
+        // 
+        // let problem_path_traces = problem_traces.iter().map(
+        //     |st| st.to_critical_path()).collect::<Vec<Trace>>();
+        // 
+        // println!();
+        // println!("PPT Len = {}", problem_traces.len());
+        // println!();
+        // 
+        // let problem_paths = problem_path_traces
+        //     .iter().map(|ppt| {
+        //     let mut cp = CriticalPath::from_trace(ppt).unwrap();
+        //     cp.request_type = ppt.request_type.clone();
+        //     cp.start_node = ppt.start_node;
+        //     cp.end_node = ppt.end_node;
+        //     cp
+        // })
+        //     .collect::<Vec<CriticalPath>>();
+        // 
+        // println!("# problem traces = {}", problem_paths.len());
+        // 
+        // // let groups = Group::from_critical_paths(problem_paths.clone()).into_iter()
+        // //     .filter(|g| g.traces.len() > 1).collect::<Vec<Group>>();
+        // 
+        // let mut group_manager = GroupManager::new();
+        // group_manager.update(&problem_paths);
+        // 
+        // // let problem_groups = group_manager.problem_groups_cv(0.05);
+        // 
+        // // TODO: Make the # of groups selected a configurable parameter
         // let problem_groups = group_manager.problem_groups_cv(0.05);
-
-        // TODO: Make the # of groups selected a configurable parameter
-        let problem_groups = group_manager.problem_groups_cv(0.05);
-        let top_problem_groups = problem_groups[..std::cmp::min(10, problem_groups.len())]
-            .into_iter().map(|&g| g.clone()).collect::<Vec<Group>>();
-
-        let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
-        for g in top_problem_groups {
-            let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
-            let ee_start = g.g
-                .node_weight(ee.0).unwrap().clone();
-            let ee_end = g.g
-                .node_weight(ee.1).unwrap().clone();
-
-            top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
-        }
+        // let top_problem_groups = problem_groups[..std::cmp::min(10, problem_groups.len())]
+        //     .into_iter().map(|&g| g.clone()).collect::<Vec<Group>>();
+        // 
+        // let mut top_problem_edges: HashMap<String, (TraceNode, TraceNode)> = HashMap::new();
+        // for g in top_problem_groups {
+        //     let ee = g.g.edge_endpoints(g.problem_edges()[0]).unwrap();
+        //     let ee_start = g.g
+        //         .node_weight(ee.0).unwrap().clone();
+        //     let ee_end = g.g
+        //         .node_weight(ee.1).unwrap().clone();
+        // 
+        //     top_problem_edges.insert(g.hash().to_string(), (ee_start, ee_end));
+        // }
 
         // sleep(Duration::from_micros(SETTINGS.cycle_lookback as u64));
         println!();
@@ -367,13 +367,13 @@ fn main() {
         println!();
         println!();
 
-        println!();
-        println!("Sleep start");
-        // sleep(Duration::from_millis(60000));
-        sleep(Duration::from_millis(6000));
-        println!("Sleep end");
-        println!();
-        println!();
+        // println!();
+        // println!("Sleep start");
+        // // sleep(Duration::from_millis(60000));
+        // sleep(Duration::from_millis(6000));
+        // println!("Sleep end");
+        // println!();
+        // println!();
 
         reader.set_fetch_all();
 

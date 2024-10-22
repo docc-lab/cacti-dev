@@ -178,7 +178,8 @@ pub struct SWReader {
     cycle_lookback: u128,
     span_cache: SpanCache,
     // current_traces: HashMap<String, i64>
-    operations: Vec<String>
+    operations: Vec<String>,
+    op_prefixes: Vec<(String, String)>
 }
 
 impl Reader for SWReader {
@@ -256,14 +257,14 @@ impl Reader for SWReader {
         }
 
         client = reqwest::blocking::Client::new();
-        
+
         let mut traces: Vec<SWResult> = Vec::new();
 
         loop {
             if trace_ids.len() == 0 {
                 break;
             }
-            
+
             let mut min_range_end = 1000;
             if trace_ids.len() < 1000 {
                 min_range_end = trace_ids.len();
@@ -280,7 +281,7 @@ impl Reader for SWReader {
 
             let mut traces_payload: SWPayload =
                 serde_json::from_str(resp_text.as_str()).unwrap();
-            
+
             traces.append(&mut (traces_payload.data));
         }
 
@@ -288,9 +289,31 @@ impl Reader for SWReader {
 
         let mut to_return = Vec::new();
 
+        let mut generics = HashSet::new();
+        for operation in &self.operations {
+            let yeet = operation.split("/{").collect::<Vec<&str>>()[0].to_string();
+            generics.insert((
+                yeet,
+                operation.clone()
+            ));
+        }
+
         for trace in traces {
-            let spans = trace.spans.into_iter()
+            let mut spans = trace.spans.into_iter()
                 .map(|s| s.to_span()).collect::<Vec<Span>>();
+            
+            spans = spans.into_iter().map(|s| {
+                let mut to_return = s;
+                
+                for (op_p, op) in &self.op_prefixes {
+                    if to_return.operation.contains(op_p.as_str()) {
+                        to_return.operation = op.clone();
+                        break;
+                    }
+                }
+                
+                to_return
+            }).collect::<Vec<Span>>();
 
             let mut root_span = spans[0].clone();
             for span in &spans {
@@ -425,7 +448,7 @@ impl Reader for SWReader {
         let resp_obj: SWBSPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
-        let trace_ids = resp_obj.traces.into_iter()
+        let mut trace_ids = resp_obj.traces.into_iter()
             .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
         #[derive(Serialize)]
@@ -435,13 +458,32 @@ impl Reader for SWReader {
 
         client = reqwest::blocking::Client::new();
 
-        resp = client.post("http://localhost:3000/traces")
-            .json(&TraceQueryPayload{
-                traceIds: trace_ids.clone()
-            })
-            .send().unwrap();
+        let mut traces: Vec<SWResult> = Vec::new();
 
-        resp_text = resp.text().unwrap();
+        loop {
+            if trace_ids.len() == 0 {
+                break;
+            }
+
+            let mut min_range_end = 1000;
+            if trace_ids.len() < 1000 {
+                min_range_end = trace_ids.len();
+            }
+            let cur_trace_ids = trace_ids.drain(..min_range_end).collect::<Vec<String>>();
+
+            resp = client.post("http://localhost:3000/traces")
+                .json(&TraceQueryPayload{
+                    traceIds: cur_trace_ids
+                })
+                .send().unwrap();
+
+            resp_text = resp.text().unwrap();
+
+            let mut traces_payload: SWPayload =
+                serde_json::from_str(resp_text.as_str()).unwrap();
+
+            traces.append(&mut (traces_payload.data));
+        }
 
         let traces_payload: SWPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
@@ -454,9 +496,10 @@ impl Reader for SWReader {
             for sw_span in trace.spans {
                 let span = sw_span.to_span();
 
-                if span.parent.is_empty() {
-                    rt_set.insert(span.service + ":" + span.operation.as_str());
-                }
+                // if span.parent.is_empty() {
+                //     rt_set.insert(span.service + ":" + span.operation.as_str());
+                // }
+                rt_set.insert(span.service + ":" + span.operation.as_str());
             }
         }
 
@@ -507,6 +550,9 @@ impl Reader for SWReader {
         }
         
         self.operations = to_return.clone().into_iter().collect();
+        self.op_prefixes = self.operations.clone().into_iter().map(|op| {
+            (op.split("/{").collect::<Vec<&str>>()[0].to_string(), op)
+        }).collect::<Vec<(String, String)>>();
 
         to_return.into_iter().map(|rt_str: String| RequestType::SW(SWRequestType{ rt: rt_str }))
             .collect::<Vec<RequestType>>()
@@ -523,7 +569,7 @@ impl Reader for SWReader {
 
 impl SWReader {
     pub fn from_settings(settings: &Settings) -> SWReader {
-        return SWReader{
+        let mut to_return = SWReader{
             fetch_url: settings.skywalking_url.clone(),
             problem_type: settings.problem_type.clone(),
             for_searchspace: false,
@@ -531,7 +577,12 @@ impl SWReader {
             cycle_lookback: settings.cycle_lookback,
             span_cache: SpanCache::init_cache(),
             operations: Vec::new(),
-        }
+            op_prefixes: Vec::new(),
+        };
+        
+        _ = to_return.all_operations();
+
+        to_return
     }
 }
 

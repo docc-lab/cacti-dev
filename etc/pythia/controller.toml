@@ -24,7 +24,8 @@ emit_events = "false"
 
 # Expected problematic endpoint/request type
 #problem_type = "ServerCreate"
-problem_type = "nginx-web-server:/wrk2-api/post/compose"
+#problem_type = "nginx-web-server:/wrk2-api/post/compose"
+problem_type = "POST:/api/v1/preserveservice/preserve"
 
 #cycle_lookback = 600000000
 cycle_lookback = 600000000
