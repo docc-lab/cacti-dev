@@ -264,7 +264,11 @@ impl Reader for SWReader {
                 break;
             }
             
-            let cur_trace_ids = trace_ids.drain(..1000).collect::<Vec<String>>();
+            let mut min_range_end = 1000;
+            if trace_ids.len() < 1000 {
+                min_range_end = trace_ids.len();
+            }
+            let cur_trace_ids = trace_ids.drain(..min_range_end).collect::<Vec<String>>();
 
             resp = client.post("http://localhost:3000/traces")
                 .json(&TraceQueryPayload{
