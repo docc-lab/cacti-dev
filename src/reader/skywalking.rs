@@ -247,7 +247,7 @@ impl Reader for SWReader {
         let resp_obj: SWBSPayload =
             serde_json::from_str(resp_text.as_str()).unwrap();
 
-        let trace_ids = resp_obj.traces.into_iter()
+        let mut trace_ids = resp_obj.traces.into_iter()
             .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
         #[derive(Serialize)]
@@ -256,19 +256,31 @@ impl Reader for SWReader {
         }
 
         client = reqwest::blocking::Client::new();
+        
+        let mut traces: Vec<SWResult> = Vec::new();
 
-        resp = client.post("http://localhost:3000/traces")
-            .json(&TraceQueryPayload{
-                traceIds: trace_ids.clone()
-            })
-            .send().unwrap();
+        loop {
+            if trace_ids.len() == 0 {
+                break;
+            }
+            
+            let cur_trace_ids = trace_ids.drain(..1000).collect::<Vec<String>>();
 
-        resp_text = resp.text().unwrap();
+            resp = client.post("http://localhost:3000/traces")
+                .json(&TraceQueryPayload{
+                    traceIds: cur_trace_ids
+                })
+                .send().unwrap();
 
-        let traces_payload: SWPayload =
-            serde_json::from_str(resp_text.as_str()).unwrap();
+            resp_text = resp.text().unwrap();
 
-        let traces = traces_payload.data;
+            let mut traces_payload: SWPayload =
+                serde_json::from_str(resp_text.as_str()).unwrap();
+            
+            traces.append(&mut (traces_payload.data));
+        }
+
+        // let traces = traces_payload.data;
 
         let mut to_return = Vec::new();
 
