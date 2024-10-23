@@ -263,6 +263,15 @@ impl Reader for SWReader {
         let loop_iters = ((trace_ids.len() as f64)/1000.0).ceil() as u64;
         let mut i = 0;
 
+        println!();
+        println!();
+        println!("GENERIC OPERATIONS:");
+        for (op_p, op) in &self.op_prefixes {
+            println!("[ Prefix: {} ] ==== [ Operation: {} ]", op_p, op);
+        }
+        println!();
+        println!();
+
         loop {
             println!("Trace retrieval loop {}/{}", i, loop_iters);
             i += 1;
@@ -303,15 +312,6 @@ impl Reader for SWReader {
         //         operation.clone()
         //     ));
         // }
-
-        println!();
-        println!();
-        println!("GENERIC OPERATIONS:");
-        for (op_p, op) in &self.op_prefixes {
-            println!("[ Prefix: {} ] ==== [ Operation: {} ]", op_p, op);
-        }
-        println!();
-        println!();
 
         for trace in traces {
             let mut spans = trace.spans.into_iter()
