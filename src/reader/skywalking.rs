@@ -304,6 +304,15 @@ impl Reader for SWReader {
         //     ));
         // }
 
+        println!();
+        println!();
+        println!("GENERIC OPERATIONS:");
+        for (op_p, op) in &self.op_prefixes {
+            println!("[ Prefix: {} ] ==== [ Operation: {} ]", op_p, op);
+        }
+        println!();
+        println!();
+
         for trace in traces {
             let mut spans = trace.spans.into_iter()
                 .map(|s| s.to_span()).collect::<Vec<Span>>();
@@ -416,8 +425,10 @@ impl Reader for SWReader {
 
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
-        let start_time = cur_date - Duration::from_secs(60*60*24);
-        let end_time = cur_date + Duration::from_secs(60*60*24);
+        // let start_time = cur_date - Duration::from_secs(60*60*24);
+        let start_time = cur_date - Duration::from_secs(60*20);
+        // let end_time = cur_date + Duration::from_secs(60*60*24);
+        let end_time = cur_date + Duration::from_secs(60*20);
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
