@@ -260,7 +260,13 @@ impl Reader for SWReader {
 
         let mut traces: Vec<SWResult> = Vec::new();
 
+        let loop_iters = ((trace_ids.len() as f64)/1000.0).ceil() as u64;
+        let mut i = 0;
+
         loop {
+            println!("Trace retrieval loop {}/{}", i, loop_iters);
+            i += 1;
+            
             if trace_ids.len() == 0 {
                 break;
             }
@@ -289,14 +295,14 @@ impl Reader for SWReader {
 
         let mut to_return = Vec::new();
 
-        let mut generics = HashSet::new();
-        for operation in &self.operations {
-            let yeet = operation.split("/{").collect::<Vec<&str>>()[0].to_string();
-            generics.insert((
-                yeet,
-                operation.clone()
-            ));
-        }
+        // let mut generics = HashSet::new();
+        // for operation in &self.operations {
+        //     let yeet = operation.split("/{").collect::<Vec<&str>>()[0].to_string();
+        //     generics.insert((
+        //         yeet,
+        //         operation.clone()
+        //     ));
+        // }
 
         for trace in traces {
             let mut spans = trace.spans.into_iter()
@@ -459,8 +465,14 @@ impl Reader for SWReader {
         client = reqwest::blocking::Client::new();
 
         let mut traces: Vec<SWResult> = Vec::new();
+        
+        let loop_iters = ((trace_ids.len() as f64)/1000.0).ceil() as u64;
+        let mut i = 0;
 
         loop {
+            println!("Trace retrieval loop {}/{}", i, loop_iters);
+            i += 1;
+            
             if trace_ids.len() == 0 {
                 break;
             }
