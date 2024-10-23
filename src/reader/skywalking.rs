@@ -498,6 +498,7 @@ impl Reader for SWReader {
                 .json(&TraceQueryPayload{
                     traceIds: cur_trace_ids
                 })
+                .timeout(Duration::from_secs(120))
                 .send().unwrap();
 
             resp_text = resp.text().unwrap();

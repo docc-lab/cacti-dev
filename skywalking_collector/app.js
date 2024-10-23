@@ -55,7 +55,8 @@ app.post('/spanquery', (req, res) => {
     }, {
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        timeout: 120000,
     }).then((resp) => {
         console.log(resp.data);
 
@@ -145,7 +146,8 @@ app.post('/traces', (req, res) => {
     }, {
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        timeout: 120000,
     }).then((resp) => {
         console.log(resp.data);
 
