@@ -77,7 +77,16 @@ impl SWSpan {
             },
             service: self.serviceCode.clone(),
             host: self.serviceCode.clone(),
-            operation: self.endpointName.clone(),
+            operation: (|s: String| {
+                let mut parts = s.split("/").collect::<Vec<&str>>();
+                
+                parts = parts.into_iter().filter(|p| {
+                    let p_string = p.to_string();
+                    !(p_string.contains("-") || p_string.contains(" ") || p_string.contains("{"))
+                }).collect::<Vec<&str>>();
+                
+                parts.join("/")
+            })(self.endpointName.clone()),
             start: DateTime::from_timestamp_millis(self.startTime as i64).unwrap().naive_utc(),
             duration: Duration::from_micros(self.endTime - self.startTime)
         }
@@ -166,6 +175,27 @@ struct SWSInner {
 struct SWServices {
     data: SWSInner
 }
+
+////////////////////////////////////////
+
+// struct QueryPartNode {
+//     part: String,
+//     count: u64,
+//     children: Vec<String>,
+// }
+// 
+// impl QueryPartNode {
+//     pub fn 
+// }
+// 
+// struct QueryPartTree {
+//     base_part: QueryPartNode,
+//     query_parts: HashMap<String, QueryPartNode>,
+// }
+// 
+// impl QueryPartTree {
+//     
+// }
 
 ////////////////////////////////////////
 
@@ -314,21 +344,23 @@ impl Reader for SWReader {
         // }
 
         for trace in traces {
-            let mut spans = trace.spans.into_iter()
+            // let mut spans = trace.spans.into_iter()
+            //     .map(|s| s.to_span()).collect::<Vec<Span>>();
+            let spans = trace.spans.into_iter()
                 .map(|s| s.to_span()).collect::<Vec<Span>>();
             
-            spans = spans.into_iter().map(|s| {
-                let mut to_return = s;
-                
-                for (op_p, op) in &self.op_prefixes {
-                    if to_return.operation.contains(op_p.as_str()) {
-                        to_return.operation = op.clone();
-                        break;
-                    }
-                }
-                
-                to_return
-            }).collect::<Vec<Span>>();
+            // spans = spans.into_iter().map(|s| {
+            //     let mut to_return = s;
+            //     
+            //     for (op_p, op) in &self.op_prefixes {
+            //         if to_return.operation.contains(op_p.as_str()) {
+            //             to_return.operation = op.clone();
+            //             break;
+            //         }
+            //     }
+            //     
+            //     to_return
+            // }).collect::<Vec<Span>>();
 
             let mut root_span = spans[0].clone();
             for span in &spans {
@@ -604,7 +636,7 @@ impl SWReader {
             op_prefixes: Vec::new(),
         };
         
-        _ = to_return.all_operations();
+        // _ = to_return.all_operations();
 
         to_return
     }
