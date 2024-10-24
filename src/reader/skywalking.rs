@@ -82,7 +82,12 @@ impl SWSpan {
                 
                 parts = parts.into_iter().filter(|p| {
                     let p_string = p.to_string();
-                    !(p_string.contains("-") || p_string.contains(" ") || p_string.contains("{"))
+                    !(
+                        p_string.contains("-") ||
+                            p_string.contains(" ") ||
+                            p_string.contains("{") ||
+                            p_string.contains(".")
+                    )
                 }).collect::<Vec<&str>>();
                 
                 parts.join("/")
