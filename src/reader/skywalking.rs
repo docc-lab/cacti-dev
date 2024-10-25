@@ -382,7 +382,7 @@ impl Reader for SWReader {
                 if i == root_id_parts.len() {
                     break;
                 } else {
-                    trace_id_parts.push(root_id_parts[i]);
+                    trace_id_parts.push(root_id_parts[i-1]);
                 }
                 
                 i += 1;
