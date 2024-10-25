@@ -601,9 +601,11 @@ fn main() {
             |a, b| {
                 if b.1.pcc.is_nan() {
                     println!("NaN Edge Group Len: {}", b.1.latencies.len());
+                    println!("NaN Edge Group Edge: ({})", b.0.clone());
                 }
                 if a.1.pcc.is_nan() {
                     println!("NaN Edge Group Len: {}", a.1.latencies.len());
+                    println!("NaN Edge Group Edge: ({})", a.0.clone());
                 }
                 println!("{} : {}", b.1.pcc, &a.1.pcc);
                 b.1.pcc.partial_cmp(&a.1.pcc).unwrap()
