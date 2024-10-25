@@ -398,7 +398,9 @@ impl Reader for SWReader {
 
             to_return.push(
                 SpanTrace::from_span_list(
-                    spans, root_span.operation, root_span.span_id,
+                    spans,
+                    format!("{}:{}", root_span.service, root_span.operation),
+                    root_span.span_id,
                     trace_id
                 )
             );
