@@ -66,6 +66,7 @@ struct SWPayload {
 
 impl SWSpan {
     pub fn to_span(&self) -> Span {
+        println!("SPAN ID = {}.{}", self.segmentId, self.spanId);
         return Span{
             span_id: format!("{}.{}", self.segmentId, self.spanId),
             parent: match self.refs.len() {
