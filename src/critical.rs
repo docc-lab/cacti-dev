@@ -582,6 +582,8 @@ impl CriticalPath {
     }
 
     pub fn get_by_tracepoints(&self, start: TracepointID, end: TracepointID) -> Option<(Event, Event, DAGEdge)> {
+        println!("get_by_tracepoints - {{\nstart: {},\nend: {}\n}}", start, end);
+        
         let mut start_nidx = self.start_node;
         loop {
             if self.g.g.node_weight(start_nidx).unwrap().tracepoint_id == start {
