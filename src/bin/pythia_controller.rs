@@ -577,8 +577,17 @@ fn main() {
 
         println!("# of edge groups: {}", eg_keys.len());
         
-        for (_, e) in edge_groups.iter_mut() {
+        let mut eg_keys = Vec::new();
+        
+        for (k, e) in edge_groups.iter_mut() {
+            eg_keys.push(k.clone());
             e.compute_stats();
+        }
+        
+        for k in eg_keys {
+            if edge_groups[k.as_str()].mean == 0 {
+                edge_groups.remove(k.as_str());
+            }
         }
 
         // let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
