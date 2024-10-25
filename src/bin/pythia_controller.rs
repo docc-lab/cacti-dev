@@ -584,7 +584,7 @@ fn main() {
             e.compute_stats();
         }
         
-        for k in eg_keys {
+        for k in eg_keys.into_iter() {
             if edge_groups[k.as_str()].mean == 0 {
                 edge_groups.remove(k.as_str());
             }
