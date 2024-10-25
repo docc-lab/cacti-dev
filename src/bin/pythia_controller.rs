@@ -676,13 +676,35 @@ fn main() {
         println!();
         println!("HHE (PCC) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
 
-        println!("HHE Metric (Cov) = {}", eg_pcc_sorted[0].1.cov);
-        println!("HHE Winner Len (Cov) = {}", eg_pcc_sorted[0].1.latencies.len());
-        let hhe_parts_pcc = eg_pcc_sorted[0].0.split("::").collect::<Vec<&str>>();
-        let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+        let mut latencies_sorted = eg_pcc_sorted[0].1.latencies.clone();
+        latencies_sorted.sort_by(|a, b| {
+            a.1.partial_cmp(&b.1).unwrap()
+        });
+        println!("{:?}", latencies_sorted);
+
         println!();
         println!();
-        println!("HHE (Cov) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
+        println!();
+        println!();
+
+        println!("HHE Metric (Cov) = {}", eg_cov_sorted[0].1.cov);
+        println!("HHE Winner Len (Cov) = {}", eg_cov_sorted[0].1.latencies.len());
+        let hhe_parts_cov = eg_cov_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_cov, hhe_end_cov) = (hhe_parts_cov[0].to_string(), hhe_parts_cov[1].to_string());
+        println!();
+        println!();
+        println!("HHE (Cov) = ({}, {})", hhe_start_cov, hhe_end_cov);
+
+        latencies_sorted = eg_cov_sorted[0].1.latencies.clone();
+        latencies_sorted.sort_by(|a, b| {
+            a.1.partial_cmp(&b.1).unwrap()
+        });
+        println!("{:?}", latencies_sorted);
+
+        println!();
+        println!();
+        println!();
+        println!();
 
         /*~ End edge grouping code ~*/
 
@@ -696,6 +718,7 @@ fn main() {
         }
 
         println!("HHE Metric (Diff) = {}", eg_diff_sorted[hhe_index].1.slow_med_diff());
+        println!("HHE Winner Len (Diff) = {}", eg_diff_sorted[0].1.latencies.len());
         // println!("HHE Metric = {}", eg_diff_sorted[1].1.slow_med_diff());
         // println!("HHE Metric = {}", eg_diff_sorted[2].1.slow_med_diff());
         // let mut hhe_parts = eg_diff_sorted[0].0.split("::").collect::<Vec<&str>>();
@@ -715,18 +738,28 @@ fn main() {
         // println!();
         // println!();
 
-        let hhe_parts = eg_diff_sorted[hhe_index].0.split("::").collect::<Vec<&str>>();
-        let (hhe_start, hhe_end) = (hhe_parts[0].to_string(), hhe_parts[1].to_string());
+        let hhe_parts_diff = eg_diff_sorted[hhe_index].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_diff, hhe_end_diff) = (hhe_parts_diff[0].to_string(), hhe_parts_diff[1].to_string());
         println!();
         println!();
-        println!("HHE (Diff) = ({}, {})", hhe_start, hhe_end);
+        println!("HHE (Diff) = ({}, {})", hhe_start_diff, hhe_end_diff);
+
+        latencies_sorted = eg_diff_sorted[hhe_index].1.latencies.clone();
+        latencies_sorted.sort_by(|a, b| {
+            a.1.partial_cmp(&b.1).unwrap()
+        });
+        println!("{:?}", latencies_sorted);
+        println!();
+        println!();
+        println!();
+        println!();
 
         let mut all_overlaps: HashMap<String, Vec<(String, String)>> = HashMap::new();
         let mut all_hhe_crits: Vec<CriticalPath> = Vec::new();
 
         for cp in &pt_crits {
             let cp_edge = cp.get_by_tracepoints(
-                TracepointID::from_str(hhe_start.as_str()), TracepointID::from_str(hhe_end.as_str())
+                TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
             );
 
             match cp_edge {
