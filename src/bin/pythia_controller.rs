@@ -602,10 +602,12 @@ fn main() {
                 if b.1.pcc.is_nan() {
                     println!("NaN Edge Group Len: {}", b.1.latencies.len());
                     println!("NaN Edge Group Edge: ({})", b.0.clone());
+                    println!("NaN Edge Group Latencies:\n{:?}", b.1.clone())
                 }
                 if a.1.pcc.is_nan() {
                     println!("NaN Edge Group Len: {}", a.1.latencies.len());
                     println!("NaN Edge Group Edge: ({})", a.0.clone());
+                    println!("NaN Edge Group Latencies:\n{:?}", a.1.clone())
                 }
                 println!("{} : {}", b.1.pcc, &a.1.pcc);
                 b.1.pcc.partial_cmp(&a.1.pcc).unwrap()
@@ -625,9 +627,13 @@ fn main() {
             |a, b| {
                 if b.1.cov.is_nan() {
                     println!("NaN Edge Group Len: {}", b.1.latencies.len());
+                    println!("NaN Edge Group Edge: ({})", b.0.clone());
+                    println!("NaN Edge Group Latencies:\n{:?}", b.1.clone())
                 }
                 if a.1.cov.is_nan() {
                     println!("NaN Edge Group Len: {}", a.1.latencies.len());
+                    println!("NaN Edge Group Edge: ({})", a.0.clone());
+                    println!("NaN Edge Group Latencies:\n{:?}", a.1.clone())
                 }
                 println!("{} : {}", b.1.cov, &a.1.cov);
                 b.1.cov.partial_cmp(&a.1.cov).unwrap()
