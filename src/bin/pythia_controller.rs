@@ -457,7 +457,7 @@ fn main() {
         }
 
         impl EdgeGroup {
-            pub fn new(edge: &DAGEdge, ts: &Event, te: &Event, parent_lat: u64) -> EdgeGroup {
+            pub fn new(edge: &DAGEdge, ts: &Event, te: &Event, parent_lat: u64, req_id: &IDType) -> EdgeGroup {
                 let mut to_return = EdgeGroup{
                     ts: ts.tracepoint_id.to_string(),
                     te: te.tracepoint_id.to_string(),
@@ -471,7 +471,7 @@ fn main() {
                 // TODO: fix this hacky stuff soon
                 if (edge.duration.as_nanos() as u64) < 10000000000000000000 {
                     to_return.latencies.push(
-                        (ts.trace_id.clone(), edge.duration.as_nanos() as u64, parent_lat));
+                        (req_id.clone(), edge.duration.as_nanos() as u64, parent_lat));
                     // to_return.mean = edge.duration.as_nanos() as u64;
                 }
 
@@ -554,12 +554,13 @@ fn main() {
                 eg_keys.insert(key.clone());
                 match edge_groups.get_mut(key.as_str()) {
                     Some(eg) => {
-                        eg.add_edge(edge, &t_start.trace_id, cp.duration.as_nanos() as u64);
+                        // eg.add_edge(edge, &t_start.trace_id, cp.duration.as_nanos() as u64);
+                        eg.add_edge(edge, &cp.request_id, cp.duration.as_nanos() as u64);
                     }
                     None => {
                         edge_groups.insert(
                             key,
-                            EdgeGroup::new(edge, t_start, t_end, cp.duration.as_nanos() as u64)
+                            EdgeGroup::new(edge, t_start, t_end, cp.duration.as_nanos() as u64, &cp.request_id)
                         );
                     }
                 }
