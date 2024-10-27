@@ -743,6 +743,22 @@ fn main() {
         println!();
         println!();
         println!("HHE (Diff) = ({}, {})", hhe_start_diff, hhe_end_diff);
+        println!();
+        println!("HHE List (Diff) = [");
+        let mut hhe_diff_ctr = hhe_index;
+        loop {
+            if hhe_diff_ctr >= eg_diff_sorted.len() {
+                break;
+            }
+
+            let diff_parts = eg_diff_sorted[hhe_diff_ctr].0.split("::").collect::<Vec<&str>>();
+            let (diff_start, diff_end) = (diff_parts[0].to_string(), diff_parts[1].to_string());
+
+            println!("HHE (Diff) Pos {} = ({}, {})", hhe_diff_ctr-hhe_index, hhe_start_diff, hhe_end_diff);
+        }
+        println!("HHE List (Diff) = [");
+        println!();
+        println!();
 
         latencies_sorted = eg_diff_sorted[hhe_index].1.latencies.clone();
         latencies_sorted.sort_by(|a, b| {
