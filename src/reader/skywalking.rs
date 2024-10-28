@@ -289,10 +289,19 @@ impl Reader for SWReader {
         let mut trace_ids = resp_obj.traces.into_iter()
             .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
+        let mut trace_ids_set = HashSet::new();
+        for trace_id in trace_ids {
+            trace_ids_set.insert(trace_id.clone());
+        }
+        
+        trace_ids = trace_ids_set.into_iter().collect::<Vec<String>>();
+
         #[derive(Serialize)]
         struct TraceQueryPayload {
             traceIds: Vec<String>
         }
+        
+        trace_ids = trace_ids.drain(..100).collect::<Vec<String>>();
 
         client = reqwest::blocking::Client::new();
 
