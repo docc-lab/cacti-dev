@@ -301,7 +301,7 @@ impl Reader for SWReader {
             traceIds: Vec<String>
         }
         
-        trace_ids = trace_ids.drain(..100).collect::<Vec<String>>();
+        // trace_ids = trace_ids.drain(..100).collect::<Vec<String>>();
 
         client = reqwest::blocking::Client::new();
 
