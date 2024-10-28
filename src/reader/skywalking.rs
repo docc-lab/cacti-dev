@@ -94,7 +94,7 @@ impl SWSpan {
                 parts.join("/")
             })(self.endpointName.clone()),
             start: DateTime::from_timestamp_millis(self.startTime as i64).unwrap().naive_utc(),
-            duration: Duration::from_micros(self.endTime - self.startTime)
+            duration: Duration::from_millis(self.endTime - self.startTime)
         }
     }
 }
