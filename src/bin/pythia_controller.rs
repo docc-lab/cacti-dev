@@ -592,6 +592,8 @@ fn main() {
             }
         }
 
+        println!("# of edge groups (post-filter): {}", edge_groups.keys().collect::<Vec<&String>>().len());
+
         // let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
         // for k in &eg_keys {
         //     eg_var_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
