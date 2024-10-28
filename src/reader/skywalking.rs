@@ -80,7 +80,7 @@ impl SWSpan {
             host: self.serviceCode.clone(),
             operation: (|s: String| {
                 let mut parts = s.split("/").collect::<Vec<&str>>();
-                
+
                 parts = parts.into_iter().filter(|p| {
                     let p_string = p.to_string();
                     !(
@@ -90,7 +90,7 @@ impl SWSpan {
                             p_string.contains(".")
                     )
                 }).collect::<Vec<&str>>();
-                
+
                 parts.join("/")
             })(self.endpointName.clone()),
             start: DateTime::from_timestamp_millis(self.startTime as i64).unwrap().naive_utc(),
@@ -246,8 +246,10 @@ impl Reader for SWReader {
 
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
-        let start_time = cur_date - Duration::from_secs(60*20);
-        let end_time = cur_date + Duration::from_secs(60*20);
+        // let start_time = cur_date - Duration::from_secs(60*20);
+        let start_time = cur_date - Duration::from_secs(60*5);
+        // let end_time = cur_date + Duration::from_secs(60*20);
+        let end_time = cur_date + Duration::from_secs(60*5);
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
@@ -357,14 +359,14 @@ impl Reader for SWReader {
             
             // spans = spans.into_iter().map(|s| {
             //     let mut to_return = s;
-            //     
+            //
             //     for (op_p, op) in &self.op_prefixes {
             //         if to_return.operation.contains(op_p.as_str()) {
             //             to_return.operation = op.clone();
             //             break;
             //         }
             //     }
-            //     
+            //
             //     to_return
             // }).collect::<Vec<Span>>();
 
