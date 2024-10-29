@@ -578,21 +578,30 @@ fn main() {
         println!("# of edge groups: {}", eg_keys.len());
 
         let mut eg_keys = Vec::new();
+        let mut f_eg_keys = Vec::new();
 
         for (k, e) in edge_groups.iter_mut() {
             eg_keys.push(k.clone());
             e.compute_stats();
         }
 
+        let mut filtered_eg: HashMap<String, EdgeGroup> = HashMap::new();
+
         for k in &eg_keys {
             let eg_mean = edge_groups[k.as_str()].mean;
             let eg_cov = edge_groups[k.as_str()].cov;
-            if eg_mean == 0 || eg_cov == 0.0 {
-                edge_groups.remove(k.as_str());
+            // if eg_mean == 0 || eg_cov == 0.0 {
+            //     edge_groups.remove(k.as_str());
+            // }
+
+            if eg_mean != 0 && eg_cov != 0.0 {
+                filtered_eg.insert(k.clone(), edge_groups[k.as_str()].clone());
             }
+
+            f_eg_keys.push(k.clone());
         }
 
-        println!("# of edge groups (post-filter): {}", edge_groups.keys().collect::<Vec<&String>>().len());
+        println!("# of edge groups (post-filter): {}", filtered_eg.keys().collect::<Vec<&String>>().len());
 
         // let mut eg_var_sorted: Vec<(String, EdgeGroup)> = Vec::new();
         // for k in &eg_keys {
@@ -603,8 +612,8 @@ fn main() {
         // );
 
         let mut eg_pcc_sorted: Vec<(String, EdgeGroup)> = Vec::new();
-        for k in &eg_keys {
-            match edge_groups.get(k.as_str()) {
+        for k in &f_eg_keys {
+            match filtered_eg.get(k.as_str()) {
                 Some(eg) => {
                     eg_pcc_sorted.push((k.clone(), eg.clone()));
                 }
@@ -629,8 +638,8 @@ fn main() {
         );
 
         let mut eg_cov_sorted: Vec<(String, EdgeGroup)> = Vec::new();
-        for k in &eg_keys {
-            match edge_groups.get(k.as_str()) {
+        for k in &f_eg_keys {
+            match filtered_eg.get(k.as_str()) {
                 Some(eg) => {
                     eg_cov_sorted.push((k.clone(), eg.clone()));
                 }
@@ -771,6 +780,63 @@ fn main() {
         println!("{:?}", latencies_sorted);
         println!();
         println!();
+        println!();
+        println!();
+        
+        let mut pcc_index = 0;
+        let mut cov_index = 0;
+        let mut diff_index = 0;
+        
+        loop {
+            let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
+            let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+            
+            if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+                break;
+            }
+            
+            pcc_index += 1;
+        }
+
+        loop {
+            let hhe_parts_cov = eg_cov_sorted[cov_index].0.split("::").collect::<Vec<&str>>();
+            let (hhe_start_cov, hhe_end_cov) = (hhe_parts_cov[0].to_string(), hhe_parts_cov[1].to_string());
+
+            if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
+                break;
+            }
+
+            cov_index += 1;
+        }
+
+        loop {
+            let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
+            let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+
+            if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+                break;
+            }
+
+            pcc_index += 1;
+        }
+
+        loop {
+            let hhe_parts_diff = eg_diff_sorted[hhe_index + diff_index].0.split("::").collect::<Vec<&str>>();
+            let (hhe_start_diff, hhe_end_diff) = (hhe_parts_diff[0].to_string(), hhe_parts_diff[1].to_string());
+
+            if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
+                break;
+            }
+
+            diff_index += 1;
+        }
+
+        println!();
+        println!();
+        println!("Result positions:");
+        println!("PCC --- {}", pcc_index);
+        println!("Covariance --- {}", cov_index);
+        println!("P99 - P50 --- {}", diff_index);
         println!();
         println!();
 

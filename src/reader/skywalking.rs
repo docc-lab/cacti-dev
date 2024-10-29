@@ -280,6 +280,8 @@ impl Reader for SWReader {
         
         let mut to_break = false;
         loop {
+            println!("SpanQuery Retrieval Loop #{}", page_num);
+            
             resp = client.post("http://localhost:3000/spanquery")
                 .json(&SpanQueryFormatReq{
                     start_year: start_time.year(),
