@@ -23,6 +23,7 @@ app.post('/spanquery', (req, res) => {
         end_day,
         end_hour,
         end_minute,
+        page_num,
     } = req.body;
 
     console.log(req.body);
@@ -45,7 +46,7 @@ app.post('/spanquery', (req, res) => {
                 },
                 traceState: "ALL",
                 paging: {
-                    pageNum: 1,
+                    pageNum: page_num,
                     pageSize: 10000,
                     needTotal: true
                 },

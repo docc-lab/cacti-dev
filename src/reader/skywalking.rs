@@ -263,38 +263,64 @@ impl Reader for SWReader {
             end_day: u32,
             end_hour: String,
             end_minute: String,
+            page_num: u64,
         }
 
         let mut client = reqwest::blocking::Client::new();
 
-        let mut resp: reqwest::blocking::Response  = client.post("http://localhost:3000/spanquery")
-            .json(&SpanQueryFormatReq{
-                start_year: start_time.year(),
-                start_month: start_time.month(),
-                start_day: start_time.day(),
-                start_hour: fmt_two_digit(start_time.hour()),
-                start_minute: fmt_two_digit(start_time.minute()),
-                end_year: end_time.year(),
-                end_month: end_time.month(),
-                end_day: end_time.day(),
-                end_hour: fmt_two_digit(end_time.hour()),
-                end_minute: fmt_two_digit(end_time.minute()),
-            }).send().unwrap();
+        let mut resp: reqwest::blocking::Response;
 
-        let mut resp_text = resp.text().unwrap();
+        let mut resp_text: String;
 
-        let resp_obj: SWBSPayload =
-            serde_json::from_str(resp_text.as_str()).unwrap();
+        let mut resp_obj: SWBSPayload;
 
-        let mut trace_ids = resp_obj.traces.into_iter()
-            .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
+        let mut all_trace_ids: Vec<String> = Vec::new();
+        
+        let mut page_num = 1u64;
+        
+        let mut to_break = false;
+        loop {
+            resp = client.post("http://localhost:3000/spanquery")
+                .json(&SpanQueryFormatReq{
+                    start_year: start_time.year(),
+                    start_month: start_time.month(),
+                    start_day: start_time.day(),
+                    start_hour: fmt_two_digit(start_time.hour()),
+                    start_minute: fmt_two_digit(start_time.minute()),
+                    end_year: end_time.year(),
+                    end_month: end_time.month(),
+                    end_day: end_time.day(),
+                    end_hour: fmt_two_digit(end_time.hour()),
+                    end_minute: fmt_two_digit(end_time.minute()),
+                    page_num: 1u64,
+                }).send().unwrap();
+            
+            resp_text = resp.text().unwrap();
+            
+            resp_obj = serde_json::from_str(resp_text.as_str()).unwrap();
+            
+            let mut trace_ids = resp_obj.traces.into_iter()
+                .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
+            
+            if trace_ids.len() < 10000 {
+                to_break = true;
+            }
+            
+            all_trace_ids.append(&mut trace_ids);
+            
+            if to_break {
+                break;
+            }
+            
+            page_num += 1;
+        }
 
         let mut trace_ids_set = HashSet::new();
-        for trace_id in trace_ids {
+        for trace_id in all_trace_ids {
             trace_ids_set.insert(trace_id.clone());
         }
         
-        trace_ids = trace_ids_set.into_iter().collect::<Vec<String>>();
+        all_trace_ids = trace_ids_set.into_iter().collect::<Vec<String>>();
 
         #[derive(Serialize)]
         struct TraceQueryPayload {
@@ -307,7 +333,7 @@ impl Reader for SWReader {
 
         let mut traces: Vec<SWResult> = Vec::new();
 
-        let loop_iters = ((trace_ids.len() as f64)/1000.0).ceil() as u64;
+        let loop_iters = ((all_trace_ids.len() as f64)/1000.0).ceil() as u64;
         let mut i = 0;
 
         println!();
@@ -323,15 +349,15 @@ impl Reader for SWReader {
             println!("Trace retrieval loop {}/{}", i, loop_iters);
             i += 1;
             
-            if trace_ids.len() == 0 {
+            if all_trace_ids.len() == 0 {
                 break;
             }
 
             let mut min_range_end = 1000;
-            if trace_ids.len() < 1000 {
-                min_range_end = trace_ids.len();
+            if all_trace_ids.len() < 1000 {
+                min_range_end = all_trace_ids.len();
             }
-            let cur_trace_ids = trace_ids.drain(..min_range_end).collect::<Vec<String>>();
+            let cur_trace_ids = all_trace_ids.drain(..min_range_end).collect::<Vec<String>>();
 
             resp = client.post("http://localhost:3000/traces")
                 .json(&TraceQueryPayload{
