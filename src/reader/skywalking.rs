@@ -247,9 +247,9 @@ impl Reader for SWReader {
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
         // let start_time = cur_date - Duration::from_secs(60*20);
-        let start_time = cur_date - Duration::from_secs(60*5);
+        let start_time = cur_date - Duration::from_secs(60*15);
         // let end_time = cur_date + Duration::from_secs(60*20);
-        let end_time = cur_date + Duration::from_secs(60*5);
+        let end_time = cur_date + Duration::from_secs(60*15);
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
@@ -294,7 +294,7 @@ impl Reader for SWReader {
                     end_day: end_time.day(),
                     end_hour: fmt_two_digit(end_time.hour()),
                     end_minute: fmt_two_digit(end_time.minute()),
-                    page_num: 1u64,
+                    page_num: page_num,
                 }).send().unwrap();
             
             resp_text = resp.text().unwrap();
