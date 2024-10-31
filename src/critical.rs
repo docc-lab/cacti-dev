@@ -602,7 +602,8 @@ impl CriticalPath {
 
         let end_nidx = self.next_node(start_nidx).unwrap();
         if self.g.g.node_weight(end_nidx).unwrap().tracepoint_id != end {
-            panic!("Impossible case!");
+            // panic!("Impossible case!");
+            return None
         }
 
         Some((
