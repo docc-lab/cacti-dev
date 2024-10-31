@@ -174,7 +174,7 @@ impl Span {
                 DateTime::from_timestamp_nanos(
                     sorted_children[0].end() + 1).naive_utc());
             for c in sorted_children.into_iter() {
-                if c.end() < cur_span.start.and_utc().timestamp_nanos_opt().unwrap() {
+                if c.end() <= cur_span.start.and_utc().timestamp_nanos_opt().unwrap() {
                     cur_span = c.clone();
                     // let child_trace = cur_span.to_critical_path(st);
                     cur_span.to_critical_path(
