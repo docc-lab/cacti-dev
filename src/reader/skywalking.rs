@@ -247,9 +247,9 @@ impl Reader for SWReader {
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
         // let start_time = cur_date - Duration::from_secs(60*20);
-        let start_time = cur_date - Duration::from_secs(60*5);
+        let start_time = cur_date - Duration::from_secs(60*10);
         // let end_time = cur_date + Duration::from_secs(60*20);
-        let end_time = cur_date + Duration::from_secs(60*5);
+        let end_time = cur_date + Duration::from_secs(60*10);
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
@@ -275,13 +275,13 @@ impl Reader for SWReader {
         let mut resp_obj: SWBSPayload;
 
         let mut all_trace_ids: Vec<String> = Vec::new();
-        
+
         let mut page_num = 1u64;
-        
+
         let mut to_break = false;
         loop {
             println!("SpanQuery Retrieval Loop #{}", page_num);
-            
+
             resp = client.post("http://localhost:3000/spanquery")
                 .json(&SpanQueryFormatReq{
                     start_year: start_time.year(),
@@ -296,24 +296,24 @@ impl Reader for SWReader {
                     end_minute: fmt_two_digit(end_time.minute()),
                     page_num: page_num,
                 }).send().unwrap();
-            
+
             resp_text = resp.text().unwrap();
-            
+
             resp_obj = serde_json::from_str(resp_text.as_str()).unwrap();
-            
+
             let mut trace_ids = resp_obj.traces.into_iter()
                 .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
-            
+
             if trace_ids.len() < 10000 {
                 to_break = true;
             }
-            
+
             all_trace_ids.append(&mut trace_ids);
-            
+
             if to_break {
                 break;
             }
-            
+
             page_num += 1;
         }
 
@@ -321,14 +321,14 @@ impl Reader for SWReader {
         for trace_id in all_trace_ids {
             trace_ids_set.insert(trace_id.clone());
         }
-        
+
         all_trace_ids = trace_ids_set.into_iter().collect::<Vec<String>>();
 
         #[derive(Serialize)]
         struct TraceQueryPayload {
             traceIds: Vec<String>
         }
-        
+
         // trace_ids = trace_ids.drain(..100).collect::<Vec<String>>();
 
         client = reqwest::blocking::Client::new();
