@@ -792,11 +792,12 @@ fn main() {
                 pcc_index = -1;
                 break;
             }
-            
+
             let hhe_parts_pcc = eg_pcc_sorted[pcc_index as usize].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
 
-            if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+            // if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+            if hhe_start_pcc.contains("ts-order-service") || hhe_end_pcc.contains("ts-order-service") {
                 break;
             }
 
@@ -808,11 +809,12 @@ fn main() {
                 cov_index = -1;
                 break;
             }
-            
+
             let hhe_parts_cov = eg_cov_sorted[cov_index as usize].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_cov, hhe_end_cov) = (hhe_parts_cov[0].to_string(), hhe_parts_cov[1].to_string());
 
-            if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
+            // if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
+            if hhe_start_cov.contains("ts-order-service") || hhe_end_cov.contains("ts-order-service") {
                 break;
             }
 
@@ -835,11 +837,12 @@ fn main() {
                 diff_index = -1;
                 break;
             }
-            
+
             let hhe_parts_diff = eg_diff_sorted[hhe_index + (diff_index as usize)].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_diff, hhe_end_diff) = (hhe_parts_diff[0].to_string(), hhe_parts_diff[1].to_string());
 
-            if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
+            // if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
+            if hhe_start_diff.contains("ts-order-service") || hhe_end_diff.contains("ts-order-service") {
                 break;
             }
 
