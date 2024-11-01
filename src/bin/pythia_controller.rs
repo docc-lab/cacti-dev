@@ -840,7 +840,11 @@ fn main() {
         println!();
         println!();
 
+        // "all_overlaps" maps from critical path hashes to vectors of edges
+        // that overlap with the corresponding CP's HHE
         let mut all_overlaps: HashMap<String, Vec<(String, String)>> = HashMap::new();
+        
+        // "all_hhe_crits" contains the CPs belonging to HHE-containing traces
         let mut all_hhe_crits: Vec<CriticalPath> = Vec::new();
 
         for cp in &pt_crits {
@@ -904,13 +908,19 @@ fn main() {
         let survivor_hashes = survivor_crits.into_iter()
             .map(|cp| cp.hash().to_string()).collect::<Vec<String>>();
 
+        // "backtraces" maps from trace ID to a set of backtraces
         let mut backtraces: HashMap<String, Vec<Vec<Span>>> = HashMap::new();
+        // "k" is a CP hash; "v" is a vector of (traceID, spanID) pairs
         for (k, v) in all_overlaps {
             for o in v {
+                // Get problem trace based on overlap's trace ID
                 let overlapping_trace = non_problem_traces
                     .get(o.0.as_str()).unwrap();
 
-                match backtraces.get_mut(o.0.as_str()) {
+                //** If there is a backtrace list corresponding to "k", add a backtrace
+                //** to it, otherwise create the list
+                // match backtraces.get_mut(o.0.as_str()) {
+                match backtraces.get_mut(k.as_str()) {
                     Some(v) => {
                         v.push(overlapping_trace.get_backtrace(o.1))
                     }

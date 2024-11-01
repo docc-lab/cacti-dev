@@ -87,6 +87,7 @@ pub trait Reader {
 
     fn set_fetch_all(&mut self);
 
+    // Returns pairs of (traceID, spanID) for overlapping spans of a target
     fn get_candidate_events(&self, start: u64, end: u64, host: String) -> Vec<(String, String)> {
         Vec::new()
     }
