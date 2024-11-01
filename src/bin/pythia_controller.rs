@@ -782,19 +782,19 @@ fn main() {
         println!();
         println!();
         println!();
-        
+
         let mut pcc_index = 0;
         let mut cov_index = 0;
         let mut diff_index = 0;
-        
+
         loop {
             let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
-            
+
             if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
                 break;
             }
-            
+
             pcc_index += 1;
         }
 
@@ -843,13 +843,14 @@ fn main() {
         // "all_overlaps" maps from critical path hashes to vectors of edges
         // that overlap with the corresponding CP's HHE
         let mut all_overlaps: HashMap<String, Vec<(String, String)>> = HashMap::new();
-        
+
         // "all_hhe_crits" contains the CPs belonging to HHE-containing traces
         let mut all_hhe_crits: Vec<CriticalPath> = Vec::new();
 
         for cp in &pt_crits {
             let cp_edge = cp.get_by_tracepoints(
-                TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
+                // TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
+                TracepointID::from_str(hhe_start_pcc.as_str()), TracepointID::from_str(hhe_end_pcc.as_str())
             );
 
             match cp_edge {
@@ -1012,7 +1013,7 @@ fn main() {
         println!();
         println!();
         println!();
-        
+
         let mut results = Vec::new();
 
         for feature in &backtrace_features {
@@ -1021,7 +1022,7 @@ fn main() {
             let survivor_mean = mean(dists.1.clone().into_iter());
             results.push((feature.clone(), victim_mean - survivor_mean));
         }
-        
+
         results.sort_by(|a, b| {
             b.1.partial_cmp(&a.1).unwrap()
         });
