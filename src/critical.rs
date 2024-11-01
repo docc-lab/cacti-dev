@@ -593,6 +593,15 @@ impl CriticalPath {
                 if self.g.g.node_weight(end_nidx).unwrap().tracepoint_id == end {
                     // panic!("Impossible case!");
                     break;
+                } else {
+                    match self.next_node(start_nidx) {
+                        Some(new_nidx) => {
+                            start_nidx = new_nidx;
+                        }
+                        None => {
+                            return None;
+                        }
+                    }
                 }
             } else {
                 match self.next_node(start_nidx) {
