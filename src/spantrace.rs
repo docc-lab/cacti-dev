@@ -335,7 +335,13 @@ impl SpanTrace {
                 break;
             }
 
-            let cur_span = self.spans.get(cur_id.as_str()).unwrap();
+            // let cur_span = self.spans.get(cur_id.as_str()).unwrap();
+            let cur_span = match self.spans.get(cur_id.as_str()) { 
+                Some(s) => s,
+                _ => {
+                    panic!("Couldn't find span with ID [[ {} ]]", cur_id);
+                }
+            };
             let cur_parent = cur_span.parent.clone();
             to_return.push(cur_span.clone());
             cur_id = cur_parent;

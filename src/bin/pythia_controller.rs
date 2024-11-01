@@ -783,12 +783,17 @@ fn main() {
         println!();
         println!();
 
-        let mut pcc_index = 0;
-        let mut cov_index = 0;
-        let mut diff_index = 0;
+        let mut pcc_index = 0i64;
+        let mut cov_index = 0i64;
+        let mut diff_index = 0i64;
 
         loop {
-            let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
+            if (pcc_index as usize) == eg_pcc_sorted.len() {
+                pcc_index = -1;
+                break;
+            }
+            
+            let hhe_parts_pcc = eg_pcc_sorted[pcc_index as usize].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
 
             if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
@@ -799,7 +804,12 @@ fn main() {
         }
 
         loop {
-            let hhe_parts_cov = eg_cov_sorted[cov_index].0.split("::").collect::<Vec<&str>>();
+            if (cov_index as usize) == eg_cov_sorted.len() {
+                cov_index = -1;
+                break;
+            }
+            
+            let hhe_parts_cov = eg_cov_sorted[cov_index as usize].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_cov, hhe_end_cov) = (hhe_parts_cov[0].to_string(), hhe_parts_cov[1].to_string());
 
             if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
@@ -808,20 +818,25 @@ fn main() {
 
             cov_index += 1;
         }
+        //
+        // loop {
+        //     let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
+        //     let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
+        //
+        //     if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+        //         break;
+        //     }
+        //
+        //     pcc_index += 1;
+        // }
 
         loop {
-            let hhe_parts_pcc = eg_pcc_sorted[pcc_index].0.split("::").collect::<Vec<&str>>();
-            let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
-
-            if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
+            if (hhe_index + (diff_index as usize)) == eg_pcc_sorted.len() {
+                diff_index = -1;
                 break;
             }
-
-            pcc_index += 1;
-        }
-
-        loop {
-            let hhe_parts_diff = eg_diff_sorted[hhe_index + diff_index].0.split("::").collect::<Vec<&str>>();
+            
+            let hhe_parts_diff = eg_diff_sorted[hhe_index + (diff_index as usize)].0.split("::").collect::<Vec<&str>>();
             let (hhe_start_diff, hhe_end_diff) = (hhe_parts_diff[0].to_string(), hhe_parts_diff[1].to_string());
 
             if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
@@ -851,6 +866,7 @@ fn main() {
             let cp_edge = cp.get_by_tracepoints(
                 // TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
                 TracepointID::from_str(hhe_start_pcc.as_str()), TracepointID::from_str(hhe_end_pcc.as_str())
+                // TracepointID::from_str(hhe_start_cov.as_str()), TracepointID::from_str(hhe_end_cov.as_str())
             );
 
             match cp_edge {
@@ -962,28 +978,54 @@ fn main() {
 
             for vh in &victim_hashes {
                 let mut occurrences = 0u64;
-                for backtrace in backtraces.get(vh.as_str()).unwrap() {
-                    // let mut to_break = false;
-                    for span in backtrace {
-                        if span.has_feature(feature.clone()) {
-                            occurrences += 1;
-                            break;
+                // for backtrace in backtraces.get(vh.as_str()).unwrap() {
+                //     // let mut to_break = false;
+                //     for span in backtrace {
+                //         if span.has_feature(feature.clone()) {
+                //             occurrences += 1;
+                //             break;
+                //         }
+                //     }
+                // }
+                match backtraces.get(vh.as_str()) {
+                    Some(bts) => {
+                        for backtrace in bts {
+                            for span in backtrace {
+                                if span.has_feature(feature.clone()) {
+                                    occurrences += 1;
+                                    break;
+                                }
+                            }
                         }
-                    }
+                    },
+                    _ => {}
                 }
                 victim_occupancy_counts.push(occurrences);
             }
 
             for sh in &survivor_hashes {
                 let mut occurrences = 0u64;
-                for backtrace in backtraces.get(sh.as_str()).unwrap() {
-                    // let mut to_break = false;
-                    for span in backtrace {
-                        if span.has_feature(feature.clone()) {
-                            occurrences += 1;
-                            break;
+                // for backtrace in backtraces.get(sh.as_str()).unwrap() {
+                //     // let mut to_break = false;
+                //     for span in backtrace {
+                //         if span.has_feature(feature.clone()) {
+                //             occurrences += 1;
+                //             break;
+                //         }
+                //     }
+                // }
+                match backtraces.get(sh.as_str()) {
+                    Some(bts) => {
+                        for backtrace in bts {
+                            for span in backtrace {
+                                if span.has_feature(feature.clone()) {
+                                    occurrences += 1;
+                                    break;
+                                }
+                            }
                         }
-                    }
+                    },
+                    _ => {}
                 }
                 survivor_occupancy_counts.push(occurrences);
             }
