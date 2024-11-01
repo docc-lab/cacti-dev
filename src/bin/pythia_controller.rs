@@ -1012,6 +1012,34 @@ fn main() {
         println!();
         println!();
         println!();
+        
+        let mut results = Vec::new();
+
+        for feature in &backtrace_features {
+            let dists = feature_occupancy_dists.get(feature).unwrap();
+            let victim_mean = mean(dists.0.clone().into_iter());
+            let survivor_mean = mean(dists.1.clone().into_iter());
+            results.push((feature.clone(), victim_mean - survivor_mean));
+        }
+        
+        results.sort_by(|a, b| {
+            b.1.partial_cmp(&a.1).unwrap()
+        });
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!("RESULTS:");
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        for result in results {
+            println!("{:?} === {}", result.0, result.1);
+        }
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        println!();
+        println!();
+        println!();
+        println!();
 
         // for cp in &pt_crits {
         //     match top_problem_edges.get(cp.hash()) {
