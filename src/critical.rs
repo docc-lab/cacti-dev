@@ -586,24 +586,24 @@ impl CriticalPath {
         println!("get_by_tracepoints - request_id = {}", self.request_id);
         
         let mut start_nidx = self.start_node;
+        let mut end_nidx = self.end_node;
         loop {
             if self.g.g.node_weight(start_nidx).unwrap().tracepoint_id == start {
-                break;
-            }
-            match self.next_node(start_nidx) {
-                Some(new_nidx) => {
-                    start_nidx = new_nidx;
+                end_nidx = self.next_node(start_nidx).unwrap();
+                if self.g.g.node_weight(end_nidx).unwrap().tracepoint_id == end {
+                    // panic!("Impossible case!");
+                    break;
                 }
-                None => {
-                    return None;
+            } else {
+                match self.next_node(start_nidx) {
+                    Some(new_nidx) => {
+                        start_nidx = new_nidx;
+                    }
+                    None => {
+                        return None;
+                    }
                 }
             }
-        }
-
-        let end_nidx = self.next_node(start_nidx).unwrap();
-        if self.g.g.node_weight(end_nidx).unwrap().tracepoint_id != end {
-            // panic!("Impossible case!");
-            return None
         }
 
         Some((
