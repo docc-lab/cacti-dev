@@ -507,7 +507,7 @@ impl Reader for SWReader {
         // let start_time = cur_date - Duration::from_secs(60*60*24);
         let start_time = cur_date - Duration::from_secs(60*20);
         // let end_time = cur_date + Duration::from_secs(60*60*24);
-        let end_time = cur_date + Duration::from_secs(60*20);
+        let end_time = cur_date + Duration::from_secs(60*60*24);
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
