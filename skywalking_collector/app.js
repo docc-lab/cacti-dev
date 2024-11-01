@@ -59,6 +59,7 @@ app.post('/spanquery', (req, res) => {
         },
         timeout: 120000,
     }).then((resp) => {
+        console.log(resp);
         console.log(resp.data);
 
         res.status(200).json({
