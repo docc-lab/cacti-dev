@@ -249,7 +249,8 @@ impl Reader for SWReader {
         // let start_time = cur_date - Duration::from_secs(60*20);
         let start_time = cur_date - Duration::from_secs(60*5);
         // let end_time = cur_date + Duration::from_secs(60*20);
-        let end_time = cur_date + Duration::from_secs(60*60*24);
+        // let end_time = cur_date + Duration::from_secs(60*60*24);
+        let end_time = cur_date;
 
         #[derive(Serialize)]
         struct SpanQueryFormatReq {
@@ -284,17 +285,17 @@ impl Reader for SWReader {
 
             resp = client.post("http://localhost:3000/spanquery")
                 .json(&SpanQueryFormatReq{
-                    start_year: start_time.year(),
-                    start_month: start_time.month(),
-                    start_day: start_time.day(),
-                    start_hour: fmt_two_digit(start_time.hour()),
-                    start_minute: fmt_two_digit(start_time.minute()),
-                    end_year: end_time.year(),
-                    end_month: end_time.month(),
-                    end_day: end_time.day(),
-                    end_hour: fmt_two_digit(end_time.hour()),
-                    end_minute: fmt_two_digit(end_time.minute()),
-                    page_num: page_num,
+                    start_year: start_time.naive_local().year(),
+                    start_month: start_time.naive_local().month(),
+                    start_day: start_time.naive_local().day(),
+                    start_hour: fmt_two_digit(start_time.naive_local().hour()),
+                    start_minute: fmt_two_digit(start_time.naive_local().minute()),
+                    end_year: end_time.naive_local().year(),
+                    end_month: end_time.naive_local().month(),
+                    end_day: end_time.naive_local().day(),
+                    end_hour: fmt_two_digit(end_time.naive_local().hour()),
+                    end_minute: fmt_two_digit(end_time.naive_local().minute()),
+                    page_num,
                 }).send().unwrap();
 
             resp_text = resp.text().unwrap();
