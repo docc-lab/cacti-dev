@@ -423,6 +423,31 @@ fn main() {
             .collect::<Vec<CriticalPath>>();
 
         println!("pt_crits.len() = {}", pt_crits.len());
+        
+        let mut victim_req_ids = Vec::new();
+        for ptc in &pt_crits {
+            victim_req_ids.push((ptc.request_id.clone(), ptc.duration));
+        }
+        victim_req_ids.sort_by(|a, b| {
+            a.1.partial_cmp(&b.1).unwrap()
+        });
+        
+        // let survivor_req_ids = victim_req_ids
+        //     .drain(..((0.9*(victim_req_ids.len() as f64)) as usize))
+        //     .collect::<Vec<(IDType, Duration)>>();
+        
+        let _ = victim_req_ids
+            .drain(..((0.9*(victim_req_ids.len() as f64)) as usize));
+        
+        let mut victim_rid_set = HashSet::new();
+        // let mut survivor_rid_set = HashSet::new();
+
+        for (vid, _) in victim_req_ids {
+            victim_rid_set.insert(vid);
+        }
+        // for (sid, _) in survivor_req_ids {
+        //     survivor_rid_set.insert(sid);
+        // }
 
         // println!();
         // println!();
@@ -453,6 +478,7 @@ fn main() {
             pub var: u64,
             pub cov: f64,
             pub pcc: f64,
+            pub vs_diff: f64,
             pub latencies: Vec<(IDType, u64, u64)>
         }
 
@@ -465,6 +491,7 @@ fn main() {
                     var: 0,
                     cov: 0.0,
                     pcc: 0.0,
+                    vs_diff: 0.0,
                     latencies: vec![],
                 };
 
@@ -494,7 +521,7 @@ fn main() {
                 }
             }
 
-            pub fn compute_stats(&mut self) {
+            pub fn compute_stats(&mut self, victim_ids: &HashSet<IDType>) {
                 let latencies_iter = self.latencies.clone().into_iter()
                     .map(|e| e.1).collect::<Vec<u64>>()
                     .into_iter();
@@ -517,6 +544,19 @@ fn main() {
                     ((self.latencies.len() as f64)*
                         (stddev(latencies_iter.clone())*
                             stddev(resp_times_iter.clone())));
+                
+                let mut victims = Vec::new();
+                let mut survivors = Vec::new();
+                
+                for (tid, lat, _) in &self.latencies {
+                    if victim_ids.contains(tid) {
+                        victims.push(lat.clone());
+                    } else {
+                        survivors.push(lat.clone());
+                    }
+                }
+                
+                self.vs_diff = mean(victims.into_iter()) - mean(survivors.into_iter());
             }
             
             pub fn get_median(&self) -> u64 {
@@ -582,7 +622,7 @@ fn main() {
 
         for (k, e) in edge_groups.iter_mut() {
             eg_keys.push(k.clone());
-            e.compute_stats();
+            e.compute_stats(&victim_rid_set);
         }
 
         let mut filtered_eg: HashMap<String, EdgeGroup> = HashMap::new();
@@ -678,6 +718,23 @@ fn main() {
         eg_diff_sorted.sort_by(
             |a, b| b.1.slow_med_diff().partial_cmp(&a.1.slow_med_diff()).unwrap()
         );
+
+        let mut eg_vs_sorted: Vec<(String, EdgeGroup)> = Vec::new();
+        // for k in &eg_keys {
+        //     eg_diff_sorted.push((k.clone(), edge_groups.get(k.as_str()).unwrap().clone()));
+        // }
+        for k in &eg_keys {
+            match edge_groups.get(k.as_str()) {
+                Some(eg) => {
+                    eg_vs_sorted.push((k.clone(), eg.clone()));
+                }
+                _ => {}
+            }
+        }
+        eg_vs_sorted.sort_by(
+            |a, b| b.1.vs_diff.partial_cmp(&a.1.vs_diff).unwrap()
+        );
+        
 
         println!("HHE Metric (PCC) = {}", eg_pcc_sorted[0].1.pcc);
         println!("HHE Winner Len (PCC) = {}", eg_pcc_sorted[0].1.latencies.len());
@@ -783,9 +840,28 @@ fn main() {
         println!();
         println!();
 
+        println!("HHE Metric (V/S) = {}", eg_vs_sorted[0].1.pcc);
+        println!("HHE Winner Len (V/S) = {}", eg_vs_sorted[0].1.latencies.len());
+        let hhe_parts_vs = eg_vs_sorted[0].0.split("::").collect::<Vec<&str>>();
+        let (hhe_start_vs, hhe_end_vs) = (hhe_parts_vs[0].to_string(), hhe_parts_vs[1].to_string());
+        println!();
+        println!();
+        println!("HHE (V/S) = ({}, {})", hhe_start_vs, hhe_end_vs);
+
+        let mut latencies_sorted = eg_vs_sorted[0].1.latencies.clone();
+        latencies_sorted.sort_by(|a, b| {
+            a.1.partial_cmp(&b.1).unwrap()
+        });
+        println!("{:?}", latencies_sorted);
+        println!();
+        println!();
+        println!();
+        println!();
+
         let mut pcc_index = 0i64;
         let mut cov_index = 0i64;
         let mut diff_index = 0i64;
+        let mut vs_index = 0i64;
 
         loop {
             if (pcc_index as usize) == eg_pcc_sorted.len() {
@@ -849,12 +925,30 @@ fn main() {
             diff_index += 1;
         }
 
+        loop {
+            if (vs_index as usize) == eg_vs_sorted.len() {
+                vs_index = -1;
+                break;
+            }
+
+            let hhe_parts_vs = eg_vs_sorted[vs_index as usize].0.split("::").collect::<Vec<&str>>();
+            let (hhe_start_vs, hhe_end_vs) = (hhe_parts_vs[0].to_string(), hhe_parts_vs[1].to_string());
+
+            // if hhe_start_vs.contains("ts-order-service") && hhe_end_vs.contains("ts-order-service") {
+            if hhe_start_vs.contains("ts-route-service") || hhe_end_vs.contains("ts-route-service") {
+                break;
+            }
+
+            vs_index += 1;
+        }
+
         println!();
         println!();
         println!("Result positions:");
         println!("PCC --- {}", pcc_index);
         println!("Covariance --- {}", cov_index);
         println!("P99 - P50 --- {}", diff_index);
+        println!("V/S Mean Diff --- {}", vs_index);
         println!();
         println!();
 
