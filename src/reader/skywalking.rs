@@ -305,7 +305,10 @@ impl Reader for SWReader {
             let mut trace_ids = resp_obj.traces.into_iter()
                 .map(|bs| bs.traceIds[0].clone()).collect::<Vec<String>>();
 
-            if trace_ids.len() < 10000 {
+            // if trace_ids.len() < 10000 {
+            //     to_break = true;
+            // }
+            if trace_ids.len() == 0 {
                 to_break = true;
             }
 
@@ -684,8 +687,6 @@ impl SWReader {
             op_prefixes: Vec::new(),
         };
         
-        // _ = to_return.all_operations();
-
         to_return
     }
 }
