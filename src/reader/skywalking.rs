@@ -297,7 +297,7 @@ impl Reader for SWReader {
                     end_minute: fmt_two_digit(end_time.naive_local().minute()),
                     page_num,
                 }).send().unwrap();
-
+            
             resp_text = resp.text().unwrap();
 
             resp_obj = serde_json::from_str(resp_text.as_str()).unwrap();
@@ -369,6 +369,7 @@ impl Reader for SWReader {
                 .json(&TraceQueryPayload{
                     traceIds: cur_trace_ids
                 })
+                .timeout(Duration::from_secs(120))
                 .send().unwrap();
 
             resp_text = resp.text().unwrap();
