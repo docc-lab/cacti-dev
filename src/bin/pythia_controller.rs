@@ -958,6 +958,7 @@ fn main() {
 
         // "all_hhe_crits" contains the CPs belonging to HHE-containing traces
         let mut all_hhe_crits: Vec<CriticalPath> = Vec::new();
+        let mut cp_hhe_lats: HashMap<String, u64> = HashMap::new();
 
         for cp in &pt_crits {
             let cp_edge = cp.get_by_tracepoints(
@@ -977,6 +978,11 @@ fn main() {
                         ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
                         te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
                         edge.host.unwrap()
+                    );
+
+                    cp_hhe_lats.insert(
+                        cp.hash().to_string(),
+                        te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64 - ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64
                     );
 
                     println!("Num Overlaps = {}", overlaps.len());
@@ -1069,10 +1075,12 @@ fn main() {
         println!();
 
         let mut feature_occupancy_dists: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
+        let mut feature_correlations: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
 
         for feature in &backtrace_features {
             let mut victim_occupancy_counts = Vec::new();
             let mut survivor_occupancy_counts = Vec::new();
+            let mut hhe_latencies = Vec::new();
 
             for vh in &victim_hashes {
                 let mut occurrences = 0u64;
@@ -1099,6 +1107,7 @@ fn main() {
                     _ => {}
                 }
                 victim_occupancy_counts.push(occurrences);
+                hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
             }
 
             for sh in &survivor_hashes {
@@ -1126,10 +1135,17 @@ fn main() {
                     _ => {}
                 }
                 survivor_occupancy_counts.push(occurrences);
+                hhe_latencies.push(cp_hhe_lats.get(sh.as_str()).unwrap().clone());
             }
             
             feature_occupancy_dists.insert(
-                feature.clone(), (victim_occupancy_counts, survivor_occupancy_counts));
+                feature.clone(), (victim_occupancy_counts.clone(), survivor_occupancy_counts.clone()));
+
+            let mut all_occupancies = victim_occupancy_counts;
+            all_occupancies.append(&mut survivor_occupancy_counts);
+
+            feature_correlations.insert(
+                feature.clone(), (all_occupancies, hhe_latencies));
         }
 
         println!();
@@ -1171,7 +1187,57 @@ fn main() {
         println!();
         println!();
         println!();
-        println!("RESULTS:");
+        println!("RESULTS (MEAN DIFF):");
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        for result in results {
+            println!("{:?} === {}", result.0, result.1);
+        }
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        println!();
+        println!();
+        println!();
+        println!();
+
+        let mut results = Vec::new();
+        for feature in &backtrace_features {
+            let dists = feature_correlations.get(feature).unwrap();
+            
+            let mut pcc_num = 0i128;
+            // for (_, ed, rt) in &dists.1 {
+            let mut i = 0;
+            let lat_mean = mean(dists.1.clone().into_iter());
+            let occ_mean = mean(dists.0.clone().into_iter());
+            loop {
+                if i == dists.1.len() {
+                    break;
+                }
+
+                let lat = dists.1[i];
+                let occ = dists.0[i];
+
+                pcc_num += (lat as i128 - lat_mean as i128)*(occ as i128 - occ_mean as i128);
+
+                i += 1;
+            }
+
+            let pcc = (pcc_num as f64)/
+                ((dists.1.len() as f64)*
+                    (stddev(dists.1.clone().into_iter())*
+                        stddev(dists.0.clone().into_iter())));
+
+            results.push((feature.clone(), pcc));
+        }
+
+        results.sort_by(|a, b| {
+            b.1.partial_cmp(&a.1).unwrap()
+        });
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!("RESULTS (CORRELATION):");
         println!("++++++++++++++++++++++++++++++++++++++++");
         for result in results {
             println!("{:?} === {}", result.0, result.1);
