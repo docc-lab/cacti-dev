@@ -1198,7 +1198,7 @@ fn main() {
         println!();
         println!();
 
-        let mut results = Vec::new();
+        results = Vec::new();
 
         for feature in &backtrace_features {
             let dists = feature_occupancy_dists.get(feature).unwrap();
@@ -1225,10 +1225,10 @@ fn main() {
         println!();
         println!();
 
-        let mut results = Vec::new();
+        results = Vec::new();
         for feature in &backtrace_features {
             let dists = feature_correlations.get(feature).unwrap();
-            
+
             let mut pcc_num = 0i128;
             // for (_, ed, rt) in &dists.1 {
             let mut i = 0;
@@ -1265,6 +1265,54 @@ fn main() {
         println!();
         println!();
         println!("RESULTS (CORRELATION):");
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        for result in results {
+            println!("{:?} === {}", result.0, result.1);
+        }
+        println!("++++++++++++++++++++++++++++++++++++++++");
+        println!();
+        println!();
+        println!();
+        println!();
+
+        results = Vec::new();
+        for feature in &backtrace_features {
+            let dists = feature_correlations.get(feature).unwrap();
+
+            let mut pcc_num = 0i128;
+            // for (_, ed, rt) in &dists.1 {
+            let mut i = 0;
+            let lat_mean = mean(dists.1.clone().into_iter());
+            let occ_mean = mean(dists.0.clone().into_iter());
+            loop {
+                if i == dists.1.len() {
+                    break;
+                }
+
+                let lat = dists.1[i];
+                let occ = dists.0[i];
+
+                pcc_num += (lat as i128 - lat_mean as i128)*(occ as i128 - occ_mean as i128);
+
+                i += 1;
+            }
+
+            let cov = (pcc_num as f64)/
+                ((dists.1.len() as f64));
+
+            results.push((feature.clone(), cov));
+        }
+
+        results.sort_by(|a, b| {
+            b.1.partial_cmp(&a.1).unwrap()
+        });
+
+        println!();
+        println!();
+        println!();
+        println!();
+        println!();
+        println!("RESULTS (COVARIANCE):");
         println!("++++++++++++++++++++++++++++++++++++++++");
         for result in results {
             println!("{:?} === {}", result.0, result.1);
