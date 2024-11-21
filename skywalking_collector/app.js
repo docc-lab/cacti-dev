@@ -60,7 +60,7 @@ app.post('/spanquery', (req, res) => {
         timeout: 180000,
     }).then((resp) => {
         // console.log(resp);
-        console.log(resp.data);
+        // console.log(resp.data);
 
         res.status(200).json({
             success: true,
@@ -134,13 +134,13 @@ app.post('/traces', (req, res) => {
         return toReturn;
     }
 
-    console.log(queryBuilder());
-    console.log(variableBuilder());
-
-    console.log(JSON.stringify({
-        query: queryBuilder(),
-        variables: variableBuilder(),
-    }));
+    // console.log(queryBuilder());
+    // console.log(variableBuilder());
+    //
+    // console.log(JSON.stringify({
+    //     query: queryBuilder(),
+    //     variables: variableBuilder(),
+    // }));
 
     axios.post(`http://localhost:${process.env.SKYWALKING_PORT}/graphql`, {
         query: queryBuilder(),
@@ -151,7 +151,7 @@ app.post('/traces', (req, res) => {
         },
         timeout: 120000,
     }).then((resp) => {
-        console.log(resp.data);
+        // console.log(resp.data);
 
         const { data } = resp.data;
 
