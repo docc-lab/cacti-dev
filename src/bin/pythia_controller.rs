@@ -1187,7 +1187,7 @@ fn main() {
         println!();
         println!();
         println!();
-        println!("RESULTS (VICTIM MEAN):");
+        println!("RESULTS (MEAN DIFF):");
         println!("++++++++++++++++++++++++++++++++++++++++");
         for result in results {
             println!("{:?} === {}", result.0, result.1);
@@ -1214,7 +1214,7 @@ fn main() {
         println!();
         println!();
         println!();
-        println!("RESULTS (MEAN DIFF):");
+        println!("RESULTS (VICTIM MEAN):");
         println!("++++++++++++++++++++++++++++++++++++++++");
         for result in results {
             println!("{:?} === {}", result.0, result.1);
