@@ -281,7 +281,7 @@ impl Reader for SWReader {
         let mut start_time_iter = end_time - Duration::from_secs(30);
         let mut end_time_iter = end_time;
 
-        let mut to_break = false;
+        let mut next_page = true;
         loop {
             println!("SpanQuery Retrieval Loop #{}", page_num);
 
@@ -311,22 +311,21 @@ impl Reader for SWReader {
             //     to_break = true;
             // }
             if trace_ids.len() == 0 {
-                to_break = true;
+                next_page = false;
             }
 
             all_trace_ids.append(&mut trace_ids);
 
-            if to_break {
+            if next_page {
+                page_num += 1;
+            } else {
                 if start_time_iter == start_time {
                     break;
                 } else {
                     start_time_iter = start_time_iter - Duration::from_secs(30);
                     end_time_iter = end_time_iter - Duration::from_secs(30);
-                    page_num = 1;
                 }
             }
-
-            page_num += 1;
         }
 
         let mut trace_ids_set = HashSet::new();
