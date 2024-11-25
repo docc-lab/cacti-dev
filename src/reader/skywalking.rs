@@ -278,6 +278,8 @@ impl Reader for SWReader {
         let mut all_trace_ids: Vec<String> = Vec::new();
 
         let mut page_num = 1u64;
+        let mut start_time_iter = end_time - Duration::from_secs(30);
+        let mut end_time_iter = end_time;
 
         let mut to_break = false;
         loop {
@@ -285,16 +287,16 @@ impl Reader for SWReader {
 
             resp = client.post("http://localhost:3000/spanquery")
                 .json(&SpanQueryFormatReq{
-                    start_year: start_time.naive_local().year(),
-                    start_month: fmt_two_digit(start_time.naive_local().month()),
-                    start_day: fmt_two_digit(start_time.naive_local().day()),
-                    start_hour: fmt_two_digit(start_time.naive_local().hour()),
-                    start_minute: fmt_two_digit(start_time.naive_local().minute()),
-                    end_year: end_time.naive_local().year(),
-                    end_month: fmt_two_digit(end_time.naive_local().month()),
-                    end_day: fmt_two_digit(end_time.naive_local().day()),
-                    end_hour: fmt_two_digit(end_time.naive_local().hour()),
-                    end_minute: fmt_two_digit(end_time.naive_local().minute()),
+                    start_year: start_time_iter.naive_local().year(),
+                    start_month: fmt_two_digit(start_time_iter.naive_local().month()),
+                    start_day: fmt_two_digit(start_time_iter.naive_local().day()),
+                    start_hour: fmt_two_digit(start_time_iter.naive_local().hour()),
+                    start_minute: fmt_two_digit(start_time_iter.naive_local().minute()),
+                    end_year: end_time_iter.naive_local().year(),
+                    end_month: fmt_two_digit(end_time_iter.naive_local().month()),
+                    end_day: fmt_two_digit(end_time_iter.naive_local().day()),
+                    end_hour: fmt_two_digit(end_time_iter.naive_local().hour()),
+                    end_minute: fmt_two_digit(end_time_iter.naive_local().minute()),
                     page_num,
                 }).send().unwrap();
 
@@ -315,7 +317,12 @@ impl Reader for SWReader {
             all_trace_ids.append(&mut trace_ids);
 
             if to_break {
-                break;
+                if start_time_iter == start_time {
+                    break;
+                } else {
+                    start_time_iter = start_time_iter - Duration::from_secs(30);
+                    end_time_iter = end_time_iter - Duration::from_secs(30);
+                }
             }
 
             page_num += 1;
