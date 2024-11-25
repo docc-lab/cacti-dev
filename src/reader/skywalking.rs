@@ -326,6 +326,7 @@ impl Reader for SWReader {
                 } else {
                     start_time_iter = start_time_iter - Duration::from_secs(30);
                     end_time_iter = end_time_iter - Duration::from_secs(30);
+                    page_num = 1;
                 }
             }
         }
