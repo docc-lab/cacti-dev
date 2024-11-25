@@ -582,8 +582,8 @@ impl CriticalPath {
     }
 
     pub fn get_by_tracepoints(&self, start: TracepointID, end: TracepointID) -> Option<(Event, Event, DAGEdge)> {
-        println!("get_by_tracepoints - {{\nstart: {},\nend: {}\n}}", start, end);
-        println!("get_by_tracepoints - request_id = {}", self.request_id);
+        //println!("get_by_tracepoints - {{\nstart: {},\nend: {}\n}}", start, end);
+        //println!("get_by_tracepoints - request_id = {}", self.request_id);
         
         let mut start_nidx = self.start_node;
         let mut end_nidx = self.end_node;

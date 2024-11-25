@@ -573,7 +573,7 @@ fn main() {
                 
                 lats_sorted.sort_by(|a, b| b.partial_cmp(a).unwrap());
 
-                println!("ls0 = {}; sgm = {}", lats_sorted[0], self.get_median());
+                // println!("ls0 = {}; sgm = {}", lats_sorted[0], self.get_median());
                 
                 lats_sorted[0] - self.get_median()
             }
@@ -748,7 +748,7 @@ fn main() {
         latencies_sorted.sort_by(|a, b| {
             a.1.partial_cmp(&b.1).unwrap()
         });
-        println!("{:?}", latencies_sorted);
+        // println!("{:?}", latencies_sorted);
 
         println!();
         println!();
@@ -767,7 +767,7 @@ fn main() {
         latencies_sorted.sort_by(|a, b| {
             a.1.partial_cmp(&b.1).unwrap()
         });
-        println!("{:?}", latencies_sorted);
+        // println!("{:?}", latencies_sorted);
 
         println!();
         println!();
@@ -834,7 +834,7 @@ fn main() {
         latencies_sorted.sort_by(|a, b| {
             a.1.partial_cmp(&b.1).unwrap()
         });
-        println!("{:?}", latencies_sorted);
+        // println!("{:?}", latencies_sorted);
         println!();
         println!();
         println!();
@@ -852,7 +852,7 @@ fn main() {
         latencies_sorted.sort_by(|a, b| {
             a.1.partial_cmp(&b.1).unwrap()
         });
-        println!("{:?}", latencies_sorted);
+        // println!("{:?}", latencies_sorted);
         println!();
         println!();
         println!();
