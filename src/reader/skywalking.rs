@@ -282,8 +282,10 @@ impl Reader for SWReader {
         let mut end_time_iter = end_time;
 
         let mut next_page = true;
+        let mut print_iter = 1;
         loop {
-            println!("SpanQuery Retrieval Loop #{}", page_num);
+            println!("SpanQuery Retrieval Loop #{}", print_iter);
+            print_iter += 1;
 
             resp = client.post("http://localhost:3000/spanquery")
                 .json(&SpanQueryFormatReq{
