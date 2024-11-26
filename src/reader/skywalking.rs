@@ -278,7 +278,7 @@ impl Reader for SWReader {
         let mut all_trace_ids: Vec<String> = Vec::new();
 
         let mut page_num = 1u64;
-        let mut start_time_iter = end_time - Duration::from_secs(30);
+        let mut start_time_iter = end_time - Duration::from_secs(10);
         let mut end_time_iter = end_time;
 
         let mut next_page = true;
@@ -324,8 +324,8 @@ impl Reader for SWReader {
                 if start_time_iter == start_time {
                     break;
                 } else {
-                    start_time_iter = start_time_iter - Duration::from_secs(30);
-                    end_time_iter = end_time_iter - Duration::from_secs(30);
+                    start_time_iter = start_time_iter - Duration::from_secs(10);
+                    end_time_iter = end_time_iter - Duration::from_secs(10);
                     page_num = 1;
                 }
             }
