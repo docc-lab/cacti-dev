@@ -32,15 +32,15 @@ pub struct Feature {
     pub value: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
-pub struct Feature2 {
-    pub parent_service: String,
-    pub parent_operation: String,
-    pub parent_kv: HashMap<String, String>,
-    pub child_service: String,
-    pub child_operation: String,
-    pub child_kv: HashMap<String, String>,
-}
+// #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+// pub struct Feature2 {
+//     pub parent_service: String,
+//     pub parent_operation: String,
+//     pub parent_kv: HashMap<String, String>,
+//     pub child_service: String,
+//     pub child_operation: String,
+//     pub child_kv: HashMap<String, String>,
+// }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Span {
