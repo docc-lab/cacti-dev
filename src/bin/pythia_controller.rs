@@ -979,6 +979,8 @@ fn main() {
                         te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
                         edge.host.unwrap()
                     );
+                    
+                    println!("CP Hash = {}", cp.hash());
 
                     cp_hhe_lats.insert(
                         cp.hash().to_string(),
