@@ -981,6 +981,8 @@ fn main() {
                     );
                     
                     println!("CP Hash = {}", cp.hash());
+                    println!("TEnd = {}", te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64);
+                    println!("TStart = {}", ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64);
 
                     cp_hhe_lats.insert(
                         cp.hash().to_string(),
