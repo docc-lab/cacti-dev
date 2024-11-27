@@ -928,7 +928,7 @@ fn main() {
 
             // if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
             // if hhe_start_pcc.contains("ts-route-service") || hhe_end_pcc.contains("ts-route-service") {
-            if hhe_start_pcc.contains("ts-seat-service") || hhe_end_pcc.contains("ts-seat-service") {
+            if hhe_start_pcc.contains("ts-price-service") || hhe_end_pcc.contains("ts-price-service") {
                 break;
             }
 
@@ -946,7 +946,7 @@ fn main() {
 
             // if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
             // if hhe_start_cov.contains("ts-route-service") || hhe_end_cov.contains("ts-route-service") {
-            if hhe_start_cov.contains("ts-seat-service") || hhe_end_cov.contains("ts-seat-service") {
+            if hhe_start_cov.contains("ts-price-service") || hhe_end_cov.contains("ts-price-service") {
                 break;
             }
 
@@ -975,7 +975,7 @@ fn main() {
 
             // if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
             // if hhe_start_diff.contains("ts-route-service") || hhe_end_diff.contains("ts-route-service") {
-            if hhe_start_diff.contains("ts-seat-service") || hhe_end_diff.contains("ts-seat-service") {
+            if hhe_start_diff.contains("ts-price-service") || hhe_end_diff.contains("ts-price-service") {
                 break;
             }
 
@@ -993,7 +993,7 @@ fn main() {
 
             // if hhe_start_vs.contains("ts-order-service") && hhe_end_vs.contains("ts-order-service") {
             // if hhe_start_vs.contains("ts-route-service") || hhe_end_vs.contains("ts-route-service") {
-            if hhe_start_vs.contains("ts-seat-service") || hhe_end_vs.contains("ts-seat-service") {
+            if hhe_start_vs.contains("ts-price-service") || hhe_end_vs.contains("ts-price-service") {
                 break;
             }
 
