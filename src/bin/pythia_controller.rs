@@ -743,6 +743,24 @@ fn main() {
         println!();
         println!();
         println!("HHE (PCC) = ({}, {})", hhe_start_pcc, hhe_end_pcc);
+        println!();
+        println!("HHE List (PCC) = [");
+        let mut hhe_pcc_ctr = 0;
+        loop {
+            if hhe_pcc_ctr >= eg_pcc_sorted.len() {
+                break;
+            }
+
+            let pcc_parts = eg_pcc_sorted[hhe_pcc_ctr].0.split("::").collect::<Vec<&str>>();
+            let (pcc_start, pcc_end) = (pcc_parts[0].to_string(), pcc_parts[1].to_string());
+
+            println!("HHE (PCC) Pos {} = ({}, {})", hhe_pcc_ctr, pcc_start, pcc_end);
+
+            hhe_pcc_ctr += 1;
+        }
+        println!("]");
+        println!();
+        println!();
 
         let mut latencies_sorted = eg_pcc_sorted[0].1.latencies.clone();
         latencies_sorted.sort_by(|a, b| {
@@ -762,6 +780,24 @@ fn main() {
         println!();
         println!();
         println!("HHE (Cov) = ({}, {})", hhe_start_cov, hhe_end_cov);
+        println!();
+        println!("HHE List (Cov) = [");
+        let mut hhe_cov_ctr = 0;
+        loop {
+            if hhe_cov_ctr >= eg_cov_sorted.len() {
+                break;
+            }
+
+            let cov_parts = eg_cov_sorted[hhe_cov_ctr].0.split("::").collect::<Vec<&str>>();
+            let (cov_start, cov_end) = (cov_parts[0].to_string(), cov_parts[1].to_string());
+
+            println!("HHE (Cov) Pos {} = ({}, {})", hhe_cov_ctr, cov_start, cov_end);
+
+            hhe_cov_ctr += 1;
+        }
+        println!("]");
+        println!();
+        println!();
 
         latencies_sorted = eg_cov_sorted[0].1.latencies.clone();
         latencies_sorted.sort_by(|a, b| {
@@ -826,7 +862,7 @@ fn main() {
 
             hhe_diff_ctr += 1;
         }
-        println!("HHE List (Diff) = [");
+        println!("]");
         println!();
         println!();
 
@@ -847,6 +883,24 @@ fn main() {
         println!();
         println!();
         println!("HHE (V/S) = ({}, {})", hhe_start_vs, hhe_end_vs);
+        println!();
+        println!("HHE List (V/S) = [");
+        let mut hhe_vs_ctr = 0;
+        loop {
+            if hhe_vs_ctr >= eg_vs_sorted.len() {
+                break;
+            }
+
+            let vs_parts = eg_vs_sorted[hhe_vs_ctr].0.split("::").collect::<Vec<&str>>();
+            let (vs_start, vs_end) = (vs_parts[0].to_string(), vs_parts[1].to_string());
+
+            println!("HHE (V/S) Pos {} = ({}, {})", hhe_vs_ctr, vs_start, vs_end);
+
+            hhe_vs_ctr += 1;
+        }
+        println!("]");
+        println!();
+        println!();
 
         let mut latencies_sorted = eg_vs_sorted[0].1.latencies.clone();
         latencies_sorted.sort_by(|a, b| {
@@ -873,7 +927,8 @@ fn main() {
             let (hhe_start_pcc, hhe_end_pcc) = (hhe_parts_pcc[0].to_string(), hhe_parts_pcc[1].to_string());
 
             // if hhe_start_pcc.contains("ts-order-service") && hhe_end_pcc.contains("ts-order-service") {
-            if hhe_start_pcc.contains("ts-route-service") || hhe_end_pcc.contains("ts-route-service") {
+            // if hhe_start_pcc.contains("ts-route-service") || hhe_end_pcc.contains("ts-route-service") {
+            if hhe_start_pcc.contains("ts-seat-service") || hhe_end_pcc.contains("ts-seat-service") {
                 break;
             }
 
@@ -890,7 +945,8 @@ fn main() {
             let (hhe_start_cov, hhe_end_cov) = (hhe_parts_cov[0].to_string(), hhe_parts_cov[1].to_string());
 
             // if hhe_start_cov.contains("ts-order-service") && hhe_end_cov.contains("ts-order-service") {
-            if hhe_start_cov.contains("ts-route-service") || hhe_end_cov.contains("ts-route-service") {
+            // if hhe_start_cov.contains("ts-route-service") || hhe_end_cov.contains("ts-route-service") {
+            if hhe_start_cov.contains("ts-seat-service") || hhe_end_cov.contains("ts-seat-service") {
                 break;
             }
 
@@ -918,7 +974,8 @@ fn main() {
             let (hhe_start_diff, hhe_end_diff) = (hhe_parts_diff[0].to_string(), hhe_parts_diff[1].to_string());
 
             // if hhe_start_diff.contains("ts-order-service") && hhe_end_diff.contains("ts-order-service") {
-            if hhe_start_diff.contains("ts-route-service") || hhe_end_diff.contains("ts-route-service") {
+            // if hhe_start_diff.contains("ts-route-service") || hhe_end_diff.contains("ts-route-service") {
+            if hhe_start_diff.contains("ts-seat-service") || hhe_end_diff.contains("ts-seat-service") {
                 break;
             }
 
@@ -935,7 +992,8 @@ fn main() {
             let (hhe_start_vs, hhe_end_vs) = (hhe_parts_vs[0].to_string(), hhe_parts_vs[1].to_string());
 
             // if hhe_start_vs.contains("ts-order-service") && hhe_end_vs.contains("ts-order-service") {
-            if hhe_start_vs.contains("ts-route-service") || hhe_end_vs.contains("ts-route-service") {
+            // if hhe_start_vs.contains("ts-route-service") || hhe_end_vs.contains("ts-route-service") {
+            if hhe_start_vs.contains("ts-seat-service") || hhe_end_vs.contains("ts-seat-service") {
                 break;
             }
 
