@@ -66,8 +66,10 @@ struct SWPayload {
 
 impl SWSpan {
     pub fn to_span(&self) -> Span {
-        println!("SPAN ID = {}.{}", self.segmentId, self.spanId);
-        return Span{
+        // TODO: Re-enable this to log all SkyWalking span IDs
+        // println!("SPAN ID = {}.{}", self.segmentId, self.spanId);
+        
+        Span{
             span_id: format!("{}.{}", self.segmentId, self.spanId),
             parent: match self.refs.len() {
                 0 => match self.parentSpanId {

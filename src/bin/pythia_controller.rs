@@ -390,10 +390,11 @@ fn main() {
             // println!("INSERTING TRACE: [[{:?}]]", tr.clone());
             // println!();
 
-            println!("TRACE TYPE = {}", RequestType::from_str(
-                tr.endpoint_type.as_str(),
-                SETTINGS.application.as_str()
-            ).unwrap());
+            // TODO: Re-Enable this to log trace types for all requests
+            // println!("TRACE TYPE = {}", RequestType::from_str(
+            //     tr.endpoint_type.as_str(),
+            //     SETTINGS.application.as_str()
+            // ).unwrap());
 
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
@@ -1037,7 +1038,7 @@ fn main() {
                         te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64,
                         edge.host.unwrap()
                     );
-                    
+
                     // println!("CP Hash = {}", cp.hash());
                     // println!("TEnd = {}", te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64);
                     // println!("TStart = {}", ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64);
@@ -1046,7 +1047,7 @@ fn main() {
                     //     cp.hash().to_string(),
                     //     te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64 - ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64
                     // );
-                    
+
                     // If difference between start and end is somehow negative, make it zero
                     let te_time = te.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64;
                     let ts_time = ts.timestamp.and_utc().timestamp_nanos_opt().unwrap() as u64;
