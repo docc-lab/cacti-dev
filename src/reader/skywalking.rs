@@ -249,7 +249,7 @@ impl Reader for SWReader {
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
         // let start_time = cur_date - Duration::from_secs(60*20);
-        let start_time = cur_date - Duration::from_secs(60*15);
+        let start_time = cur_date - Duration::from_secs(60*10);
         // let end_time = cur_date + Duration::from_secs(60*20);
         // let end_time = cur_date + Duration::from_secs(60*60*24);
         let end_time = cur_date;
@@ -450,7 +450,8 @@ impl Reader for SWReader {
                 self.span_cache.add_span(span.clone(), trace_id.clone());
             }
             
-            println!("skywalking.rs - get_recent_span_traces - root_span.operation = {}", root_span.operation);
+            // TODO: Re-enable this to gain more information
+            // println!("skywalking.rs - get_recent_span_traces - root_span.operation = {}", root_span.operation);
 
             to_return.push(
                 SpanTrace::from_span_list(
