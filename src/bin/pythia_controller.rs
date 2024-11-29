@@ -576,7 +576,7 @@ fn main() {
 
                 // println!("ls0 = {}; sgm = {}", lats_sorted[0], self.get_median());
                 
-                lats_sorted[0] - self.get_median()
+                lats_sorted[((lats_sorted.len() as f64)*0.01) as usize] - self.get_median()
             }
         }
 
