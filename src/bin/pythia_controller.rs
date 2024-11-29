@@ -755,7 +755,7 @@ fn main() {
             let pcc_parts = eg_pcc_sorted[hhe_pcc_ctr].0.split("::").collect::<Vec<&str>>();
             let (pcc_start, pcc_end) = (pcc_parts[0].to_string(), pcc_parts[1].to_string());
 
-            println!("HHE (PCC) Pos {} = ({}, {})", hhe_pcc_ctr, pcc_start, pcc_end);
+            println!("HHE (PCC) Pos {} = ({}, {}) --- Score = [ {} ]", hhe_pcc_ctr, pcc_start, pcc_end, eg_pcc_sorted[hhe_pcc_ctr].1.pcc);
 
             hhe_pcc_ctr += 1;
         }
@@ -792,7 +792,7 @@ fn main() {
             let cov_parts = eg_cov_sorted[hhe_cov_ctr].0.split("::").collect::<Vec<&str>>();
             let (cov_start, cov_end) = (cov_parts[0].to_string(), cov_parts[1].to_string());
 
-            println!("HHE (Cov) Pos {} = ({}, {})", hhe_cov_ctr, cov_start, cov_end);
+            println!("HHE (Cov) Pos {} = ({}, {}) --- Score = [ {} ]", hhe_cov_ctr, cov_start, cov_end, eg_cov_sorted[hhe_cov_ctr].1.cov);
 
             hhe_cov_ctr += 1;
         }
@@ -859,7 +859,7 @@ fn main() {
             let diff_parts = eg_diff_sorted[hhe_diff_ctr].0.split("::").collect::<Vec<&str>>();
             let (diff_start, diff_end) = (diff_parts[0].to_string(), diff_parts[1].to_string());
 
-            println!("HHE (Diff) Pos {} = ({}, {})", hhe_diff_ctr-hhe_index, diff_start, diff_end);
+            println!("HHE (Diff) Pos {} = ({}, {}) --- Score = [ {} ]", hhe_diff_ctr-hhe_index, diff_start, diff_end, eg_diff_sorted[hhe_diff_ctr].1.slow_med_diff());
 
             hhe_diff_ctr += 1;
         }
@@ -895,7 +895,7 @@ fn main() {
             let vs_parts = eg_vs_sorted[hhe_vs_ctr].0.split("::").collect::<Vec<&str>>();
             let (vs_start, vs_end) = (vs_parts[0].to_string(), vs_parts[1].to_string());
 
-            println!("HHE (V/S) Pos {} = ({}, {})", hhe_vs_ctr, vs_start, vs_end);
+            println!("HHE (V/S) Pos {} = ({}, {}) --- Score = [ {} ]", hhe_vs_ctr, vs_start, vs_end, eg_vs_sorted[hhe_vs_ctr].1.vs_diff);
 
             hhe_vs_ctr += 1;
         }
