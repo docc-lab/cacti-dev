@@ -41,7 +41,7 @@ use pythia::manifest::Manifest;
 use pythia::reader::reader_from_settings;
 use pythia::search::get_strategy;
 use pythia::settings::{ApplicationType, Settings};
-use pythia::spantrace::{Feature, Span, SpanTrace};
+use pythia::spantrace::{Feature, Feature2, Span, SpanTrace};
 use pythia::trace::{DAGEdge, Event, IDType, Trace, TraceNode, TracepointID};
 
 // // use keccak_hash::keccak256;
@@ -1109,8 +1109,45 @@ fn main() {
         let survivor_hashes = survivor_crits.into_iter()
             .map(|cp| cp.hash().to_string()).collect::<Vec<String>>();
 
+        // // "backtraces" maps from trace ID to a set of backtraces
+        // let mut backtraces: HashMap<String, Vec<Vec<Span>>> = HashMap::new();
+        // // "k" is a CP hash; "v" is a vector of (traceID, spanID) pairs
+        // for (k, v) in all_overlaps {
+        //     for o in v {
+        //         // Get problem trace based on overlap's trace ID
+        //         let overlapping_trace = non_problem_traces
+        //             .get(o.0.as_str()).unwrap();
+        // 
+        //         //** If there is a backtrace list corresponding to "k", add a backtrace
+        //         //** to it, otherwise create the list
+        //         // match backtraces.get_mut(o.0.as_str()) {
+        //         match backtraces.get_mut(k.as_str()) {
+        //             Some(v) => {
+        //                 v.push(overlapping_trace.get_backtrace(o.1))
+        //             }
+        //             None => {
+        //                 backtraces.insert(k.clone(), vec![overlapping_trace.get_backtrace(o.1)]);
+        //             }
+        //         }
+        //     }
+        // }
+        // 
+        // let mut backtrace_features = HashSet::new();
+        // for (_, v) in backtraces.clone().into_iter() {
+        //     for backtrace in v {
+        //         for span in backtrace {
+        //             let features = span.get_features();
+        //             for feature in features {
+        //                 backtrace_features.insert(feature);
+        //             }
+        //         }
+        //     }
+        // }
+
         // "backtraces" maps from trace ID to a set of backtraces
-        let mut backtraces: HashMap<String, Vec<Vec<Span>>> = HashMap::new();
+        // let mut backtraces: HashMap<String, Vec<Vec<Span>>> = HashMap::new();
+        let mut backtraces: HashMap<String, Vec<Vec<Feature2>>> = HashMap::new();
+        let mut backtrace_features = HashSet::new();
         // "k" is a CP hash; "v" is a vector of (traceID, spanID) pairs
         for (k, v) in all_overlaps {
             for o in v {
@@ -1121,28 +1158,34 @@ fn main() {
                 //** If there is a backtrace list corresponding to "k", add a backtrace
                 //** to it, otherwise create the list
                 // match backtraces.get_mut(o.0.as_str()) {
+                
+                let ot_bf2 = overlapping_trace.backtrace_features_2(o.1);
+                
                 match backtraces.get_mut(k.as_str()) {
                     Some(v) => {
-                        v.push(overlapping_trace.get_backtrace(o.1))
+                        v.push(ot_bf2.clone())
                     }
                     None => {
-                        backtraces.insert(k.clone(), vec![overlapping_trace.get_backtrace(o.1)]);
+                        backtraces.insert(k.clone(), vec![ot_bf2.clone()]);
                     }
+                }
+                
+                for bf in &ot_bf2 {
+                    backtrace_features.insert(bf.clone());
                 }
             }
         }
-
-        let mut backtrace_features = HashSet::new();
-        for (_, v) in backtraces.clone().into_iter() {
-            for backtrace in v {
-                for span in backtrace {
-                    let features = span.get_features();
-                    for feature in features {
-                        backtrace_features.insert(feature);
-                    }
-                }
-            }
-        }
+        
+        // for (_, v) in backtraces.clone().into_iter() {
+        //     for backtrace in v {
+        //         for span in backtrace {
+        //             let features = span.get_features();
+        //             for feature in features {
+        //                 backtrace_features.insert(feature);
+        //             }
+        //         }
+        //     }
+        // }
 
         println!();
         println!();
@@ -1154,8 +1197,10 @@ fn main() {
         println!();
         println!();
 
-        let mut feature_occupancy_dists: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
-        let mut feature_correlations: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
+        // let mut feature_occupancy_dists: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
+        let mut feature_occupancy_dists: HashMap<Feature2, (Vec<u64>, Vec<u64>)> = HashMap::new();
+        // let mut feature_correlations: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
+        let mut feature_correlations: HashMap<Feature2, (Vec<u64>, Vec<u64>)> = HashMap::new();
 
         for feature in &backtrace_features {
             let mut victim_occupancy_counts = Vec::new();
@@ -1164,51 +1209,60 @@ fn main() {
 
             for vh in &victim_hashes {
                 let mut occurrences = 0u64;
-                // for backtrace in backtraces.get(vh.as_str()).unwrap() {
-                //     // let mut to_break = false;
-                //     for span in backtrace {
-                //         if span.has_feature(feature.clone()) {
-                //             occurrences += 1;
-                //             break;
+
+                // match backtraces.get(vh.as_str()) {
+                //     Some(bts) => {
+                //         for backtrace in bts {
+                //             for span in backtrace {
+                //                 if span.has_feature(feature.clone()) {
+                //                     occurrences += 1;
+                //                     break;
+                //                 }
+                //             }
                 //         }
-                //     }
+                //     },
+                //     _ => {}
                 // }
+
                 match backtraces.get(vh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
-                            for span in backtrace {
-                                if span.has_feature(feature.clone()) {
-                                    occurrences += 1;
-                                    break;
-                                }
+                            if backtrace.contains(feature) {
+                                occurrences += 1;
+                                break;
                             }
                         }
                     },
                     _ => {}
                 }
+                
                 victim_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
             }
 
             for sh in &survivor_hashes {
                 let mut occurrences = 0u64;
-                // for backtrace in backtraces.get(sh.as_str()).unwrap() {
-                //     // let mut to_break = false;
-                //     for span in backtrace {
-                //         if span.has_feature(feature.clone()) {
-                //             occurrences += 1;
-                //             break;
+
+                // match backtraces.get(sh.as_str()) {
+                //     Some(bts) => {
+                //         for backtrace in bts {
+                //             for span in backtrace {
+                //                 if span.has_feature(feature.clone()) {
+                //                     occurrences += 1;
+                //                     break;
+                //                 }
+                //             }
                 //         }
-                //     }
+                //     },
+                //     _ => {}
                 // }
+
                 match backtraces.get(sh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
-                            for span in backtrace {
-                                if span.has_feature(feature.clone()) {
-                                    occurrences += 1;
-                                    break;
-                                }
+                            if backtrace.contains(feature) {
+                                occurrences += 1;
+                                break;
                             }
                         }
                     },
