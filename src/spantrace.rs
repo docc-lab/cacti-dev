@@ -32,15 +32,15 @@ pub struct Feature {
     pub value: String,
 }
 
-// #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
-// pub struct Feature2 {
-//     pub parent_service: String,
-//     pub parent_operation: String,
-//     pub parent_kv: HashMap<String, String>,
-//     pub child_service: String,
-//     pub child_operation: String,
-//     pub child_kv: HashMap<String, String>,
-// }
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+pub struct Feature2 {
+    pub parent_service: String,
+    pub parent_operation: String,
+    // pub parent_kv: HashMap<String, String>,
+    pub child_service: String,
+    pub child_operation: String,
+    // pub child_kv: HashMap<String, String>,
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Span {
@@ -364,6 +364,50 @@ impl SpanTrace {
         self.get_backtrace(from).into_iter()
             .map(|s| s.get_features()).collect::<Vec<Vec<Feature>>>()
             .into_iter().flatten().collect()
+    }
+
+    pub fn backtrace_features_2(&self, from: String) -> Vec<Feature2> {
+        let mut to_return = Vec::new();
+        let mut cur_id = from;
+        loop {
+            // let cur_span = self.spans.get(cur_id.as_str()).unwrap();
+            let cur_span = match self.spans.get(cur_id.as_str()) { 
+                Some(s) => s,
+                _ => {
+                    break;
+                    // panic!("Couldn't find span with ID [[ {} ]]", cur_id);
+                }
+            };
+            let cur_parent = cur_span.parent.clone();
+            cur_id = cur_parent;
+
+            if cur_id.is_empty() {
+                to_return.push(Feature2{
+                    parent_service: "".to_string(),
+                    parent_operation: "".to_string(),
+                    child_service: cur_span.service.clone(),
+                    child_operation: cur_span.operation.clone()
+                });
+
+                break;
+            } else {
+                let parent_span = match self.spans.get(cur_id.as_str()) { 
+                    Some(s) => s,
+                    _ => {
+                        break;
+                        // panic!("Couldn't find span with ID [[ {} ]]", cur_id);
+                    }
+                };
+
+                to_return.push(Feature2{
+                    parent_service: parent_span.service.clone(),
+                    parent_operation: parent_span.operation.clone(),
+                    child_service: cur_span.service.clone(),
+                    child_operation: cur_span.operation.clone()
+                });
+            }
+        }
+        return to_return;
     }
 }
 
