@@ -1202,12 +1202,20 @@ fn main() {
         // let mut feature_correlations: HashMap<Feature, (Vec<u64>, Vec<u64>)> = HashMap::new();
         let mut feature_correlations: HashMap<Feature2, (Vec<u64>, Vec<u64>)> = HashMap::new();
 
+        let total_problem_count = victim_hashes.len() + survivor_hashes.len();
+
         for feature in &backtrace_features {
+            println!();
+            println!("Starting analysis for:\n{:?}", feature);
+            println!();
             let mut victim_occupancy_counts = Vec::new();
             let mut survivor_occupancy_counts = Vec::new();
             let mut hhe_latencies = Vec::new();
 
+            let mut counter = 1;
             for vh in &victim_hashes {
+                println!("{} of {}", counter, total_problem_count);
+
                 let mut occurrences = 0u64;
 
                 // match backtraces.get(vh.as_str()) {
@@ -1238,9 +1246,13 @@ fn main() {
                 
                 victim_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
+
+                counter += 1;
             }
 
             for sh in &survivor_hashes {
+                println!("{} of {}", counter, total_problem_count);
+
                 let mut occurrences = 0u64;
 
                 // match backtraces.get(sh.as_str()) {
@@ -1270,6 +1282,8 @@ fn main() {
                 }
                 survivor_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(sh.as_str()).unwrap().clone());
+
+                counter += 1;
             }
             
             feature_occupancy_dists.insert(
