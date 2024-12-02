@@ -179,6 +179,18 @@ app.post('/traces', (req, res) => {
                                     refs.push(newRef)
                                 }
                                 toPush['refs'] = refs;
+                            } else if (attr === 'peer') {
+                                if (span['peer'].includes(':')) {
+                                    const spanPeer = span['peer'].split(':')[0];
+                                    if (spanPeer.startsWith('ts-') && spanPeer.endsWith('-service')) {
+                                        toPush['serviceCode'] = spanPeer;
+                                        toPush['peer'] = span['peer'];
+                                    } else {
+                                        toPush['peer'] = spanPeer;
+                                    }
+                                } else {
+                                    toPush['peer'] = span['peer'];
+                                }
                             } else {
                                 toPush[attr] = span[attr];
                             }

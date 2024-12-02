@@ -391,10 +391,10 @@ fn main() {
             // println!();
 
             // TODO: Re-Enable this to log trace types for all requests
-            // println!("TRACE TYPE = {}", RequestType::from_str(
-            //     tr.endpoint_type.as_str(),
-            //     SETTINGS.application.as_str()
-            // ).unwrap());
+            println!("TRACE TYPE = {}", RequestType::from_str(
+                tr.endpoint_type.as_str(),
+                SETTINGS.application.as_str()
+            ).unwrap());
 
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
