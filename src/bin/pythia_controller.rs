@@ -1102,6 +1102,14 @@ fn main() {
             }
         }
 
+        println!();
+        println!();
+        for (cph, ov) in all_overlaps.clone() {
+            println!("CPH = {}   |||   # OL = {}", cph, ov.len());
+        }
+        println!();
+        println!();
+
         all_hhe_crits.sort_by(|a, b| {
             a.duration.partial_cmp(&b.duration).unwrap()
         });
