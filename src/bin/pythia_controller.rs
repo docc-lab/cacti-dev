@@ -385,6 +385,8 @@ fn main() {
         // let mut non_problem_traces = Vec::new();
         let mut non_problem_traces = HashMap::new();
 
+        println!();
+        println!();
         for tr in off_pl_traces {
             // println!();
             // println!("INSERTING TRACE: [[{:?}]]", tr.clone());
@@ -395,6 +397,8 @@ fn main() {
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
             ).unwrap());
+            println!("TRACE SPAN COUNT = {}}", tr.spans.len());
+            println!();
 
             if RequestType::from_str(
                 tr.endpoint_type.as_str(),
@@ -408,6 +412,8 @@ fn main() {
             // }
             non_problem_traces.insert(tr.req_id.clone(), tr);
         }
+        println!();
+        println!();
 
         let pt_traces = problem_type_traces.iter().map(
             |st| st.to_critical_path()).collect::<Vec<Trace>>();
