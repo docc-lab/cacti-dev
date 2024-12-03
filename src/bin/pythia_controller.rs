@@ -397,7 +397,7 @@ fn main() {
                 tr.endpoint_type.as_str(),
                 SETTINGS.application.as_str()
             ).unwrap());
-            println!("TRACE SPAN COUNT = {}}", tr.spans.len());
+            println!("TRACE SPAN COUNT = {}", tr.spans.len());
             println!();
 
             if RequestType::from_str(
