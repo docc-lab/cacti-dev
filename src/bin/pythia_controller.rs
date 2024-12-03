@@ -1189,6 +1189,14 @@ fn main() {
                 }
             }
         }
+
+        println!();
+        println!();
+        for (cph, bv) in backtraces.clone() {
+            println!("CPH = {}   |||   # Backtraces = {}", cph, bv.len());
+        }
+        println!();
+        println!();
         
         // for (_, v) in backtraces.clone().into_iter() {
         //     for backtrace in v {
