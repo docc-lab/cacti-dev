@@ -1071,7 +1071,7 @@ fn main() {
                     }
 
                     // TODO: Re-enable this to gain more info
-                    // println!("Num Overlaps = {}", overlaps.len());
+                    println!("Num Overlaps = {}", overlaps.len());
 
                     // println!("OVERLAPPING EDGES:");
                     for o in overlaps {
