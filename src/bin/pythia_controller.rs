@@ -1031,8 +1031,8 @@ fn main() {
 
         for cp in &pt_crits {
             let cp_edge = cp.get_by_tracepoints(
-                TracepointID::from_str(hhe_start_vs.as_str()), TracepointID::from_str(hhe_end_vs.as_str())
-                // TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
+                // TracepointID::from_str(hhe_start_vs.as_str()), TracepointID::from_str(hhe_end_vs.as_str())
+                TracepointID::from_str(hhe_start_diff.as_str()), TracepointID::from_str(hhe_end_diff.as_str())
                 // TracepointID::from_str(hhe_start_pcc.as_str()), TracepointID::from_str(hhe_end_pcc.as_str())
                 // TracepointID::from_str(hhe_start_cov.as_str()), TracepointID::from_str(hhe_end_cov.as_str())
             );

@@ -249,7 +249,7 @@ impl Reader for SWReader {
         // if self.fetch_all {
         let cur_date = chrono::Utc::now();
         // let start_time = cur_date - Duration::from_secs(60*20);
-        let start_time = cur_date - Duration::from_secs(60*10);
+        let start_time = cur_date - Duration::from_secs(60*25);
         // let end_time = cur_date + Duration::from_secs(60*20);
         // let end_time = cur_date + Duration::from_secs(60*60*24);
         let end_time = cur_date;
