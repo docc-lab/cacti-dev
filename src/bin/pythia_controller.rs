@@ -1228,6 +1228,15 @@ fn main() {
 
         for feature in &backtrace_features {
             println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
             println!("Starting analysis for:\n{:?}", feature);
             println!();
             let mut victim_occupancy_counts = Vec::new();
@@ -1266,6 +1275,9 @@ fn main() {
                 }
 
                 println!("{} of {}   (V)   |||    {} occurrences", counter, total_problem_count, occurrences);
+                println!();
+                println!();
+                println!();
                 
                 victim_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
@@ -1304,6 +1316,9 @@ fn main() {
                 }
 
                 println!("{} of {}   (S)   |||    {} occurrences", counter, total_problem_count, occurrences);
+                println!();
+                println!();
+                println!();
                 
                 survivor_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(sh.as_str()).unwrap().clone());
@@ -1319,6 +1334,17 @@ fn main() {
 
             feature_correlations.insert(
                 feature.clone(), (all_occupancies, hhe_latencies));
+
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
+            println!();
         }
 
         println!();
