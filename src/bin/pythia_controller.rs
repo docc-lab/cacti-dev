@@ -1255,6 +1255,7 @@ fn main() {
                 match backtraces.get(vh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
+                            println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
                                 break;
@@ -1292,6 +1293,7 @@ fn main() {
                 match backtraces.get(sh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
+                            println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
                                 break;
