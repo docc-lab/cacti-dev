@@ -1267,7 +1267,6 @@ fn main() {
                             println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
-                                break;
                             }
                         }
                     },
@@ -1308,7 +1307,6 @@ fn main() {
                             println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
-                                break;
                             }
                         }
                     },
