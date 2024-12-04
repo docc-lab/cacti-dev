@@ -1236,8 +1236,6 @@ fn main() {
 
             let mut counter = 1;
             for vh in &victim_hashes {
-                println!("{} of {}", counter, total_problem_count);
-
                 let mut occurrences = 0u64;
 
                 // match backtraces.get(vh.as_str()) {
@@ -1265,6 +1263,8 @@ fn main() {
                     },
                     _ => {}
                 }
+
+                println!("{} of {}   (V)   |||    {} occurrences", counter, total_problem_count, occurrences);
                 
                 victim_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
@@ -1273,8 +1273,6 @@ fn main() {
             }
 
             for sh in &survivor_hashes {
-                println!("{} of {}", counter, total_problem_count);
-
                 let mut occurrences = 0u64;
 
                 // match backtraces.get(sh.as_str()) {
@@ -1302,6 +1300,9 @@ fn main() {
                     },
                     _ => {}
                 }
+
+                println!("{} of {}   (S)   |||    {} occurrences", counter, total_problem_count, occurrences);
+                
                 survivor_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(sh.as_str()).unwrap().clone());
 
