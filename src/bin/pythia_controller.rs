@@ -1227,16 +1227,16 @@ fn main() {
         let total_problem_count = victim_hashes.len() + survivor_hashes.len();
 
         for feature in &backtrace_features {
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
             println!("Starting analysis for:\n{:?}", feature);
             println!();
             let mut victim_occupancy_counts = Vec::new();
@@ -1264,7 +1264,7 @@ fn main() {
                 match backtraces.get(vh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
-                            println!("{:?}", backtrace);
+                            // println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
                             }
@@ -1274,9 +1274,9 @@ fn main() {
                 }
 
                 println!("{} of {}   (V)   |||    {} occurrences", counter, total_problem_count, occurrences);
-                println!();
-                println!();
-                println!();
+                // println!();
+                // println!();
+                // println!();
                 
                 victim_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(vh.as_str()).unwrap().clone());
@@ -1304,7 +1304,7 @@ fn main() {
                 match backtraces.get(sh.as_str()) {
                     Some(bts) => {
                         for backtrace in bts {
-                            println!("{:?}", backtrace);
+                            // println!("{:?}", backtrace);
                             if backtrace.contains(feature) {
                                 occurrences += 1;
                             }
@@ -1314,9 +1314,9 @@ fn main() {
                 }
 
                 println!("{} of {}   (S)   |||    {} occurrences", counter, total_problem_count, occurrences);
-                println!();
-                println!();
-                println!();
+                // println!();
+                // println!();
+                // println!();
                 
                 survivor_occupancy_counts.push(occurrences);
                 hhe_latencies.push(cp_hhe_lats.get(sh.as_str()).unwrap().clone());
@@ -1333,16 +1333,16 @@ fn main() {
             feature_correlations.insert(
                 feature.clone(), (all_occupancies, hhe_latencies));
 
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
-            println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
+            // println!();
         }
 
         println!();
