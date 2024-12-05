@@ -883,7 +883,7 @@ fn main() {
         println!();
         println!();
 
-        println!("HHE Metric (V/S) = {}", eg_vs_sorted[0].1.pcc);
+        println!("HHE Metric (V/S) = {}", eg_vs_sorted[0].1.vs_diff);
         println!("HHE Winner Len (V/S) = {}", eg_vs_sorted[0].1.latencies.len());
         let hhe_parts_vs = eg_vs_sorted[0].0.split("::").collect::<Vec<&str>>();
         let (hhe_start_vs, hhe_end_vs) = (hhe_parts_vs[0].to_string(), hhe_parts_vs[1].to_string());
@@ -1102,13 +1102,13 @@ fn main() {
             }
         }
 
-        println!();
-        println!();
-        for (cph, ov) in all_overlaps.clone() {
-            println!("CPH = {}   |||   # OL = {}", cph, ov.len());
-        }
-        println!();
-        println!();
+        // println!();
+        // println!();
+        // for (cph, ov) in all_overlaps.clone() {
+        //     println!("CPH = {}   |||   # OL = {}", cph, ov.len());
+        // }
+        // println!();
+        // println!();
 
         all_hhe_crits.sort_by(|a, b| {
             a.duration.partial_cmp(&b.duration).unwrap()
@@ -1190,13 +1190,13 @@ fn main() {
             }
         }
 
-        println!();
-        println!();
-        for (cph, bv) in backtraces.clone() {
-            println!("CPH = {}   |||   # Backtraces = {}", cph, bv.len());
-        }
-        println!();
-        println!();
+        // println!();
+        // println!();
+        // for (cph, bv) in backtraces.clone() {
+        //     println!("CPH = {}   |||   # Backtraces = {}", cph, bv.len());
+        // }
+        // println!();
+        // println!();
         
         // for (_, v) in backtraces.clone().into_iter() {
         //     for backtrace in v {
@@ -1273,7 +1273,7 @@ fn main() {
                     _ => {}
                 }
 
-                println!("{} of {}   (V)   |||    {} occurrences", counter, total_problem_count, occurrences);
+                // println!("{} of {}   (V)   |||    {} occurrences", counter, total_problem_count, occurrences);
                 // println!();
                 // println!();
                 // println!();
@@ -1313,7 +1313,7 @@ fn main() {
                     _ => {}
                 }
 
-                println!("{} of {}   (S)   |||    {} occurrences", counter, total_problem_count, occurrences);
+                // println!("{} of {}   (S)   |||    {} occurrences", counter, total_problem_count, occurrences);
                 // println!();
                 // println!();
                 // println!();
